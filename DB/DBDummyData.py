@@ -14,6 +14,8 @@ def main():
     users_collection = db["users"]
     nests_collection = db["nests"]
 
+    createRideStats(db)
+
 def getAllFrom(collection):
     result = collection.find()
     print(type(result))
@@ -28,16 +30,20 @@ def getServiceAreaFromID(collection, id):
     item = collection.find_one({"_id": id})
     return item
 
-
 def getServiceAreaID(collection, name):
     result = collection.find_one({"area_name": name}, {"_id": 1})
-
     return result["_id"]
 
 def getUserID(collection, id):
     result = collection.find_one({"user_id": id}, {"_id": 1})
-
     return result["_id"]
+
+def getNestID(collection, name):
+    result = collection.find_one({"nest_name": name}, {"_id": 1})
+    return result["_id"]
+
+def formatDate(date):
+    return date.strftime('%Y-%m-%d')
 
 def dropCollection(collection):
     """
@@ -62,6 +68,108 @@ def createUsersTable(db):
             "prviledges": priviledges[x]
         }
         print(collection.insert_one(item))
+
+def createNestConfigTable(db):
+    user_id = ["1", "2"]
+
+    startDate1 = formatDate(datetime.datetime(2013, 9, 20, 5, 00))
+    date2 = datetime.datetime(2013, 9, 27, 5, 00)
+    startDate2 = formatDate(datetime.datetime(2013, 9, 27, 5, 00))
+
+    date = [startDate1, startDate2]
+
+    rebalancing = [x.strftime('%Y-%m-%dT%H:%M:%S.%f%z') for x in reversed(list(random_hour(date2, 12)))]
+
+    nest_name = ["bosque1", "bosque2", "bosque3", "bosque4", "pueblo1", "pueblo2", "pueblo3",
+                 "pueblo4", "interseccion", "banda", "stefani", "terrace"]
+
+    vehicleqty = [x for x in random_value(12, 3, 7, 0)]
+
+    nestconfig1 = []
+    collection = db["nest_configuration"]
+
+    for i in range(12):
+        item = {
+            "user_id": user_id[0],
+            "start_date": startDate1,
+            "nest_id": {"name": nest_name[i], "id": getNestID(db["nests"], nest_name[i])},
+            "vehicle_qty": vehicleqty[i]
+        }
+        print(collection.insert_one(item))
+
+    for i in range(12):
+        item = {
+            "user_id": user_id[1],
+            "start_date": startDate2,
+            "rebalancing": {"timestamp": rebalancing[i], "vehicle_qty": vehicleqty[i]},
+            "nest_id": {"name": nest_name[i], "id": getNestID(db["nests"], nest_name[i])},
+            "vehicle_qty": vehicleqty[i]
+        }
+        print(collection.insert_one(item))
+
+def createDropStrategyTable(db):
+    nest_name = ["bosque1", "bosque2", "bosque3", "bosque4", "pueblo1", "pueblo2", "pueblo3",
+                 "pueblo4", "interseccion", "banda", "stefani", "terrace"]
+    user_id = ["1", "2"]
+
+    date = datetime.datetime(2013, 9, 20, 5, 00)
+    startDate1 = formatDate(date)
+    startDate2 = formatDate(date + datetime.timedelta(days=5))
+    startDate3 = formatDate(date + datetime.timedelta(days=14))
+
+    date_list = [startDate1, startDate2, startDate3]
+
+    configs = [findConfigurationsOnDateRange(db, startDate1, startDate2),
+                findConfigurationsOnDateRange(db, startDate2, startDate3)]
+
+    collection = db["drop_strategies"]
+    for x in range(2):
+        item = {
+            "user_id": 0,
+            "nest_configurations": configs[x],
+            "start_date": date_list[x],
+            "end_date": date_list[x+1]
+        }
+        print(item)
+        collection.insert_one(item)
+
+def createExperimentsTable(db):
+    user_id = "1"
+
+    ds_list = []
+    if db["drop_strategies"] is None:
+        print("first create a drop strategy collection with entries")
+        return
+    else:
+        cursor = db["drop_strategies"].find({}, {"_id": 1})
+
+        for x in cursor:
+            ds_list.append(x["_id"])
+
+    date = datetime.datetime(2013, 9, 20, 5, 00)
+    startDate1 = formatDate(date)
+
+    item = {
+        "user_id": user_id,
+        "drop_strategies": ds_list,
+        "date": startDate1
+    }
+    collection = db["experiments"]
+    collection.insert_one(item)
+
+
+def findConfigurationsOnDateRange(db, from_date, to_date):
+    collection = db["nest_configuration"]
+    cursor = collection.find({"start_date": {"$gte": from_date, "$lt": to_date}}, {"_id": 1})
+
+    total = 0
+    config_list = []
+    for x in cursor:
+        total+=1
+        config_list.append(x["_id"])
+
+    print("total: ", total)
+    return config_list
 
 
 def createNestsTable(db):
@@ -112,30 +220,12 @@ def createServiceAreaTable(db):
     polygon= [{
       "coordinates": [
         [
-          [
-            -67.152729,
-            18.2176116
-          ],
-          [
-            -67.1393824,
-            18.2233593
-          ],
-          [
-            -67.1374512,
-            18.2067272
-          ],
-          [
-            -67.1437168,
-            18.194456
-          ],
-          [
-            -67.1549177,
-            18.1955975
-          ],
-          [
-            -67.152729,
-            18.217367
-          ]
+          [-67.152729, 18.2176116],
+          [-67.1393824, 18.2233593],
+          [-67.1374512, 18.2067272],
+          [-67.1437168, 18.194456],
+          [-67.1549177, 18.1955975],
+          [-67.152729, 18.217367]
         ]
       ], "type": "LineString"
         }, {
@@ -190,18 +280,18 @@ def createRideTable(db):
     bird_id = [x for x in range(10)]
     print("bird id ", bird_id)
 
-    startDate = datetime.datetime(2013, 9, 20, 8, 00)
+    startDate = datetime.datetime(2013, 9, 21, 8, 00)
 
-    date = startDate.strftime("%d/%m/%y")
+    date = formatDate(startDate)
 
     serviceArea = ["Mayaguez", "San Juan"]
     print("service area", serviceArea)
 
-    ride_started_at = [x.strftime("%d/%m/%y %H:%M") for x in reversed(list(random_date(startDate, 10)))]
+    ride_started_at = [x.strftime('%Y-%m-%dT%H:%M:%S.%f%z') for x in reversed(list(random_date(startDate, 10)))]
     print("ride started at ", ride_started_at)
 
-    completed = datetime.datetime(2013, 9, 20, 9, 00)
-    ride_completed_at = [x.strftime("%d/%m/%y %H:%M") for x in reversed(list(random_date(startDate, 10)))]
+    completed = datetime.datetime(2013, 9, 21, 9, 00)
+    ride_completed_at = [x.strftime('%Y-%m-%dT%H:%M:%S.%f%z') for x in reversed(list(random_date(startDate, 10)))]
     print("ride completed at ", ride_completed_at)
 
     ride_cost = [x for x in random_value(10, 3.15, 10, 2)]
@@ -248,9 +338,39 @@ def createRideTable(db):
         ride_list.append(item)
     pprint(ride_list)
 
-    collection = db["ride"]
+    collection = db["rides"]
     collection.insert_many(ride_list)
 
+def createRideStats(db):
+    days = [20,21]
+
+    collection = db["ride_stats"]
+    for i in range(2):
+        startDate = datetime.datetime(2013, 9, days[i], 8, 00)
+        date = formatDate(startDate)
+
+        total_rides = 0
+        total_revenue = 0
+        total_ride_time = 0
+
+        cursor = db["rides"].find({"date": date}, {"ride_cost": 1, "ride_duration": 1})
+
+        for x in cursor:
+            total_revenue += x["ride_cost"]
+            total_ride_time += x["ride_duration"]
+            total_rides+=1
+
+        print("total_ride_time: ",total_ride_time)
+        print("total_rides: ", total_rides)
+        print("total revenue: ", total_revenue)
+
+        item = {
+            "total_rides": total_rides,
+            "total_revenue": total_revenue,
+            "total_ride_time": total_ride_time
+        }
+
+        collection.insert_one()
 
 
 # Build and return a list
@@ -264,6 +384,13 @@ def random_date(start,l):
    current = start
    while l >= 0:
        current = current + datetime.timedelta(minutes=randrange(10))
+       yield current
+       l-=1
+
+def random_hour(timestamp,l):
+   current = timestamp
+   while l >= 0:
+       current = current + datetime.timedelta(hours=randrange(10,19,2))
        yield current
        l-=1
 
