@@ -8,14 +8,21 @@ def main():
     client = MongoClient('localhost', 27017)
     db = client["Nestmatics"]
 
-   # createServiceArea(db)
-    rides_collection = db["ride"]
-    sa_collection = db["service_area"]
-    users_collection = db["users"]
-    nests_collection = db["nests"]
-
+    createUsersTable(db)
+    createServiceAreaTable(db)
+    createRideTable(db)
+    createRideStats(db)
+    createNestsTable(db)
+    createNestConfigTable(db)
+    createDropStrategyTable(db)
+    createExperimentsTable(db)
     createModelTable(db)
-
+    createPredictionTable(db)
+    createStreetsTable(db)
+    createAmenitiesTable(db)
+    createWeatherTable(db)
+    createBuildingsTable(db)
+    createBirdAppActTable(db)
 
 def getAllFrom(collection):
     result = collection.find()
@@ -36,7 +43,9 @@ def getServiceAreaID(collection, name):
     return result["_id"]
 
 def getModelID(collection, date, area):
-    result = collection.find_one({"creation_date": date, "city":{"name": area}}, {"_id": 1})
+    result = collection.find_one({"creation_date": date, "service_area.name": area}, {"_id": 1})
+    if result is None:
+        return None
     return result["_id"]
 
 def getUserID(collection, id):
@@ -49,6 +58,9 @@ def getNestID(collection, name):
 
 def formatDate(date):
     return date.strftime('%Y-%m-%d')
+
+def formatTimestamp(date):
+    return date.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
 
 def dropCollection(collection):
     """
@@ -325,7 +337,7 @@ def createRideTable(db):
         item = {
             "bird_id" : bird_id[i],
             "date": date,
-            "city": {
+            "service_area": {
                 "name": serviceArea[int(i%2)],
                 "_id": getServiceAreaID(db["service_area"],serviceArea[int(i%2)])
             },
@@ -371,7 +383,7 @@ def createBirdAppActTable(db):
     for i in range(10):
         item = {
             "date": date,
-            "city": {
+            "service_area": {
                 "name": serviceArea[int(i%2)],
                 "_id": getServiceAreaID(db["service_area"],serviceArea[int(i%2)])
             },
@@ -421,7 +433,7 @@ def createRideStats(db):
         item = {
             "date": date,
             "total_rides": total_rides,
-            "city": {
+            "service_area": {
                 "name": serviceArea[int(i % 2)],
                 "_id": getServiceAreaID(db["service_area"], serviceArea[int(i % 2)])
             },
@@ -452,7 +464,7 @@ def createModelTable(db):
         item = {
             "model_file": model_file[i],
             "creation_date": creation_date,
-            "city": {
+            "service_area": {
                 "name": serviceArea[int(i % 2)],
                 "_id": getServiceAreaID(db["service_area"], serviceArea[int(i % 2)])
             },
@@ -475,9 +487,15 @@ def createPredictionTable(db):
 
     collection = db["predictions"]
 
+    precipitation = [x for x in random_value(3, 30, 70, 4)]
+    temp = [x for x in random_value(3, 5, 10, 4)]
+    rides = [x for x in random_value(3, 60, 90, 0)]
+    buildings = [x for x in random_value(3, 30, 40, 0)]
+    streets = [x for x in random_value(3, 50, 70, 0)]
+    ammenities = [x for x in random_value(3, 20, 70, 0)]
+    error_metric = [x for x in random_value(3, 8.3052, 10.5123, 5)]
+
     for i in range(3):
-        date = datetime.datetime(2013, 9, prediction_days[i], 8, 00)
-        model_date = formatDate(date)
 
         date = datetime.datetime(2013, 9, prediction_days[i], 8, 00)
         prediction_date = formatDate(date)
@@ -486,14 +504,109 @@ def createPredictionTable(db):
         creation_date = formatDate(date)
 
         feature_importance = {
-            "weather": {"precipitation":random_value(5, 30, 70, 4), "temperature": random_value(5, 5, 10, 4) },
-            "rides": random_value(5, 60, 90, 0),
-            "buildings": random_value(5, 30, 40, 0),
-            "streets": random_value(5, 50, 70, 0),
-            "ammenities": random_value(5, 20, 70, 0)
+            "weather": {"precipitation": precipitation[i], "temperature": temp[i] },
+            "rides": rides[i],
+            "buildings": buildings[i],
+            "streets": streets[i],
+            "ammenities": ammenities[i]
         }
-        error_metric = [x for x in random_value(3, 8.3052, 10.5123, 5)]
 
+        item = {
+            "model_id": {"model_date": model_date, "model_id": getModelID(db["models"], model_date, "Mayaguez")},
+            "prediction": prediction_output,
+            "prediction_date": prediction_date,
+            "creation_date": creation_date,
+            "feature_importance": feature_importance,
+            "error_metric": error_metric[i]
+        }
+        print(collection.insert_one(item))
+
+def createWeatherTable(db):
+    precipitation = [x for x in random_value(5, 30, 70, 4)]
+    temp = [x for x in random_value(5, 5, 10, 4)]
+    serviceArea = ["Mayaguez", "San Juan"]
+
+    prediction_days = [14, 15, 13, 12, 11]
+
+    collection = db["weather"]
+    for i in range(5):
+        date = datetime.datetime(2013, 9, prediction_days[i], 8, 00)
+        timestamp = formatTimestamp(date)
+
+        item = {
+            "precipitation": precipitation[i],
+            "temperature": temp[i],
+            "service_area": {
+                "name": serviceArea[int(i % 2)],
+                "_id": getServiceAreaID(db["service_area"], serviceArea[int(i % 2)])
+            },
+            "timestamp": timestamp
+        }
+        print(collection.insert_one(item))
+    print("created weather table")
+
+def createAmenitiesTable(db):
+    serviceArea = ["Mayaguez", "San Juan"]
+    bitmapfile = ["Nestmatics/docs/maps/amenities1", "Nestmatics/docs/maps/amenities2"]
+    prediction_days = [14, 15]
+
+    collection = db["ammenities"]
+    for i in range(2):
+        date = datetime.datetime(2013, 9, prediction_days[i], 8, 00)
+        timestamp = formatTimestamp(date)
+
+        item = {
+            "timestamp": timestamp,
+            "service_area": {
+                "name": serviceArea[int(i % 2)],
+                "_id": getServiceAreaID(db["service_area"], serviceArea[int(i % 2)])
+            },
+            "bitmap_file": bitmapfile[i]
+        }
+        print(collection.insert_one(item))
+    print("created amenities table")
+
+def createStreetsTable(db):
+    serviceArea = ["Mayaguez", "San Juan"]
+    bitmapfile = ["Nestmatics/docs/maps/streets1", "Nestmatics/docs/maps/streets1"]
+    prediction_days = [14, 15]
+
+    collection = db["streets"]
+    for i in range(2):
+        date = datetime.datetime(2013, 9, prediction_days[i], 8, 00)
+        timestamp = formatTimestamp(date)
+
+        item = {
+            "timestamp": timestamp,
+            "service_area": {
+                "name": serviceArea[int(i % 2)],
+                "_id": getServiceAreaID(db["service_area"], serviceArea[int(i % 2)])
+            },
+            "bitmap_file": bitmapfile[i]
+        }
+        print(collection.insert_one(item))
+    print("created streets table")
+
+def createBuildingsTable(db):
+    serviceArea = ["Mayaguez", "San Juan"]
+    bitmapfile = ["Nestmatics/docs/maps/buildings1", "Nestmatics/docs/maps/buildings2"]
+    prediction_days = [14, 15]
+
+    collection = db["buildings"]
+    for i in range(2):
+        date = datetime.datetime(2013, 9, prediction_days[i], 8, 00)
+        timestamp = formatTimestamp(date)
+
+        item = {
+            "timestamp": timestamp,
+            "service_area": {
+                "name": serviceArea[int(i % 2)],
+                "_id": getServiceAreaID(db["service_area"], serviceArea[int(i % 2)])
+            },
+            "bitmap_file": bitmapfile[i]
+        }
+        print(collection.insert_one(item))
+    print("created buildings table")
 
 def getActiveVehicles(list):
     # Creating an empty dictionary
