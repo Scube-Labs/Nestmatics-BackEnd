@@ -14,7 +14,8 @@ def main():
     users_collection = db["users"]
     nests_collection = db["nests"]
 
-    createRideStats(db)
+    createModelTable(db)
+
 
 def getAllFrom(collection):
     result = collection.find()
@@ -32,6 +33,10 @@ def getServiceAreaFromID(collection, id):
 
 def getServiceAreaID(collection, name):
     result = collection.find_one({"area_name": name}, {"_id": 1})
+    return result["_id"]
+
+def getModelID(collection, date, area):
+    result = collection.find_one({"creation_date": date, "city":{"name": area}}, {"_id": 1})
     return result["_id"]
 
 def getUserID(collection, id):
@@ -214,7 +219,6 @@ def createNestsTable(db):
     result = collection.insert_many(nest_list)
     print(result)
 
-
 def createServiceAreaTable(db):
     area_names = ["Mayaguez", "San Juan"]
     polygon= [{
@@ -341,8 +345,52 @@ def createRideTable(db):
     collection = db["rides"]
     collection.insert_many(ride_list)
 
+def createBirdAppActTable(db):
+
+    startDate = datetime.datetime(2013, 9, 21, 10, 00)
+
+    date = formatDate(startDate)
+
+    serviceArea = ["Mayaguez", "San Juan"]
+    print("service area", serviceArea)
+
+    app_opened_at = [x.strftime('%Y-%m-%dT%H:%M:%S.%f%z') for x in reversed(list(random_hour(startDate, 10)))]
+    print("ride started at ", app_opened_at)
+
+    billed_minutes = [x for x in random_value(10, 1, 200, 2)]
+    print("billed minutes ", billed_minutes)
+
+    user_lat=[x for x in random_value(10, 60.3052, 60.5123, 5)]
+    print("user lat ", user_lat)
+
+    user_lon=[x for x in random_value(10, 100.3052, 100.5123, 5)]
+    print("user lon ", user_lon)
+
+    app_act_list = []
+
+    for i in range(10):
+        item = {
+            "date": date,
+            "city": {
+                "name": serviceArea[int(i%2)],
+                "_id": getServiceAreaID(db["service_area"],serviceArea[int(i%2)])
+            },
+            "app_opened_at": app_opened_at[i],
+            "billed_minutes": billed_minutes[i],
+            "user_lat": user_lat[i],
+            "user_lon": user_lon[i]
+        }
+        app_act_list.append(item)
+    pprint(app_act_list)
+
+    collection = db["bird_app_act"]
+    print(collection.insert_many(app_act_list))
+
 def createRideStats(db):
     days = [20,21]
+
+    serviceArea = ["Mayaguez", "San Juan"]
+    print("service area", serviceArea)
 
     collection = db["ride_stats"]
     for i in range(2):
@@ -353,27 +401,122 @@ def createRideStats(db):
         total_revenue = 0
         total_ride_time = 0
 
-        cursor = db["rides"].find({"date": date}, {"ride_cost": 1, "ride_duration": 1})
+        cursor = db["rides"].find({"date": date}, {"ride_cost": 1, "ride_duration": 1, "bird_id": 1})
+
+        freq = {}
 
         for x in cursor:
             total_revenue += x["ride_cost"]
             total_ride_time += x["ride_duration"]
             total_rides+=1
+            if x["bird_id"] in freq:
+                freq[str(x["bird_id"])] += 1
+            else:
+                freq[str(x["bird_id"])] = 1
 
-        print("total_ride_time: ",total_ride_time)
+        print("total_ride_time: ", total_ride_time)
         print("total_rides: ", total_rides)
         print("total revenue: ", total_revenue)
 
         item = {
+            "date": date,
             "total_rides": total_rides,
+            "city": {
+                "name": serviceArea[int(i % 2)],
+                "_id": getServiceAreaID(db["service_area"], serviceArea[int(i % 2)])
+            },
             "total_revenue": total_revenue,
-            "total_ride_time": total_ride_time
+            "total_ride_time": total_ride_time,
+            "total_active_vehicles": freq
         }
+        print(item)
+        collection.insert_one(item)
 
-        collection.insert_one()
+def createModelTable(db):
+    model_file = ["usr/model", "usr/repository/model2", "usr/model3"]
+    days = [20, 21, 24]
+    serviceArea = ["Mayaguez", "San Juan"]
+    print("service area", serviceArea)
 
-# Build and return a list
+    training_error = [x for x in random_value(3, 60.3052, 60.5123, 5)]
+
+    critical_validation_error = [x for x in random_value(3, 100.3052, 100.5123, 5)]
+
+    validation_error = [x for x in random_value(3, 5.3052, 10.5123, 5)]
+
+    collection = db["models"]
+    for i in range(3):
+        startDate = datetime.datetime(2013, 9, days[i], 8, 00)
+        creation_date = formatDate(startDate)
+
+        item = {
+            "model_file": model_file[i],
+            "creation_date": creation_date,
+            "city": {
+                "name": serviceArea[int(i % 2)],
+                "_id": getServiceAreaID(db["service_area"], serviceArea[int(i % 2)])
+            },
+            "training_error": training_error[i],
+            "critical_val_error": critical_validation_error[i],
+            "validation_error": validation_error[i]
+        }
+        print(collection.insert_one(item))
+
+def createPredictionTable(db):
+    model_date = "2013-09-20"
+    prediction_days = [14, 15, 13]
+    creation_days =  [13,14,12]
+
+    serviceArea = ["Mayaguez", "San Juan"]
+    print("service area", serviceArea)
+
+    D3 = [x for x in random_value(5, 1, 7, 0)]
+    prediction_output =[[D3, D3], [D3, D3], [D3, D3]]
+
+    collection = db["predictions"]
+
+    for i in range(3):
+        date = datetime.datetime(2013, 9, prediction_days[i], 8, 00)
+        model_date = formatDate(date)
+
+        date = datetime.datetime(2013, 9, prediction_days[i], 8, 00)
+        prediction_date = formatDate(date)
+
+        date = datetime.datetime(2013, 9, creation_days[i], 8, 00)
+        creation_date = formatDate(date)
+
+        feature_importance = {
+            "weather": {"precipitation":random_value(5, 30, 70, 4), "temperature": random_value(5, 5, 10, 4) },
+            "rides": random_value(5, 60, 90, 0),
+            "buildings": random_value(5, 30, 40, 0),
+            "streets": random_value(5, 50, 70, 0),
+            "ammenities": random_value(5, 20, 70, 0)
+        }
+        error_metric = [x for x in random_value(3, 8.3052, 10.5123, 5)]
+
+
+def getActiveVehicles(list):
+    # Creating an empty dictionary
+    freq = {}
+    for item in list:
+        if (item in freq):
+            freq[item] += 1
+        else:
+            freq[item] = 1
+
+    return freq
+
+
+    # Build and return a list
 def random_value(n, l_l, u_l, decimals):
+    """
+    Produce random values
+    :param n: number of random values to create
+    :param l_l: lower threshold
+    :param u_l: upper threshold
+    :param decimals: how many decimals for the random number
+    :return:
+    """
     while n > 0:
         cost = round(uniform(l_l, u_l), decimals)
         yield cost
