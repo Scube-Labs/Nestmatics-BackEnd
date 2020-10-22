@@ -8,11 +8,18 @@ def main():
     client = MongoClient('localhost', 27017)
     db = client["Nestmatics"]
 
+    ################################3
+    # These tables have to be created before other tables, as there are some dependencies
+    #
     createUsersTable(db)
     createServiceAreaTable(db)
+    createNestsTable(db)
+    #############################33
+
+    # As it is dummy data to quickly set up a db and all its collections, there is currently no
+    # error handling. If an error happens, it will stop the running process
     createRideTable(db)
     createRideStats(db)
-    createNestsTable(db)
     createNestConfigTable(db)
     createDropStrategyTable(db)
     createExperimentsTable(db)
@@ -25,41 +32,94 @@ def main():
     createBirdAppActTable(db)
 
 def getAllFrom(collection):
+    """
+    Get all documents from a collection. Only prints the results
+    :param collection: collection to get documents from
+    :return:
+    """
     result = collection.find()
     print(type(result))
     for x in result:
         print(x)
 
 def getDB(client):
+    """
+    Gets the MongoClient db object to communicate with the Nestmatics database.
+    If it does not exist yet, it will create it automatically
+    :param client: MongoClient object
+    :return: the Nestmatics databse object
+    """
     db = client["Nestmatics"]
     return db
 
 def getServiceAreaFromID(collection, id):
+    """
+    Get ServiceArea document info from the provided ID
+    :param collection: should be the service area collection object
+    :param id: string representing service area id
+    :return: returns service area result from query
+    """
     item = collection.find_one({"_id": id})
     return item
 
 def getServiceAreaID(collection, name):
+    """
+    Get service area ID from name of service area
+    :param collection: should be the service area collection object
+    :param name: name of service area
+    :return: string ID for service area name provided
+    """
     result = collection.find_one({"area_name": name}, {"_id": 1})
     return result["_id"]
 
 def getModelID(collection, date, area):
+    """
+    Get model string ID from date and service area provided
+    :param collection: should be the model collection from the db
+    :param date: creation date from the desired model
+    :param area: area name that the desired model belongs to
+    :return: string ID for desired model
+    """
     result = collection.find_one({"creation_date": date, "service_area.name": area}, {"_id": 1})
     if result is None:
         return None
     return result["_id"]
 
 def getUserID(collection, id):
+    """
+    Get document ID from nestmatics given user id.
+    (Only for the purposes of creating this dummy data)
+    :param collection: should be the collection that houses users
+    :param id: integer representing an app given user id
+    :return: MongoDB auto generated ID
+    """
     result = collection.find_one({"user_id": id}, {"_id": 1})
     return result["_id"]
 
 def getNestID(collection, name):
+    """
+    get Nest ID from Nest provided name
+    :param collection: should be the collection belonging to Nests
+    :param name: name of the nest to get
+    :return: string ID. Mongo DB auto generated ID
+    """
     result = collection.find_one({"nest_name": name}, {"_id": 1})
     return result["_id"]
 
 def formatDate(date):
+    """
+    Format date as per ISO date formatting
+    :param date: a datetime date object
+    :return: string representing formatted date
+    """
     return date.strftime('%Y-%m-%d')
 
 def formatTimestamp(date):
+    """
+    Format date provided as an ISO timestamp
+    :param date: datetome date object
+    :return: string representing formatted timestamp
+    """
     return date.strftime('%Y-%m-%dT%H:%M:%S.%f%z')
 
 def dropCollection(collection):
@@ -71,6 +131,11 @@ def dropCollection(collection):
     return collection.drop()
 
 def createUsersTable(db):
+    """
+    Create Users collection. SHOULD BE THE FIRST TABLE CREATED
+    :param db: db to create collection on
+    :return:
+    """
     email = ["pupo@gmail.com", "felipe@gmail.com"]
     priviledges = ["admin", "user"]
     user_id = ["1", "2"]
@@ -87,6 +152,11 @@ def createUsersTable(db):
         print(collection.insert_one(item))
 
 def createNestConfigTable(db):
+    """
+    Create nest Configuration collection. SHOULD BE THE CREATED AFTER THE NEST COLLECTION IS CREATED
+    :param db: db to create collection on
+    :return:
+    """
     user_id = ["1", "2"]
 
     startDate1 = formatDate(datetime.datetime(2013, 9, 20, 5, 00))
@@ -125,6 +195,11 @@ def createNestConfigTable(db):
         print(collection.insert_one(item))
 
 def createDropStrategyTable(db):
+    """
+       Create drop strategy collection. SHOULD BE THE CREATED AFTER THE NEST CONGIFURATION COLLECTION IS CREATED
+       :param db: db to create collection on
+       :return:
+    """
     nest_name = ["bosque1", "bosque2", "bosque3", "bosque4", "pueblo1", "pueblo2", "pueblo3",
                  "pueblo4", "interseccion", "banda", "stefani", "terrace"]
     user_id = ["1", "2"]
@@ -151,6 +226,11 @@ def createDropStrategyTable(db):
         collection.insert_one(item)
 
 def createExperimentsTable(db):
+    """
+    create experiments table. SHOULD BE CREATED AFTER THE DROP STRATEGIES COLLECTION IS CREATED
+    :param db: db to create the experiments collection on
+    :return:
+    """
     user_id = "1"
 
     ds_list = []
@@ -176,6 +256,13 @@ def createExperimentsTable(db):
 
 
 def findConfigurationsOnDateRange(db, from_date, to_date):
+    """
+    Find Nest configurations on a specified date interval
+    :param db: should be the db from which to look for nest configurations
+    :param from_date: lower threshold of date range
+    :param to_date: upper threshold of data range
+    :return: list of configurations that belong to the selected date range
+    """
     collection = db["nest_configuration"]
     cursor = collection.find({"start_date": {"$gte": from_date, "$lt": to_date}}, {"_id": 1})
 
@@ -190,6 +277,11 @@ def findConfigurationsOnDateRange(db, from_date, to_date):
 
 
 def createNestsTable(db):
+    """
+    create Nests table. SHOULD BE CREATED AFTER THE SERVICE AREA COLLECTION IS CREATED
+    :param db: db to create the nests collection on
+    :return:
+    """
     user_id = ["1", "2"]
     coords = [
         [-67.1406215, 18.2047195],
@@ -232,6 +324,11 @@ def createNestsTable(db):
     print(result)
 
 def createServiceAreaTable(db):
+    """
+    create service area table.
+    :param db: db to create service area collection on
+    :return:
+    """
     area_names = ["Mayaguez", "San Juan"]
     polygon= [{
       "coordinates": [
@@ -292,7 +389,11 @@ def createServiceAreaTable(db):
 
 
 def createRideTable(db):
-
+    """
+    create rides data collection. SHOULD BE CREATED AFTER THE SERVICE AREA COLLECTION IS CREATED
+    :param db: db to create the rides data collection on
+    :return:
+    """
     bird_id = [x for x in range(10)]
     print("bird id ", bird_id)
 
@@ -358,7 +459,11 @@ def createRideTable(db):
     collection.insert_many(ride_list)
 
 def createBirdAppActTable(db):
-
+    """
+    create the bird app data collection. SHOULD BE CREATED AFTER THE SERVICE AREA COLLECTION IS CREATED
+    :param db: db to create the bird app data collection on
+    :return:
+    """
     startDate = datetime.datetime(2013, 9, 21, 10, 00)
 
     date = formatDate(startDate)
@@ -399,6 +504,11 @@ def createBirdAppActTable(db):
     print(collection.insert_many(app_act_list))
 
 def createRideStats(db):
+    """
+    create the rides stats collection. SHOULD BE CREATED AFTER THE RIDES COLLECTION IS CREATED
+    :param db: db to create the rides stats collection on
+    :return:
+    """
     days = [20,21]
 
     serviceArea = ["Mayaguez", "San Juan"]
@@ -445,6 +555,11 @@ def createRideStats(db):
         collection.insert_one(item)
 
 def createModelTable(db):
+    """
+    create the AI model collection. SHOULD BE CREATED AFTER THE SERVICE AREA COLLECTION IS CREATED
+    :param db: db to create the AI model collection on
+    :return:
+    """
     model_file = ["usr/model", "usr/repository/model2", "usr/model3"]
     days = [20, 21, 24]
     serviceArea = ["Mayaguez", "San Juan"]
@@ -475,6 +590,11 @@ def createModelTable(db):
         print(collection.insert_one(item))
 
 def createPredictionTable(db):
+    """
+    create the prediction collection. SHOULD BE CREATED AFTER THE MODEL COLLECTION IS CREATED
+    :param db: db to create the prediction collection on
+    :return:
+    """
     model_date = "2013-09-20"
     prediction_days = [14, 15, 13]
     creation_days =  [13,14,12]
@@ -522,6 +642,11 @@ def createPredictionTable(db):
         print(collection.insert_one(item))
 
 def createWeatherTable(db):
+    """
+    create the weather collection. SHOULD BE CREATED AFTER THE SERVICE AREA COLLECTION IS CREATED
+    :param db: db to create the weather collection on
+    :return:
+    """
     precipitation = [x for x in random_value(5, 30, 70, 4)]
     temp = [x for x in random_value(5, 5, 10, 4)]
     serviceArea = ["Mayaguez", "San Juan"]
@@ -546,6 +671,11 @@ def createWeatherTable(db):
     print("created weather table")
 
 def createAmenitiesTable(db):
+    """
+    create the amenities collection. SHOULD BE CREATED AFTER THE SERVICE AREA COLLECTION IS CREATED
+    :param db: db to create the amenities collection on
+    :return:
+    """
     serviceArea = ["Mayaguez", "San Juan"]
     bitmapfile = ["Nestmatics/docs/maps/amenities1", "Nestmatics/docs/maps/amenities2"]
     prediction_days = [14, 15]
@@ -567,6 +697,11 @@ def createAmenitiesTable(db):
     print("created amenities table")
 
 def createStreetsTable(db):
+    """
+   create the streets collection. SHOULD BE CREATED AFTER THE SERVICE AREA COLLECTION IS CREATED
+   :param db: db to create the streets collection on
+   :return:
+   """
     serviceArea = ["Mayaguez", "San Juan"]
     bitmapfile = ["Nestmatics/docs/maps/streets1", "Nestmatics/docs/maps/streets1"]
     prediction_days = [14, 15]
@@ -588,6 +723,11 @@ def createStreetsTable(db):
     print("created streets table")
 
 def createBuildingsTable(db):
+    """
+   create the buildings collection. SHOULD BE CREATED AFTER THE SERVICE AREA COLLECTION IS CREATED
+   :param db: db to create the buildings collection on
+   :return:
+   """
     serviceArea = ["Mayaguez", "San Juan"]
     bitmapfile = ["Nestmatics/docs/maps/buildings1", "Nestmatics/docs/maps/buildings2"]
     prediction_days = [14, 15]
@@ -607,18 +747,6 @@ def createBuildingsTable(db):
         }
         print(collection.insert_one(item))
     print("created buildings table")
-
-def getActiveVehicles(list):
-    # Creating an empty dictionary
-    freq = {}
-    for item in list:
-        if (item in freq):
-            freq[item] += 1
-        else:
-            freq[item] = 1
-
-    return freq
-
 
     # Build and return a list
 def random_value(n, l_l, u_l, decimals):
