@@ -372,7 +372,6 @@ def createRideStats(db):
 
         collection.insert_one()
 
-
 # Build and return a list
 def random_value(n, l_l, u_l, decimals):
     while n > 0:
