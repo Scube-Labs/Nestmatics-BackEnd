@@ -218,7 +218,7 @@ img_buildings.save('building.bmp') #TODO this to DB
 
 
 #TODO: map fetch
-#TODO: map processing
+#TODO: map processing 
 
 #TODO: weather fetch
 #TODO:weather processing
