@@ -7,3 +7,4 @@ class ParentDao():
         self.db = self.client["Nestmatics"]
 
         self.ridesCollection = self.db["rides"]
+        self.nestsCollection = self.db["nests"]

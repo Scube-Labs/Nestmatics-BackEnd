@@ -8,21 +8,25 @@ def main():
     client = MongoClient('localhost', 27017)
     db = client["Nestmatics"]
 
-    createUsersTable(db)
-    createServiceAreaTable(db)
-    createRideTable(db)
-    createRideStats(db)
-    createNestsTable(db)
-    createNestConfigTable(db)
-    createDropStrategyTable(db)
-    createExperimentsTable(db)
-    createModelTable(db)
-    createPredictionTable(db)
-    createStreetsTable(db)
-    createAmenitiesTable(db)
-    createWeatherTable(db)
-    createBuildingsTable(db)
-    createBirdAppActTable(db)
+    cursor = db["nests"].find_one({"service_area.name": "Mayaguez", "user.user_id": "1", "coords":{"lat": -67.1406215, "lon":18.2047195}},
+                                       {"coords": 1, "service_area": 1, "nest_name": 1, "nest_radius": 1})
+    print(cursor)
+
+    # createUsersTable(db)
+    # createServiceAreaTable(db)
+    # createRideTable(db)
+    # createRideStats(db)
+    # createNestsTable(db)
+    # createNestConfigTable(db)
+    # createDropStrategyTable(db)
+    # createExperimentsTable(db)
+    # createModelTable(db)
+    # createPredictionTable(db)
+    # createStreetsTable(db)
+    # createAmenitiesTable(db)
+    # createWeatherTable(db)
+    # createBuildingsTable(db)
+    # createBirdAppActTable(db)
 
 def getAllFrom(collection):
     result = collection.find()
@@ -346,10 +350,12 @@ def createRideTable(db):
             "ride_distance": ride_distance[i],
             "ride_duration": ride_duration_minutes[i],
             "ride_started_at": ride_started_at[i],
-            "start_lat": start_lat[i],
-            "start_lon": start_lon[i],
-            "end_lat": end_lat[i],
-            "end_lon": end_lon[i]
+            "coords":{
+                "start_lat": start_lat[i],
+                "start_lon": start_lon[i],
+                "end_lat": end_lat[i],
+                "end_lon": end_lon[i]
+            }
         }
         ride_list.append(item)
     pprint(ride_list)
