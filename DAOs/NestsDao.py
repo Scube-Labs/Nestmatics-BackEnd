@@ -17,6 +17,13 @@ class NestsDao(ParentDao):
             cursor["service_area"]["_id"] = str(cursor["service_area"]["_id"])
         return cursor
 
+    def findNestById(self, nestid):
+        cursor = self.nestsCollection.find_one({"_id": ObjectId(nestid)})
+        if cursor is not None:
+            cursor["_id"] = str(cursor["_id"])
+        return cursor
+
+
     def findNestByCoords(self, coords, userid):
         cursor = self.nestsCollection.find_one({"coords": coords, "user.user_id":userid},{"coords": 1, "service_area": 1, "nest_name": 1, "nest_radius": 1, "_id":0})
         if cursor is not None:

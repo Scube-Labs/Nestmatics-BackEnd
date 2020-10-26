@@ -19,11 +19,8 @@ USERDICTKEYS=["user_id", "_id"]
 SERVICEAREADICTKEYS=["name", "_id"]
 COORDSDICTKEYS=["lat", "lon"]
 
-userdict = {"user":USERDICTKEYS}
-sadict = {"service_area": SERVICEAREADICTKEYS}
-coordsdict = {"coords":COORDSDICTKEYS}
-
 NESTKEYS=["user", "service_area", "coords", "nest_radius", "nest_name"]
+RIDESKEYS=["bird_id","date", "service_area","ride_started_at","ride_completed_at", "ride_cost", "ride_distance","ride_duration", "coords"]
 
 @app.route('/nestmatics', methods=['GET'])
 def home():
@@ -42,21 +39,37 @@ def getRidesCoordinates(areaid=None, date=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
+@app.route('/nestmatics/rides/startat/nest/<nestid>/date/<date>/hour/<hour>/area/<areaid>', methods=['GET'])
+def getRidesStartingAtNest(nestid=None,date=None,hour=None,areaid=None):
+    if request.method == 'GET':
+        if areaid == None or date == None or nestid == None:
+            return jsonify(Error="URI does not have all parameters needed"), 404
+        rides = RidesHandler().getRidesStartingAtNest(nestid=nestid, date=date, areaid=areaid, start=True)
+        return rides
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/rides/endat/nest/<nestid>/date/<date>/hour/<hour>/area/<areaid>', methods=['GET'])
+def getRidesEndingAtNest(nestid=None,date=None,hour=None,areaid=None):
+    if request.method == 'GET':
+        if areaid == None or date == None or nestid == None:
+            return jsonify(Error="URI does not have all parameters needed"), 404
+        rides = RidesHandler().getRidesStartingAtNest(nestid=nestid, date=date, areaid=areaid, start=False)
+        return rides
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/rides', methods=['POST'])
+def postRides():
+    if request.method == 'POST':
+        return RidesHandler().insertRides(rides_json=request.json)
+    else:
+        return jsonify(Error="Method not allowed."), 405
 
 # ------------------------ Nest API routes ------------------------------------------#
 @app.route('/nestmatics/nests', methods=['POST'])
 def postNests():
     if request.method == 'POST':
-        for item in request.json:
-            for key in NESTKEYS:
-                if key not in item:
-                    return jsonify(Error='Missing credentials from submission: ' + key)
-                if key == "user":
-                    verifyInnerDict(item[key], USERDICTKEYS)
-                elif key == "service_area":
-                    verifyInnerDict(item[key], SERVICEAREADICTKEYS)
-                elif key == "coords":
-                    verifyInnerDict(item[key], COORDSDICTKEYS)
         return NestsHandler().insertNests(request.json)
     else:
         return jsonify(Error="Method not allowed."), 405
