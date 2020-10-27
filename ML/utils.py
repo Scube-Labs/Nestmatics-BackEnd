@@ -1,5 +1,5 @@
 import numpy as np
-from PIL import Image,  ImageDraw
+from PIL import Image
 import math
 
 
@@ -31,3 +31,5 @@ def create_blank_image(cord1, cord2, format='1'):
         (float(cord2[0]), float(cord1[1]))
         ))
     ))
+
+
