@@ -8,6 +8,7 @@ import os
 
 from Handlers.RidesHandler import RidesHandler
 from Handlers.NestsHandler import NestsHandler
+from Handlers.RideStatsHandler import RideStatsHandler
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -50,7 +51,7 @@ def getRidesStartingAtNest(nestid=None,date=None,hour=None,areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 @app.route('/nestmatics/rides/endat/nest/<nestid>/date/<date>/hour/<hour>/area/<areaid>', methods=['GET'])
-def getRidesEndingAtNest(nestid=None,date=None,hour=None,areaid=None):
+def getRidesEndingAtNest(nestid=None,date=None,areaid=None):
     if request.method == 'GET':
         if areaid == None or date == None or nestid == None:
             return jsonify(Error="URI does not have all parameters needed"), 404
@@ -63,6 +64,43 @@ def getRidesEndingAtNest(nestid=None,date=None,hour=None,areaid=None):
 def postRides():
     if request.method == 'POST':
         return RidesHandler().insertRides(rides_json=request.json)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+# ------------------------ Rides Stats API routes -----------------------------------#
+
+@app.route('/nestmatics/stats/area/<areaid>/date/<date>', methods=['GET'])
+def getRidesStats(areaid=None,date=None):
+    if request.method == 'GET':
+        return RideStatsHandler().getStatsForDate(date, areaid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/stats/ridesnum/area/<areaid>/date/<date>', methods=['GET'])
+def getTotalNumberOfRides(areaid=None,date=None):
+    if request.method == 'GET':
+        return RideStatsHandler().getTotalNumberOfRides(date, areaid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/stats/ridetime/area/<areaid>/date/<date>', methods=['GET'])
+def getTotalRideTime(areaid=None,date=None):
+    if request.method == 'GET':
+        return RideStatsHandler().getTotalRideTime(date, areaid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/stats/activevehicles/area/<areaid>/date/<date>', methods=['GET'])
+def getTotalActiveVehicles(areaid=None,date=None):
+    if request.method == 'GET':
+        return RideStatsHandler().getTotalActiveVehicles(date, areaid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/stats/revenue/area/<areaid>/date/<date>', methods=['GET'])
+def getTotalRevenue(areaid=None,date=None):
+    if request.method == 'GET':
+        return RideStatsHandler().getTotalRevenue(date, areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
 

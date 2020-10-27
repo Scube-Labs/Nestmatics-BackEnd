@@ -8,3 +8,4 @@ class ParentDao():
 
         self.ridesCollection = self.db["rides"]
         self.nestsCollection = self.db["nests"]
+        self.statsCollection = self.db["ride_stats"]

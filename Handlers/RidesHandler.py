@@ -13,6 +13,10 @@ class RidesHandler(ParentHandler):
         rides = RidesDAO().getRidesForDateAndArea(date, areaid)
         return jsonify(rides)
 
+    def getRidesCoordsForDateAndArea(self, date, areaid):
+        rides = RidesDAO().getRidesCoordsForDateAndArea(date, areaid)
+        return jsonify(rides)
+
     def getRidesForTimeIntervalAndArea(self, time_gt, time_lt, areaid):
         rides = RidesDAO().getRidesForTimeIntervalAndArea(time_gt, time_lt, areaid)
         return jsonify(rides)
@@ -47,11 +51,11 @@ class RidesHandler(ParentHandler):
                 elif key == "coords":
                     self.verifyInnerDict(item[key], self.COORDSDICTKEYS)
 
-            findRides = RidesDAO().getRidesForTimeAndArea(item["ride_started_at"], item["service_area"]["_id"],
+            findRides = RidesDAO().getRidesForTimeAndVechicleId(item["ride_started_at"], item["service_area"]["_id"],
                                                           item["bird_id"])
             print(findRides)
-            if len(findRides) != 0:
-                nack.append(findRides[0])
+            if findRides is not None:
+                nack.append(findRides)
                 if len(nack) == len(rides_json):
                     return jsonify([{"error": "There is already rides stored for this day"},{"rejected": nack}])
                 continue
