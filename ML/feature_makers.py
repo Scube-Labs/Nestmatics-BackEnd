@@ -1,5 +1,7 @@
 import numpy as np
 from utils import haversine, create_blank_image
+import datetime
+import holidays
 from PIL import Image, ImageDraw
 
 #TODO check valids date
@@ -211,7 +213,15 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
 
     return img_streets, img_buildings, img_amenities
 
-# def make_temporal_features()
+
+#TODO personalized holidays
+def make_temporal_features(date): 
+    weekday = datetime.datetime.strptime(date, '%Y-%m-%d').weekday()
+    month = datetime.datetime.strptime(date, '%Y-%m-%d').month()
+    pr_holidays = holidays.UnitedStates(state='PR') 
+    holiday = date in pr_holidays
+
+    return weekday, month, holiday
 
 
 # def make_rides_features()
