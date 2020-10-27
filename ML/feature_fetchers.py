@@ -4,10 +4,9 @@ from datetime import datetime, timedelta
 from requests import request
 
 MAX_REQUEST_AREA = 0.74
-API_KEY = '5aa45f527ec96b53372c4f12808b6f94'
+API_KEY = '5aa45f527ec96b53372c4f12808b6f94' #TODO change to config
 
-#TODO future days
-#TODO check valids date
+
 #TODO precipitation units
 
 
@@ -69,7 +68,7 @@ def fetch_historical_temperature_data(date, state):
     return data_points                
 
 
-def fetch_terrain_data(North_Lat, South_Lat, East_Lon, West_Lon):
+def fetch_terrain_data(north_lat, south_lat, east_lon, west_lon):
 
     """Gather terrain data from OpenStreetMap given a region.
 
@@ -80,13 +79,16 @@ def fetch_terrain_data(North_Lat, South_Lat, East_Lon, West_Lon):
         [dict]: dictionary of the OpenStreetMap data as specified in their website.
     """
 
-    if (abs(North_Lat - South_Lat) * abs(East_Lon - West_Lon)) > MAX_REQUEST_AREA: # OpenStreeMap API square degree limit per request.
+    if (abs(north_lat - south_lat) * abs(east_lon - west_lon)) > MAX_REQUEST_AREA: # OpenStreeMap API square degree limit per request.
         raise ValueError("Requested area is too big.")
     
-    request_link = "https://api.openstreetmap.org/api/0.6/map.json?bbox=" + str(West_Lon) + "," + str(South_Lat) + "," + str(East_Lon) + "," + str(North_Lat)
+    request_link = "https://api.openstreetmap.org/api/0.6/map.json?bbox=" + str(west_lon) + "," + str(south_lat) + "," + str(east_lon) + "," + str(north_lat)
     response = request('GET', request_link)
 
     return response.json()
+
+
+#TODO fetch from file
 
 
 def fetch_weather_forecast_data(lat, lon, date):
@@ -112,3 +114,4 @@ def fetch_weather_forecast_data(lat, lon, date):
             return [day['temp']['day'], day['rain']]
 
     raise ValueError('Invalid date')
+
