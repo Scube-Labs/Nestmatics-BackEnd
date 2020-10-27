@@ -214,7 +214,21 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
     return img_streets, img_buildings, img_amenities
 
 
-#TODO personalized holidays
+def make_rides_features(data, north_lat, south_lat, east_lon, west_lon):
+    #data [lat, lon, time(hour)]
+    img_x = int(haversine((north_lat, west_lon), (north_lat, east_lon))) 
+    img_y = int(haversine((north_lat, west_lon), (north_lat, east_lon))) 
+
+    ride_matrix = np.zeros((img_x, img_y, 24))
+    
+    for ride in data:
+        x = int(haversine((north_lat, west_lon), (north_lat, ride[1])))
+        y = int(haversine((north_lat, west_lon), (ride[0], east_lon)))
+        ride_matrix[x][y][ride[2]] += 1
+    
+    return ride_matrix
+        
+
 def make_temporal_features(date): 
     weekday = datetime.datetime.strptime(date, '%Y-%m-%d').weekday()
     month = datetime.datetime.strptime(date, '%Y-%m-%d').month()
@@ -222,6 +236,4 @@ def make_temporal_features(date):
     holiday = date in pr_holidays
 
     return weekday, month, holiday
-
-
-# def make_rides_features()
+    #TODO personalized holidays
