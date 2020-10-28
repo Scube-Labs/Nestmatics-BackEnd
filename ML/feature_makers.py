@@ -16,8 +16,8 @@ AMENITIES_TYPE = {
 
 def make_temperature_features(data, north_lat, south_lat, east_lon, west_lon, meter_per_pixel = 1):
 
-    x = int(haversine([north_lat, west_lon], [north_lat, east_lon])/meter_per_pixe) #columns
-    y = int(haversine([north_lat, west_lon], [south_lat, west_lon])/meter_per_pixe) #rows
+    x = int(haversine([north_lat, west_lon], [north_lat, east_lon])/meter_per_pixel) #columns
+    y = int(haversine([north_lat, west_lon], [south_lat, west_lon])/meter_per_pixel) #rows
 
     if len(data) == 1: # Set all values the same since there's only one data point.
         return np.full((y, x), data[0][2])
@@ -79,6 +79,7 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
                 continue
             if e["type"] == "node":
                 nodes_raw.append(e)
+    #TODO change matrix to single number
     
     #Filter elements (ways, buildings, ammenities)
     ways = {}
@@ -225,7 +226,7 @@ def make_rides_features(data, north_lat, south_lat, east_lon, west_lon, meter_pe
         y = int(haversine((north_lat, west_lon), (ride[0], west_lon))/meter_per_pixel)
         ride_matrix[x][y][ride[2]] += 1
     
-    return ride_matrix
+    return ride_matrix #TODO change matrix to single number
         
 
 def make_temporal_features(date): 
