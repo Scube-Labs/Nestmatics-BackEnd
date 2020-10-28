@@ -43,4 +43,15 @@ class RideStatsDao(ParentDao):
             cursor["_id"] = str(cursor["_id"])
         return cursor
 
+    def insertStats(self, item):
+        statsCollection = self.db["ride_stats"]
+        _id = statsCollection.insert_one(item)
+        returnAck = (str(_id.inserted_id))
+        return returnAck
+
+    def deleteStatsByDate(self, date):
+        statsCollection = self.db["rides"]
+        x = statsCollection.delete_many({"date":date})
+        return x.deleted_count
+
 #print(RideStatsDao().getStatsForDateAndArea("2013-09-21","5f91c682bc71a04fda4b9dc7"))

@@ -112,10 +112,63 @@ def postNests():
     else:
         return jsonify(Error="Method not allowed."), 405
 
-def verifyInnerDict(innerDict, innerDictKeys):
-    for key in innerDictKeys:
-        if key not in innerDict:
-            return jsonify(Error='Missing credentials from submission: ' + key)
+@app.route('/nestmatics/nests/area/<areaid>/user/<userid>', methods=['GET'])
+def getNestsOnArea(userid=None, areaid=None):
+    if request.method == 'GET':
+        return NestsHandler().getNestsByServiceAreaId(sa_id=areaid, user_id=userid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/nests/names/area/<areaid>/user/<userid>', methods=['GET'])
+def getNestsName(userid=None, areaid=None):
+    if request.method == 'GET':
+        return NestsHandler().getNestNames(sa_id=areaid, user_id=userid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/nests/nest/<nestid>', methods=['GET'])
+def getNest(nestid=None):
+    if request.method == 'GET':
+        return NestsHandler().getNestById(nest_id=nestid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/nests/nest/<nestid>', methods=['DELETE'])
+def deleteNest(nestid=None):
+    if request.method == 'DELETE':
+        return NestsHandler().deleteNest(nestid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+# ----------------- Nest Configuration API routes -------------------------
+@app.route('/nestmatics/nests/nestconfig', methods=['POST'])
+def postNestConfigurations():
+    if request.method == 'POST':
+        return NestsHandler().insertNestConfiguration(request.json)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/nests/nestconfig/nest/<nestid>', methods=['GET'])
+def findNestConfigurationsForNest(nestid=None):
+    if request.method == 'GET':
+        return NestsHandler().getNestConfigurationsForNest(nestid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/nests/nestconfig/<nestconfigid>', methods=['GET'])
+def findNestConfiguration(nestconfigid=None):
+    if request.method == 'GET':
+        return NestsHandler().getNestConfigurationFromId(nestconfigid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/nests/nestconfig/<nestconfigid>', methods=['DELETE'])
+def deleteNestConfiguration(nestconfigid=None):
+    if request.method == 'DELETE':
+        return NestsHandler().deleteNestConfiguration(nestconfigid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
 
 if __name__ == '__main__':
     app.run(debug=True)

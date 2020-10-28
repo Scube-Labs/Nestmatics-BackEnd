@@ -24,3 +24,19 @@ class RideStatsHandler(ParentHandler):
     def getTotalRevenue(self, date, areaid):
         stats = RideStatsDao().getTotalRevenue(date, areaid)
         return jsonify(stats)
+
+    def insertStats(self, revenue, totalact, ridetime, totalRides, date, area):
+        item = {
+            "total_rides":totalRides,
+            "service_area": area,
+            "total_revenue": revenue,
+            "date": date,
+            "total_ride_time": ridetime,
+            "total_active_vehicles":totalact
+        }
+        _id = RideStatsDao().insertStats(item)
+        return _id
+
+    def deleteRideStatsByDate(self, date):
+        x = RideStatsDao().deleteStatsByDate(date)
+        return x

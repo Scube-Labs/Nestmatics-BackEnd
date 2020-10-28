@@ -1,8 +1,10 @@
 from flask import jsonify
 from math import pow, sqrt, pi, sin, cos, atan2
 from pprint import pprint
+from datetime import datetime
 from Handlers.ParentHandler import ParentHandler
 from Handlers.NestsHandler import NestsHandler
+from Handlers.RideStatsHandler import RideStatsHandler
 from DAOs.RidesDao import RidesDAO
 
 RIDESKEYS=["bird_id","date", "service_area","ride_started_at","ride_completed_at", "ride_cost", "ride_distance","ride_duration", "coords"]
@@ -42,6 +44,12 @@ class RidesHandler(ParentHandler):
     def insertRides(self, rides_json):
         ack = []
         nack=[]
+        total_rides = 0
+        revenue = 0
+        total_ride_time = 0
+        total_active_vehicles = {}
+        date = rides_json[0]["date"]
+        service_area = rides_json[0]["service_area"]
         for item in rides_json:
             for key in RIDESKEYS:
                 if key not in item:
@@ -51,17 +59,36 @@ class RidesHandler(ParentHandler):
                 elif key == "coords":
                     self.verifyInnerDict(item[key], self.COORDSDICTKEYS)
 
-            findRides = RidesDAO().getRidesForTimeAndVechicleId(item["ride_started_at"], item["service_area"]["_id"],
+            findRides = RidesDAO().getRidesForTimeAndVechicleId(item["ride_started_at"], item["date"], item["service_area"]["_id"],
                                                           item["bird_id"])
-            print(findRides)
+            #print(findRides)
             if findRides is not None:
                 nack.append(findRides)
                 if len(nack) == len(rides_json):
                     return jsonify([{"error": "There is already rides stored for this day"},{"rejected": nack}])
                 continue
             else:
+                bird_id = str(item["bird_id"])
+                if bird_id in total_active_vehicles:
+                    total_active_vehicles[bird_id] += 1
+                    print("bird_id: "+ bird_id+ ", "+ str(total_active_vehicles[bird_id]))
+                else:
+                    total_active_vehicles[bird_id] = 1
+                    print("new bird_id: " + bird_id + ", " + str(total_active_vehicles[bird_id]))
+                revenue += item["ride_cost"]
+                total_ride_time += item["ride_duration"]
+                total_rides += 1
+                item["date"] = datetime.strptime(item["date"], '%Y-%m-%d').isoformat()
                 ack.append(RidesDAO().insertRide(item))
-        return jsonify({"inserted": ack}, {"rejected": nack})
+
+        _id = RideStatsHandler().insertStats(revenue, total_active_vehicles, total_ride_time,
+                                       total_rides, date, service_area)
+        return jsonify({"inserted": ack}, {"rejected": nack}, {"stats":_id})
+
+    def deleteRidesByDate(self, date):
+        count = RidesDAO().deleteRidesByDate(date)
+        deletedStats = RideStatsHandler().deleteRideStatsByDate(date)
+        print("deleted entries: " + str(count) + ", deleted stats: "+str(deletedStats))
 
     def areCoordsInsideNest(self, nest_coords, radius, compare_coords):
         earthRadiusM =  6371000
@@ -82,5 +109,5 @@ class RidesHandler(ParentHandler):
         return degrees * pi /180
 
 
-#pprint(RidesDAO().getRidesForDateAndArea("2020-10-5","5f91c682bc71a04fda4b9dc6"))
+#RidesHandler().deleteRidesByDate("2013-09-21")
 #pprint(RidesHandler().getRidesStartingAtNest("5f95a6c3efb54db872a2cbf1","2020-10-5","5f91c682bc71a04fda4b9dc6"))
