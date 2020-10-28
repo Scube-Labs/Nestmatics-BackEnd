@@ -14,13 +14,13 @@ AMENITIES_TYPE = {
     "Entertainment": ["arts_centre", "brothel", "casino", "cinema", "community_centre", "fountain", "gambling", "nightclub", "planetarium", "public_bookcase", "social_centre", "stripclub", "studio", "swingerclub", "theatre"]
 }
 
-def make_temperature_features(data, north_lat, south_lat, east_lon, west_lon):
+def make_temperature_features(data, north_lat, south_lat, east_lon, west_lon, meter_per_pixel = 1):
 
-    x = utils.haversine([north_lat, west_lon], [north_lat, east_lon]) #columns
-    y = utils.haversine([north_lat, west_lon], [south_lat, west_lon]) #rows
+    x = int(haversine([north_lat, west_lon], [north_lat, east_lon])/meter_per_pixe) #columns
+    y = int(haversine([north_lat, west_lon], [south_lat, west_lon])/meter_per_pixe) #rows
 
     if len(data) == 1: # Set all values the same since there's only one data point.
-        return np.full((y, x), data[0][2], dtype=float)
+        return np.full((y, x), data[0][2])
     elif len(data) > 1: # Set all values to the closest one to the middle of the area.
 
         mid_lat = (north_lat + south_lat)/2
@@ -30,7 +30,7 @@ def make_temperature_features(data, north_lat, south_lat, east_lon, west_lon):
         closest_point_temp = None
 
         for data_point in data:
-            distance = utils.haversine([mid_lat, mid_lon], [data_point[0], data_point[1]])
+            distance = haversine([mid_lat, mid_lon], [data_point[0], data_point[1]])
             if closest_point_dist is None or closest_point_dist > distance:
                 closest_point_dist = distance
                 closest_point_temp = data_point[2]
@@ -41,12 +41,12 @@ def make_temperature_features(data, north_lat, south_lat, east_lon, west_lon):
         raise ValueError("data field empty.")
 
 
-def make_precipitation_features(data, north_lat, south_lat, east_lon, west_lon):
-    x = utils.haversine([north_lat, west_lon], [north_lat, east_lon]) #columns
-    y = utils.haversine([north_lat, west_lon], [south_lat, west_lon]) #rows
+def make_precipitation_features(data, north_lat, south_lat, east_lon, west_lon, meter_per_pixel = 1):
+    x = int(haversine([north_lat, west_lon], [north_lat, east_lon])/meter_per_pixel) #columns
+    y = int(haversine([north_lat, west_lon], [south_lat, west_lon])/meter_per_pixel) #rows
 
     if len(data) == 1: # Set all values the same since there's only one data point.
-        return np.full((y, x), data[0][2], dtype=float)
+        return np.full((y, x), data[0][2])
     elif len(data) > 1: # Set all values to the closest one to the middle of the area.
 
         mid_lat = (north_lat + south_lat)/2
@@ -56,17 +56,17 @@ def make_precipitation_features(data, north_lat, south_lat, east_lon, west_lon):
         closest_point_prec = None
 
         for data_point in data:
-            distance = utils.haversine([mid_lat, mid_lon], [data_point[0], data_point[1]])
+            distance = haversine([mid_lat, mid_lon], [data_point[0], data_point[1]])
             if closest_point_dist is None or closest_point_dist > distance:
                 closest_point_dist = distance
                 closest_point_prec = data_point[2]
 
-        return np.full((y, x), closest_point_prec, dtype=float)
+        return np.full((y, x), closest_point_prec)
         
     else:
         raise ValueError("data field empty.")
 
-
+#TODO integrate meter_per_pixel
 def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
     
     #Getting ways and node objects
@@ -214,16 +214,15 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
     return img_streets, img_buildings, img_amenities
 
 
-def make_rides_features(data, north_lat, south_lat, east_lon, west_lon):
+def make_rides_features(data, north_lat, south_lat, east_lon, west_lon, meter_per_pixel=1):
     #data [lat, lon, time(hour)]
-    img_x = int(haversine((north_lat, west_lon), (north_lat, east_lon))) 
-    img_y = int(haversine((north_lat, west_lon), (north_lat, east_lon))) 
-
-    ride_matrix = np.zeros((img_x, img_y, 24))
+    img_x = int(haversine((north_lat, west_lon), (north_lat, east_lon))/meter_per_pixel)
+    img_y = int(haversine((north_lat, west_lon), (south_lat, west_lon))/meter_per_pixel)
+    ride_matrix = np.zeros((img_x, img_y, 24), dtype = np.int8)
     
     for ride in data:
-        x = int(haversine((north_lat, west_lon), (north_lat, ride[1])))
-        y = int(haversine((north_lat, west_lon), (ride[0], east_lon)))
+        x = int(haversine((north_lat, west_lon), (north_lat, ride[1]))/meter_per_pixel)
+        y = int(haversine((north_lat, west_lon), (ride[0], west_lon))/meter_per_pixel)
         ride_matrix[x][y][ride[2]] += 1
     
     return ride_matrix
