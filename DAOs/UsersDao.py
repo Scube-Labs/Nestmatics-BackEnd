@@ -12,15 +12,20 @@ class UsersDao(ParentDao):
                 users.append(i)
         return users
 
-    def getUser(self, userid):
+    def getUserByID(self, userid):
         cursor = self.usersCollection.find_one({"_id": ObjectId(userid)})
+        if cursor is not None:
+            cursor["_id"] = str(cursor["_id"])
+        return cursor
+
+    def getUserByEmail(self, email):
+        cursor = self.usersCollection.find_one({"email": email})
         if cursor is not None:
             cursor["_id"] = str(cursor["_id"])
         return cursor
 
     def insertUser(self, user):
         cursor = self.usersCollection.insert_one(user)
-        print(cursor.inserted_id)
         id = (str(cursor.inserted_id))
         return id
 
@@ -28,4 +33,8 @@ class UsersDao(ParentDao):
         cursor = self.usersCollection.delete_one({"_id": ObjectId(userid)})
         return cursor.deleted_count
 
-#print(UsersDao().deleteUser("5f91c682bc71a04fda4b9dc4"))
+# item = {
+#     "email":"bean@gmail.com",
+#     "privilege":"user"
+# }
+#print(UsersDao().insertUser(item))

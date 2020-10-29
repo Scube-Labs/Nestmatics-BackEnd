@@ -211,7 +211,7 @@ def insertUser():
 
 @app.route('/nestmatics/users/user/<userid>', methods=['DELETE'])
 def deleteUser(userid=None):
-    if request.method == 'POST':
+    if request.method == 'DELETE':
         return UsersHandler().deleteUser(userid)
     else:
         return jsonify(Error="Method not allowed."), 405
