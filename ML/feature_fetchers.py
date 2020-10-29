@@ -1,7 +1,8 @@
 from climata.cocorahs import CocorahsIO
 from climata.acis import StationDataIO
 from datetime import datetime, timedelta
-from requests import request
+import requests
+import json
 
 MAX_REQUEST_AREA = 0.74
 API_KEY = '5aa45f527ec96b53372c4f12808b6f94' #TODO change to config
@@ -83,9 +84,9 @@ def fetch_terrain_data(north_lat, south_lat, east_lon, west_lon):
         raise ValueError("Requested area is too big.")
     
     request_link = "https://api.openstreetmap.org/api/0.6/map.json?bbox=" + str(west_lon) + "," + str(south_lat) + "," + str(east_lon) + "," + str(north_lat)
-    response = request('GET', request_link)
+    response = requests.get(request_link)
 
-    return response.json()
+    return json.loads(response.content.decode('utf-8'))
 
 
 #TODO fetch from file
