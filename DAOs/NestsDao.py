@@ -58,9 +58,15 @@ class NestsDao(ParentDao):
             nests.append(i)
         return nests
 
+    #TODO: if one deletes a nest, what happens to all its stored nest configurations?
     def deleteNest(self, nestId):
         cursor = self.nestsCollection.delete_one({"_id": ObjectId(nestId)})
         return cursor.deleted_count
+
+    def editNest(self, nestId, nestName):
+        cursor = self.nestsCollection.update_one({"_id": ObjectId(nestId)},
+                                                      {"$set": {"nest_name": nestName}})
+        return cursor.modified_count
 
     #----------------- Nest Configurations methods ------------------------ #
 
@@ -99,3 +105,9 @@ class NestsDao(ParentDao):
         cursor = self.nestConfigCollection.delete_one({"_id": ObjectId(nestconfigid)})
         return cursor.deleted_count
 
+    def editNestConfiguration(self, nestconfigid, vehicleqty):
+        cursor = self.nestConfigCollection.update_one({"_id": ObjectId(nestconfigid)},
+                                                      { "$set": { "vehicle_qty": vehicleqty}})
+        return cursor.modified_count
+
+#print(NestsDao().editNestConfiguration("5f98f5ab28b88b39ef01c973", 1))

@@ -9,6 +9,7 @@ import os
 from Handlers.RidesHandler import RidesHandler
 from Handlers.NestsHandler import NestsHandler
 from Handlers.RideStatsHandler import RideStatsHandler
+from Handlers.UsersHandler import UsersHandler
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -140,6 +141,13 @@ def deleteNest(nestid=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
+@app.route('/nestmatics/nests/nest/<nestid>', methods=['PUT'])
+def editNest(nestid=None):
+    if request.method == 'PUT':
+        return NestsHandler().editNest(nestid, request.json["nest_name"])
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
 # ----------------- Nest Configuration API routes -------------------------
 @app.route('/nestmatics/nests/nestconfig', methods=['POST'])
 def postNestConfigurations():
@@ -169,6 +177,44 @@ def deleteNestConfiguration(nestconfigid=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
+@app.route('/nestmatics/nests/nestconfig/<nestconfigid>', methods=['PUT'])
+def editNestConfiguration(nestconfigid=None):
+    if request.method == 'PUT':
+        print(request.json["vehicle_qty"])
+        print(nestconfigid)
+        return NestsHandler().editNestConfiguration(nestconfigid, request.json["vehicle_qty"])
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+# ---------------------- Users API routes -------------------------------------
+
+@app.route('/nestmatics/users', methods=['GET'])
+def getAllUsers():
+    if request.method == 'GET':
+        return UsersHandler().getAllUsers()
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/users/user/<userid>', methods=['GET'])
+def getUser(userid=None):
+    if request.method == 'GET':
+        return UsersHandler().getUser(userid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/users/user', methods=['POST'])
+def insertUser():
+    if request.method == 'POST':
+        return UsersHandler().insertuser(request.json)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/users/user/<userid>', methods=['DELETE'])
+def deleteUser(userid=None):
+    if request.method == 'POST':
+        return UsersHandler().deleteUser(userid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
 
 if __name__ == '__main__':
     app.run(debug=True)

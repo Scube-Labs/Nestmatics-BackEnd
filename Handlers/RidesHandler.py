@@ -3,7 +3,7 @@ from math import pow, sqrt, pi, sin, cos, atan2
 from pprint import pprint
 from datetime import datetime
 from Handlers.ParentHandler import ParentHandler
-from Handlers.NestsHandler import NestsHandler
+
 from Handlers.RideStatsHandler import RideStatsHandler
 from DAOs.RidesDao import RidesDAO
 
@@ -24,21 +24,9 @@ class RidesHandler(ParentHandler):
         return jsonify(rides)
 
     def getRidesStartingAtNest(self, nestid, date, areaid, start):
-        nest = NestsHandler().getNestById(nestid)
-       # print(nest)
-        nest_radius = nest["nest_radius"]
-        nest_coords = nest["coords"]
-
+        date = datetime.strptime(date, '%Y-%m-%d').isoformat()
         rides = RidesDAO().getRidesForDateAndArea(date, areaid)
-        rides_at_nest = []
-        for item in rides:
-            if start:
-                rides_coords = {"lat":item["coords"]["start_lat"], "lon": item["coords"]["start_lon"]}
-            else:
-                rides_coords = {"lat": item["coords"]["end_lat"], "lon": item["coords"]["end_lon"]}
-            #print(rides_lat)
-            if self.areCoordsInsideNest(nest_coords, 30, rides_coords):
-                rides_at_nest.append(item)
+        rides_at_nest = self.startAtNest(nestid, rides, start)
         return jsonify(rides_at_nest)
 
     def insertRides(self, rides_json):
@@ -90,6 +78,29 @@ class RidesHandler(ParentHandler):
         deletedStats = RideStatsHandler().deleteRideStatsByDate(date)
         print("deleted entries: " + str(count) + ", deleted stats: "+str(deletedStats))
 
+# ----------------- Helper functions ----------------------------------------
+    def startAtNest(self, nestid, rides, start):
+        from Handlers.NestsHandler import NestsHandler
+        nest = NestsHandler().findNest(nestid)
+
+        if nest is None:
+            return "No nest on with this id"
+
+       # print(nest)
+        nest_radius = nest["nest_radius"]
+        nest_coords = nest["coords"]
+
+        rides_at_nest = []
+        for item in rides:
+            if start:
+                rides_coords = {"lat":item["coords"]["start_lat"], "lon": item["coords"]["start_lon"]}
+            else:
+                rides_coords = {"lat": item["coords"]["end_lat"], "lon": item["coords"]["end_lon"]}
+            #print(rides_lat)
+            if self.areCoordsInsideNest(nest_coords, 30, rides_coords):
+                rides_at_nest.append(item)
+        return rides_at_nest
+
     def areCoordsInsideNest(self, nest_coords, radius, compare_coords):
         earthRadiusM =  6371000
         dLat = self.degreesToRadians(nest_coords["lat"]-compare_coords["lat"])
@@ -107,6 +118,13 @@ class RidesHandler(ParentHandler):
 
     def degreesToRadians(self, degrees):
         return degrees * pi /180
+
+    def calculateRideCost(self, ride_cost, minute_rate, ride_duration):
+        if ride_cost is None:
+            calc = ride_duration * minute_rate
+        else:
+            calc = ride_cost
+        return calc
 
 
 #RidesHandler().deleteRidesByDate("2013-09-21")
