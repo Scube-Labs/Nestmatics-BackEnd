@@ -10,6 +10,7 @@ from Handlers.RidesHandler import RidesHandler
 from Handlers.NestsHandler import NestsHandler
 from Handlers.RideStatsHandler import RideStatsHandler
 from Handlers.UsersHandler import UsersHandler
+from Handlers.ServiceAreaHandler import ServiceAreaHandler
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -195,24 +196,40 @@ def getAllUsers():
     else:
         return jsonify(Error="Method not allowed."), 405
 
-@app.route('/nestmatics/users/user/<userid>', methods=['GET'])
+@app.route('/nestmatics/users/<userid>', methods=['GET'])
 def getUser(userid=None):
     if request.method == 'GET':
         return UsersHandler().getUser(userid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
-@app.route('/nestmatics/users/user', methods=['POST'])
+@app.route('/nestmatics/users', methods=['POST'])
 def insertUser():
     if request.method == 'POST':
         return UsersHandler().insertuser(request.json)
     else:
         return jsonify(Error="Method not allowed."), 405
 
-@app.route('/nestmatics/users/user/<userid>', methods=['DELETE'])
+@app.route('/nestmatics/users/<userid>', methods=['DELETE'])
 def deleteUser(userid=None):
     if request.method == 'DELETE':
         return UsersHandler().deleteUser(userid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+# ----------------------- Service Area API routes -----------------
+
+@app.route('/nestmatics/areas', methods=['GET'])
+def getAllServiceAreas():
+    if request.method == 'GET':
+        return ServiceAreaHandler().getAllServiceAreas()
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/areas/<areaid>', methods=['GET'])
+def getServiceArea(areaid=None):
+    if request.method == 'GET':
+        return ServiceAreaHandler().getServiceArea(areaid=areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
 

@@ -18,8 +18,8 @@ class UsersHandler(ParentDao):
             else:
                 response = make_response(jsonify(user), 200)
             return response
-        except:
-            response = make_response(jsonify("there was an error on the request"), 400)
+        except Exception as e:
+            response = make_response(jsonify(Error=str(e)), 400)
             return response
 
     def getUser(self, userid):
