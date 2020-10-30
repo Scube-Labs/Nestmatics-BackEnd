@@ -198,7 +198,6 @@ class NestsHandler(ParentHandler):
             config_start_date = nestConfig["start_date"]
             config_end_date = nestConfig["end_date"]
 
-            #nest = NestsDao().findNestById(nestConfig["nest"]["_id"])
             try:
                 nest = NestsDao().findNestById(nestConfig["nest"]["_id"])
             except:
@@ -287,4 +286,3 @@ class NestsHandler(ParentHandler):
             return response
 
 
-#print(NestsHandler().editNest("5f95a4b6efb54db872a2cbce", "po"))

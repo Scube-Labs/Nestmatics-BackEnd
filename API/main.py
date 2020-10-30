@@ -233,5 +233,19 @@ def getServiceArea(areaid=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
+@app.route('/nestmatics/areas', methods=['POST'])
+def postServiceArea():
+    if request.method == 'POST':
+        return ServiceAreaHandler().insertServiceArea(request.json)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/areas/<areaid>/date/<date>/weather', methods=['GET'])
+def getWeaterData(areaid=None, date=None):
+    if request.method == 'GET':
+        return ServiceAreaHandler().getWeatherForDay(areaid, date)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
 if __name__ == '__main__':
     app.run(debug=True)

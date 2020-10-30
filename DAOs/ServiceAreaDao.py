@@ -1,4 +1,5 @@
 from bson import ObjectId
+from datetime import datetime, timedelta
 from DAOs.ParentDao import ParentDao
 
 class ServiceAreaDao(ParentDao):
@@ -16,7 +17,14 @@ class ServiceAreaDao(ParentDao):
         return self.returnMany(cursor)
 
     def getWeatherData(self, areaid, timestamp):
-        cursor = self.weatherCollection.find({"timestamp": timestamp, "service_area._id": areaid})
+        gt = datetime.fromisoformat(timestamp)
+        lt = gt + timedelta(days=1)
+        gt = gt.isoformat()
+        lt = lt.isoformat()
+        print("gt ", gt)
+        print("lt ", lt)
+        cursor = self.weatherCollection.find({"timestamp": {"$gte": gt, "$lte":lt},
+                                              "service_area._id": areaid})
         return self.returnMany(cursor)
 
     def getAmenitiesOfArea(self, areaid):
@@ -24,6 +32,7 @@ class ServiceAreaDao(ParentDao):
         return self.returnOne(cursor)
 
     def getBuildingsOfArea(self, areaid):
+        print(type(areaid))
         cursor = self.buildingsCollection.find_one({"service_area._id": areaid})
         return self.returnOne(cursor)
 
@@ -35,6 +44,10 @@ class ServiceAreaDao(ParentDao):
         cursor = self.serviceAreaCollection.insert_one(area)
         return self.insertOne(cursor)
 
+    def insertAmenitiesData(self, data):
+        cursor = self.amenitiesCollection.insert_one(data)
+        return self.insertOne(cursor)
+
     def insertWeatherData(self, data):
         cursor = self.weatherCollection.insert_one(data)
         return self.insertOne(cursor)
@@ -43,16 +56,12 @@ class ServiceAreaDao(ParentDao):
         cursor = self.streetsCollection.insert_one(data)
         return self.insertOne(cursor)
 
+    def insertBuildingsData(self, data):
+        cursor = self.buildingsCollection.insert_one(data)
+        return self.insertOne(cursor)
+
     def deleteServiceArea(self, areaid):
         cursor = self.serviceAreaCollection.delete_one({"_id": ObjectId(areaid)})
         return self.deleteOne(cursor)
 
-item = {
-    "timestamp": "2013-09-20T08:00:00.000000",
-    "service_area": {
-        "name": "Mayaguez",
-        "_id": "5f91c682bc71a04fda4b9dc6"
-    },
-    "bitmap_file": "Nestmatics/docs/maps/streets1"
-	}
-#print(ServiceAreaDao().insertStreetData(item))
+#print(ServiceAreaDao().getWeatherData("5f91c682bc71a04fda4b9dc7", "2013-09-15"))
