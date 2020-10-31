@@ -13,8 +13,9 @@ class DropStrategyDao(ParentDao):
         lt = datetime.strptime(end_date, '%Y-%m-%d').isoformat()
         print("gt ", gt)
         print("lt ", lt)
-        cursor = self.dropStrategyCollection.find({"start_date": {"$gte": gt, "$lte": lt},
-                                              "service_area._id": areaid})
+        cursor = self.dropStrategyCollection.find({"start_date": {"$lte": lt},
+                                                   "end_date": {"$gte": gt, "$lte": lt},
+                                                "service_area._id": areaid})
         return self.returnMany(cursor)
 
     def getDropStrategiesForArea(self, areaid):
@@ -25,18 +26,18 @@ class DropStrategyDao(ParentDao):
         cursor = self.dropStrategyCollection.find_one({"_id": ObjectId(dropid)})
         return self.returnOne(cursor)
 
-    def getMostRecentDropStrategy(self):
-        cursor = self.dropStrategyCollection.find().sort([("start_date", -1)]).limit(1)
+    def getMostRecentDropStrategy(self, areaid):
+        cursor = self.dropStrategyCollection.find({"service_area._id":areaid}).sort([("start_date", -1)]).limit(1)
         return self.returnMany(cursor)
 
     def deleteDropStrategy(self, dropid):
         cursor = self.dropStrategyCollection.delete_one({"_id": ObjectId(dropid)})
         return cursor.deleted_count
 
-    def editDropStrategy(self, dropid, dayNum, configurations):
-        valueToUpdate = {"$set": {}}
-        valueToUpdate["$set"]["days." + dayNum] = "MongoDB"
-        cursor = self.nestsCollection.update_one({"_id": ObjectId(dropid)}, valueToUpdate)
+    def editDropStrategy(self, dropid, dayNum, config):
+        cursor = self.dropStrategyCollection.update_one({"_id": ObjectId(dropid)},
+                                                 { "$set":
+                                                 {"days."+dayNum+".configurations": config}})
         return cursor.modified_count
 
 config = ["5f98f5ab28b88b39ef01c96f",
@@ -48,8 +49,10 @@ config = ["5f98f5ab28b88b39ef01c96f",
           "5f98f5ab28b88b39ef01c987",
           "5f98f5ab28b88b39ef01c98b"]
 
-print(DropStrategyDao().editDropStrategy("5f9ce122be85e716e210ff1e",
-                                         "2", config))
+# print(DropStrategyDao().editDropStrategy("5f9ce122be85e716e210ff1e",
+#                                          "2", config))
+
+print(DropStrategyDao().getDropStrategyForDate("2020-10-20", "2020-10-22", "5f91c682bc71a04fda4b9dc6"))
 
 item = {
     "start_date":"2020-10-13T00:00:00",

@@ -11,6 +11,7 @@ from Handlers.NestsHandler import NestsHandler
 from Handlers.RideStatsHandler import RideStatsHandler
 from Handlers.UsersHandler import UsersHandler
 from Handlers.ServiceAreaHandler import ServiceAreaHandler
+from Handlers.DropStrategyHandler import DropStrategyHandler
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -244,6 +245,57 @@ def postServiceArea():
 def getWeaterData(areaid=None, date=None):
     if request.method == 'GET':
         return ServiceAreaHandler().getWeatherForDay(areaid, date)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+# ------------------------ Drop Strategy API routes ----------------------------
+
+@app.route('/nestmatics/drop/area/<areaid>/date/<sdate>/<edate>', methods=['GET'])
+def getDropStrategyForDate(areaid=None, sdate=None, edate=None):
+    if request.method == 'GET':
+        return DropStrategyHandler().getDropStrategyForDate(sdate, edate, areaid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/drop/area/<areaid>', methods=['GET'])
+def getDropStrategiesForArea(areaid=None):
+    if request.method == 'GET':
+        return DropStrategyHandler().getDropStrategyForArea(areaid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/drop/<dropid>', methods=['GET'])
+def getDropStrategyFromID(dropid=None):
+    if request.method == 'GET':
+        return DropStrategyHandler().getDropStrategyFromId(dropid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/drop/area/<areaid>/recent', methods=['GET'])
+def getMostRecentDropStrategy(areaid=None):
+    if request.method == 'GET':
+        return DropStrategyHandler().getMostRecentDropStrategy(areaid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/drop', methods=['POST'])
+def postDropStrategy():
+    if request.method == 'POST':
+        return DropStrategyHandler().insertDropStrategy(request.json)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/drop/<dropid>', methods=['DELETE'])
+def deleteDropStrategy(dropid=None):
+    if request.method == 'DELETE':
+        return DropStrategyHandler().deleteDropStrategy(dropid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/drop/<dropid>/day/<daynum>', methods=['PUT'])
+def editDropStrategy(dropid=None, daynum=None):
+    if request.method == 'PUT':
+        return DropStrategyHandler().editDropStrategy(dropid, daynum, request.json)
     else:
         return jsonify(Error="Method not allowed."), 405
 
