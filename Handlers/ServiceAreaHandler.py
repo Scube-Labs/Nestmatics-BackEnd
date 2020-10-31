@@ -9,6 +9,7 @@ SERVICEAREAKEYS = {"area_name": str, "coords":dict}
 WEATHERKEYS= {"precipitation":float, "temperature":float, "service_area":dict, "timestamp":str}
 SAPROPERTIESKEYS = {"timestamp":str, "service_area":dict, "bitmap_file":str}
 
+
 class ServiceAreaHandler(ParentHandler):
 
     def getAllServiceAreas(self):
@@ -122,24 +123,24 @@ class ServiceAreaHandler(ParentHandler):
         else:
             return ServiceAreaDao().getServiceAreaById(areaid)
 
-    def insertServiceArea(self, data):
+    def insertServiceArea(self, sa_json):
         try:
             for key in SERVICEAREAKEYS:
-                if key not in data:
+                if key not in sa_json:
                     return jsonify(Error='Missing fields from submission: ' + key)
                 keyType = SERVICEAREAKEYS[key]
                 print("key type: ", keyType)
-                print("user[key]: ", type(data[key]))
-                if type(data[key]) is not keyType:
+                print("user[key]: ", type(sa_json[key]))
+                if type(sa_json[key]) is not keyType:
                     return jsonify(Error='Key ' + key + ' is not the expected type: ' + str(keyType))
 
-            if self.getSArea(name=data["area_name"]):
+            if self.getSArea(name=sa_json["area_name"]):
                 return jsonify(Error='There is already an area with this name')
 
-            if len(data["coords"]["coordinates"]) < 4:
+            if len(sa_json["coords"]["coordinates"]) < 2:
                 return jsonify(Error='Area has to be defined at least by 4 coordinate points')
 
-            id = ServiceAreaDao().insertServiceArea(data)
+            id = ServiceAreaDao().insertServiceArea(sa_json)
             print(id)
             if id is None:
                 response = make_response(jsonify(Error="Error on insertion"), 404)

@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from datetime import datetime
 
 class ParentDao():
 
@@ -16,6 +17,7 @@ class ParentDao():
         self.streetsCollection = self.db["streets"]
         self.amenitiesCollection = self.db["amenities"]
         self.buildingsCollection = self.db["buildings"]
+        self.dropStrategyCollection = self.db["drop_strategies"]
 
     def returnOne(self, cursor):
         if cursor is not None:
@@ -39,3 +41,6 @@ class ParentDao():
     def deleteOne(self, cursor):
         if cursor is not None:
             return cursor.deleted_count
+
+    def toIsoFormat(self, date):
+        return datetime.strptime(date, '%Y-%m-%d').isoformat()
