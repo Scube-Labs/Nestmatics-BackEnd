@@ -12,19 +12,13 @@ from Handlers.RideStatsHandler import RideStatsHandler
 from Handlers.UsersHandler import UsersHandler
 from Handlers.ServiceAreaHandler import ServiceAreaHandler
 from Handlers.DropStrategyHandler import DropStrategyHandler
+from Handlers.ExperimentsHandler import ExperimentsHandler
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
 # Apply CORS to this app
 CORS(app)
-
-USERDICTKEYS=["user_id", "_id"]
-SERVICEAREADICTKEYS=["name", "_id"]
-COORDSDICTKEYS=["lat", "lon"]
-
-NESTKEYS=["user", "service_area", "coords", "nest_radius", "nest_name"]
-RIDESKEYS=["bird_id","date", "service_area","ride_started_at","ride_completed_at", "ride_cost", "ride_distance","ride_duration", "coords"]
 
 @app.route('/nestmatics', methods=['GET'])
 def home():
@@ -146,6 +140,8 @@ def deleteNest(nestid=None):
 @app.route('/nestmatics/nests/nest/<nestid>', methods=['PUT'])
 def editNest(nestid=None):
     if request.method == 'PUT':
+        if "nest_name" not in request.json:
+            return jsonify(Error="BODY should have a nest_name key"), 404
         return NestsHandler().editNest(nestid, request.json["nest_name"])
     else:
         return jsonify(Error="Method not allowed."), 405
@@ -182,8 +178,8 @@ def deleteNestConfiguration(nestconfigid=None):
 @app.route('/nestmatics/nests/nestconfig/<nestconfigid>', methods=['PUT'])
 def editNestConfiguration(nestconfigid=None):
     if request.method == 'PUT':
-        print(request.json["vehicle_qty"])
-        print(nestconfigid)
+        if "vehicle_qty" not in request.json:
+            return jsonify(Error="BODY should have a vehicle_qty key"), 404
         return NestsHandler().editNestConfiguration(nestconfigid, request.json["vehicle_qty"])
     else:
         return jsonify(Error="Method not allowed."), 405
@@ -296,6 +292,59 @@ def deleteDropStrategy(dropid=None):
 def editDropStrategy(dropid=None, daynum=None):
     if request.method == 'PUT':
         return DropStrategyHandler().editDropStrategy(dropid, daynum, request.json)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+# --------------------- Experiments API routes -----------------------------
+
+@app.route('/nestmatics/experiment', methods=['POST'])
+def postExperiment():
+    if request.method == 'POST':
+        return ExperimentsHandler().insertExperiment(request.json)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/experiment/<experimentid>', methods=['GET'])
+def getExperimentFromID(experimentid=None):
+    if request.method == 'GET':
+        return ExperimentsHandler().getExperimentFromID(experimentid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/experiment/area/<areaid>/user/<userid>', methods=['GET'])
+def getExperimentsForAreaID(areaid=None, userid=None):
+    if request.method == 'GET':
+        return ExperimentsHandler().getExperimentsForArea(areaid, userid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/experiment/nest/<nestid>', methods=['GET'])
+def getExperimentsForNestID(nestid=None):
+    if request.method == 'GET':
+        return ExperimentsHandler().getExperimentsOfNest(nestid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/experiment/<experimentid>', methods=['DELETE'])
+def deleteExperiment(experimentid=None):
+    if request.method == 'DELETE':
+        return ExperimentsHandler().deleteExperiment(experimentid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/experiment/<experimentid>', methods=['PUT'])
+def editExperiment(experimentid=None):
+    if request.method == 'PUT':
+        if "name" not in request.json:
+            return jsonify(Error="BODY should have a name key"), 404
+        return ExperimentsHandler().editExperiment(experimentid, request.json["name"])
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/experiment/<experimentid>/report', methods=['GET'])
+def getReportForExperiment(experimentid=None):
+    if request.method == 'GET':
+        return ExperimentsHandler().getReportForExperiment(experimentid)
     else:
         return jsonify(Error="Method not allowed."), 405
 

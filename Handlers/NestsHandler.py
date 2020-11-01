@@ -49,7 +49,7 @@ class NestsHandler(ParentHandler):
 
     def getNestsByServiceAreaId(self, sa_id, user_id):
         try:
-            nests = NestsDao().findNestsByServiceAreaId(sa_id, user_id)
+            nests = self.getNestByArea(sa_id, user_id)
             if nests is None or len(nests) == 0:
                 response = make_response(jsonify(error="there was an error on the request. Or"
                                                  "No Nest with that ID"), 404)
@@ -59,6 +59,10 @@ class NestsHandler(ParentHandler):
         except:
             response = make_response(jsonify("there was an error on the request"), 400)
             return response
+
+    def getNestByArea(self, sa_id, user_id):
+        nests = NestsDao().findNestsByServiceAreaId(sa_id, user_id)
+        return nests
 
     def getNestById(self, nest_id):
         try:
@@ -74,11 +78,14 @@ class NestsHandler(ParentHandler):
             return response
 
     def findNest(self, nest_id):
-        try:
-            nest = NestsDao().findNestById(nest_id)
-            return nest
-        except:
-            return "error with nest id. Invalid."
+        nest = NestsDao().findNestById(nest_id)
+        return nest
+
+    def verifyNestExists(self, nestid):
+        if self.findNest(nestid) is not None:
+            return True
+        else:
+            return False
 
     def getNestNames(self, sa_id, user_id):
         try:
@@ -124,44 +131,44 @@ class NestsHandler(ParentHandler):
 
     def insertNestConfiguration(self, nestConfig_json):
         try:
-            ack = []
             if nestConfig_json is None or len(nestConfig_json) == 0:
                 return jsonify(Error='BODY empty')
-            for item in nestConfig_json:
-                for key in NESTCONFIGKEYS:
-                    if key not in item:
-                        return jsonify(Error='Missing credentials from submission: ' + key)
-                    if key == "nest":
-                        self.verifyInnerDict(item[key], self.NESTDICTKEYS)
+            print(nestConfig_json)
+            for key in NESTCONFIGKEYS:
+                if key not in nestConfig_json:
+                    return make_response(jsonify(Error='Missing credentials from submission: ' + key), 400)
+                if key == "nest":
+                    self.verifyInnerDict(nestConfig_json[key], self.NESTDICTKEYS)
 
-                item["start_date"] = datetime.strptime(item["start_date"], '%Y-%m-%d').isoformat()
-                item["end_date"] = datetime.strptime(item["end_date"], '%Y-%m-%d').isoformat()
-                startDate = item["start_date"]
-                nest_id = item["nest"]["_id"]
+            startDate = self.toIsoFormat(nestConfig_json["start_date"])
+            endDate = self.toIsoFormat(nestConfig_json["end_date"])
 
-                findNestConfig = NestsDao().getNestConfiguration(startDate=startDate,
-                                                            nestid=nest_id)
-                if findNestConfig is not None:
-                    print(findNestConfig)
-                    response = make_response(jsonify([{"error": "There is already a nest configuration for this date on this nest",
-                                     "nest config": findNestConfig}, {"inserted": ack}]), 409)
-                    return response
+            if startDate == -1 or endDate == -1:
+                return make_response(jsonify(Error='Date in wrong format. It should be YYYY-MM-DD'), 400)
 
-                findNest = NestsDao().findNestById(nest_id)
-                if findNest is None:
-                    response = make_response(jsonify([{"error": "There is no Nest with name this id: " + nest_id ,
-                                                       "inserted": ack}]), 404)
-                    return response
+            nestConfig_json["start_date"] = startDate
+            nestConfig_json["end_date"] = endDate
 
-                ack.append(NestsDao().insertNestConfiguration(item))
-            if len(ack) == len(nestConfig_json):
-                response = make_response(jsonify(ack), 200)
+            nest_id = nestConfig_json["nest"]["_id"]
+
+            findNest = NestsDao().findNestById(nest_id)
+            if findNest is None:
+                return make_response(jsonify(Error= "There is no Nest with name this id: " + nest_id), 404)
+
+            findNestConfig = NestsDao().getNestConfiguration(startDate=startDate, nestid=nest_id)
+            if findNestConfig is not None:
+                print(findNestConfig)
+                return make_response(jsonify(Error='There is already a nest configuration for this date'), 400)
+
+            id = NestsDao().insertNestConfiguration(nestConfig_json)
+            print("id ", id)
+            if id is None:
+                response = make_response(jsonify(Error="Error on insertion"), 500)
             else:
-                response = make_response(jsonify(ack), 409)
+                response = make_response(jsonify(ok=id), 200)
             return response
-        except:
-            response = make_response(jsonify("there was an error on the request"), 400)
-            return response
+        except Exception as e:
+            return jsonify(Error=str(e))
 
     def getNestConfigurationsForNest(self, nestid):
         try:
@@ -178,7 +185,7 @@ class NestsHandler(ParentHandler):
 
     def getNestConfigurationFromId(self, nestconfigid):
         try:
-            nests = NestsDao().getNestConfigurationFromID(nestconfigid)
+            nests = self.getNestConfig(nestconfigid)
             if nests is None:
                 response = make_response(jsonify(error="there was an error on the request. Or"
                                                  "No Nest Configuration with that ID"), 404)
@@ -188,6 +195,10 @@ class NestsHandler(ParentHandler):
         except:
             response = make_response(jsonify("there was an error on the request"), 400)
             return response
+
+    def getNestConfig(self, nestconfigid):
+        config = NestsDao().getNestConfigurationFromID(nestconfigid)
+        return config
 
     def calculateNestConfigurationStats(self, nestconfigid):
         try:

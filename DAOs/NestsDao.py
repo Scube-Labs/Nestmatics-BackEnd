@@ -5,9 +5,7 @@ class NestsDao(ParentDao):
 
     def insertNest(self, nest):
         cursor = self.nestsCollection.insert_one(nest)
-        print(cursor.inserted_id)
-        id=(str(cursor.inserted_id))
-        return id
+        return self.insertOne(cursor)
 
     def findNestsByNestName(self, sa_name, nest_name, userid):
         cursor = self.nestsCollection.find_one({"service_area.name": sa_name, "nest_name": nest_name,
@@ -42,7 +40,7 @@ class NestsDao(ParentDao):
 
     def findNestsByServiceAreaId(self, sa_id, userid):
         nests = []
-        cursor = self.nestsCollection.find({"service_area._id": sa_id, "user.user_id":userid},
+        cursor = self.nestsCollection.find({"service_area._id": sa_id, "user._id":userid},
                                            {"coords":1, "service_area": 1, "nest_name": 1, "nest_radius":1})
         for i in cursor:
             i["_id"] = str(i["_id"])
@@ -111,3 +109,14 @@ class NestsDao(ParentDao):
         return cursor.modified_count
 
 #print(NestsDao().editNestConfiguration("5f98f5ab28b88b39ef01c973", 1))
+
+item={
+    "start_date": "2020-10-013T00:00:00",
+    "end_date": "2020-10-19T00:00:00",
+    "nest": {
+        "nest_name": "Bosque2",
+        "_id": "5f95a0c6efb54db872a2cbc4"
+    },
+    "vehicle_qty": 7
+}
+#print(NestsDao().insertNestConfiguration(item))

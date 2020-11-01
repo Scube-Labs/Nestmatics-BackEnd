@@ -18,6 +18,7 @@ class ParentDao():
         self.amenitiesCollection = self.db["amenities"]
         self.buildingsCollection = self.db["buildings"]
         self.dropStrategyCollection = self.db["drop_strategies"]
+        self.experimentCollection = self.db["experiments"]
 
     def returnOne(self, cursor):
         if cursor is not None:
@@ -43,4 +44,7 @@ class ParentDao():
             return cursor.deleted_count
 
     def toIsoFormat(self, date):
-        return datetime.strptime(date, '%Y-%m-%d').isoformat()
+        if date.find("T") == -1:
+            return datetime.strptime(date, '%Y-%m-%d').isoformat()
+        else:
+            return date
