@@ -19,6 +19,8 @@ class ParentDao():
         self.buildingsCollection = self.db["buildings"]
         self.dropStrategyCollection = self.db["drop_strategies"]
         self.experimentCollection = self.db["experiments"]
+        self.modelCollection = self.db["models"]
+        self.predictionsCollection = self.db["predictions"]
 
     def returnOne(self, cursor):
         if cursor is not None:

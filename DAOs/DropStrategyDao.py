@@ -27,8 +27,8 @@ class DropStrategyDao(ParentDao):
         return self.returnOne(cursor)
 
     def getMostRecentDropStrategy(self, areaid):
-        cursor = self.dropStrategyCollection.find({"service_area._id":areaid}).sort([("start_date", -1)]).limit(1)
-        return self.returnMany(cursor)
+        cursor = self.dropStrategyCollection.find_one({"service_area._id":areaid}).sort([("start_date", -1)]).limit(1)
+        return self.returnOne(cursor)
 
     def deleteDropStrategy(self, dropid):
         cursor = self.dropStrategyCollection.delete_one({"_id": ObjectId(dropid)})

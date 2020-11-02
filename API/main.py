@@ -13,6 +13,7 @@ from Handlers.UsersHandler import UsersHandler
 from Handlers.ServiceAreaHandler import ServiceAreaHandler
 from Handlers.DropStrategyHandler import DropStrategyHandler
 from Handlers.ExperimentsHandler import ExperimentsHandler
+from Handlers.ModelHandler import ModelHandler
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -345,6 +346,45 @@ def editExperiment(experimentid=None):
 def getReportForExperiment(experimentid=None):
     if request.method == 'GET':
         return ExperimentsHandler().getReportForExperiment(experimentid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+# ------------------------------ Models API routes ---------------------------------
+
+@app.route('/nestmatics/ml/<modelid>', methods=['GET'])
+def getModelFromID(modelid=None):
+    if request.method == 'GET':
+        return ModelHandler().getModelForID(modelid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/ml/area/<areaid>', methods=['GET'])
+def getModelsForArea(areaid=None):
+    if request.method == 'GET':
+        return ModelHandler().getModelsForArea(areaid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/ml/area/<areaid>/recent', methods=['GET'])
+def getMostRecentModel(areaid=None):
+    if request.method == 'GET':
+        return ModelHandler().getMostRecentModel(areaid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+# -------------------------- Predictions API routes ----------------------
+
+@app.route('/nestmatics/ml/prediction/area/<areaid>/date/<date>', methods=['GET'])
+def getPredictionForDate(areaid=None, date=None):
+    if request.method == 'GET':
+        return ModelHandler().getPredictionForDate(areaid, date)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/ml/prediction/area/<areaid>/date/<date>/features', methods=['GET'])
+def getPredictionFeatures(areaid=None, date=None):
+    if request.method == 'GET':
+        return ModelHandler().getPredictionFeatures(areaid, date)
     else:
         return jsonify(Error="Method not allowed."), 405
 
