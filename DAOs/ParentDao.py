@@ -1,10 +1,14 @@
 from pymongo import MongoClient
 from datetime import datetime
+import os
 
 class ParentDao():
 
     def __init__(self):
-        self.client = MongoClient('localhost', 27017)
+
+        
+        self.client = MongoClient(host="mongoContainer", port=27017, username=os.environ['DB_USERNAME'],
+                                  password=os.environ['DB_PASWD'])
         self.db = self.client["Nestmatics"]
 
         self.ridesCollection = self.db["rides"]

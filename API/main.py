@@ -4,7 +4,8 @@ from flask import Flask, jsonify, request
 # services on other ports on this machine or on other
 # machines to access this app
 from flask_cors import CORS, cross_origin
-import os
+
+from API import app
 
 from Handlers.RidesHandler import RidesHandler
 from Handlers.NestsHandler import NestsHandler
@@ -15,13 +16,8 @@ from Handlers.DropStrategyHandler import DropStrategyHandler
 from Handlers.ExperimentsHandler import ExperimentsHandler
 from Handlers.ModelHandler import ModelHandler
 
-app = Flask(__name__)
-app.config["DEBUG"] = True
 
-# Apply CORS to this app
-CORS(app)
-
-@app.route('/nestmatics', methods=['GET'])
+@app.route('/', methods=['GET'])
 def home():
     return "henlo"
 
@@ -388,5 +384,5 @@ def getPredictionFeatures(areaid=None, date=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
