@@ -1,6 +1,5 @@
 from flask import jsonify
 from math import pow, sqrt, pi, sin, cos, atan2
-from pprint import pprint
 from datetime import datetime
 from Handlers.ParentHandler import ParentHandler
 

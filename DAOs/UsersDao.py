@@ -4,37 +4,45 @@ from DAOs.ParentDao import ParentDao
 class UsersDao(ParentDao):
 
     def getAllUsers(self):
-        users = []
-        cursor = self.usersCollection.find({})
-        if cursor is not None:
-            for i in cursor:
-                i["_id"] = str(i["_id"])
-                users.append(i)
-        return users
+        """
+        Gets all users from database
+        :return: dictionary with all users of system
+        """
+        cursor = self.usersCollection.find()
+        return self.returnMany(cursor)
 
     def getUserByID(self, userid):
+        """
+        Gets a specific user from the database identified by a provided userid
+        :param userid: ID of the user to get from the database
+        :return: dictionary with user data
+        """
         cursor = self.usersCollection.find_one({"_id": ObjectId(userid)})
-        if cursor is not None:
-            cursor["_id"] = str(cursor["_id"])
-        return cursor
+        return self.returnOne(cursor)
 
     def getUserByEmail(self, email):
+        """
+        Gets a specific user from the database identified by a provided email
+        :param email: email of the user to get from the database
+        :return: dictionary with user data
+        """
         cursor = self.usersCollection.find_one({"email": email})
-        if cursor is not None:
-            cursor["_id"] = str(cursor["_id"])
-        return cursor
+        return self.returnOne(cursor)
 
     def insertUser(self, user):
+        """
+        Insert a user into the database
+        :param user: new user information
+        :return: id of inserted user
+        """
         cursor = self.usersCollection.insert_one(user)
-        id = (str(cursor.inserted_id))
-        return id
+        return self.insertOne(cursor)
 
     def deleteUser(self, userid):
+        """
+        Delete a specified user from the database
+        :param userid: ID identifying the user to delete
+        :return: number of documents deleted
+        """
         cursor = self.usersCollection.delete_one({"_id": ObjectId(userid)})
         return cursor.deleted_count
-
-# item = {
-#     "email":"bean@gmail.com",
-#     "privilege":"user"
-# }
-#print(UsersDao().insertUser(item))

@@ -32,3 +32,10 @@ class ParentHandler:
             return newdate
         except Exception as e:
             return -1
+
+    def verifyIDString(self, id):
+        if len(id) == 24:
+            print(len(id))
+            return True
+        else:
+            return False

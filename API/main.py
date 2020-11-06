@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, make_response
 
 # Import Cross-Origin Resource Sharing to enable
 # services on other ports on this machine or on other
@@ -23,7 +23,6 @@ def home():
 
 # ------------------------ Rides API routes -----------------------------------------#
 
-#TODO
 @app.route('/nestmatics/rides/position/area/<areaid>/date/<date>', methods=['GET'])
 def getRidesCoordinates(areaid=None, date=None):
     if request.method == 'GET':
@@ -144,6 +143,7 @@ def editNest(nestid=None):
         return jsonify(Error="Method not allowed."), 405
 
 # ----------------- Nest Configuration API routes -------------------------
+
 @app.route('/nestmatics/nests/nestconfig', methods=['POST'])
 def postNestConfigurations():
     if request.method == 'POST':
@@ -185,6 +185,28 @@ def editNestConfiguration(nestconfigid=None):
 
 @app.route('/nestmatics/users', methods=['GET'])
 def getAllUsers():
+    """
+    Route to get all users registered in the system
+    :return:
+        if request is successful (status code 200), will return a response object with the information of all Users
+        in the database. Response will have the format:
+        [
+            {
+                "_id": document_id,
+                "email": user_email,
+                "type": user_type
+            },
+            .
+            .
+            .
+
+        ]
+        if error in request, will return a 400, 404, 500 or 405 status code with corresponding information, following the
+        format:
+        {
+            "Error": "error information string"
+        }
+    """
     if request.method == 'GET':
         return UsersHandler().getAllUsers()
     else:
@@ -192,6 +214,24 @@ def getAllUsers():
 
 @app.route('/nestmatics/users/<userid>', methods=['GET'])
 def getUser(userid=None):
+    """
+    Route to get a specific user's information from the database
+    :param userid: User ID of a specific user
+    :return:
+        if request is successful (status code 200), will return a response object with the information of requested
+        user. Response will have the format:
+        {
+            "_id": document_id,
+            "email": user_email,
+            "type": user_type
+        }
+
+        if error in request, will return a 400, 404, 500 or 405 ststus code with corresponding information, following the
+        format:
+        {
+            "Error": "error information string"
+        }
+    """
     if request.method == 'GET':
         return UsersHandler().getUser(userid)
     else:
@@ -199,13 +239,45 @@ def getUser(userid=None):
 
 @app.route('/nestmatics/users', methods=['POST'])
 def insertUser():
+    """
+    Route to insert a user in the system
+    :return:
+        if request is successful, will return a response object with the id of the inserted object with format:
+        { "ok":
+            { "_id": id_Number  }
+        }
+        ** id_Number refers to the db id for the newly inserted field
+
+        if error in request, will return a 400, 404, 500 or 405 error with corresponding information, following the
+        format:
+        {
+            "Error": "error information string"
+        }
+    """
     if request.method == 'POST':
+        if request.json is None:
+            return make_response(jsonify(Error="Must provide a JSON body"), 400)
         return UsersHandler().insertuser(request.json)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 @app.route('/nestmatics/users/<userid>', methods=['DELETE'])
 def deleteUser(userid=None):
+    """
+    Route to delete users from the database. User will be identified with the userid in the URI route.
+    :param userid: ID of the user to delete
+    :return:
+        if request is successful, will return a response object with the number of deleted documents with format:
+            { "ok":
+                { "deleted": number_of_documents_deleted  }
+            }
+
+        if error in request, will return a 400, 404, 500 or 405 error with corresponding information, following the
+        format:
+        {
+            "Error": "error information string"
+        }
+    """
     if request.method == 'DELETE':
         return UsersHandler().deleteUser(userid)
     else:

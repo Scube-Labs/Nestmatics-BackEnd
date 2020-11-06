@@ -5,10 +5,20 @@ import os
 class ParentDao():
 
     def __init__(self):
+        try:
+            DB_USERNAME = os.environ['DB_USERNAME']
+            DB_PASSWD = os.environ['DB_PASWD']
+            DB_HOST = "mongoContainer"
+            PORT = 27017
+        except KeyError:
+            DB_USERNAME = "root"
+            DB_PASSWD = "example"
+            DB_HOST = "localhost"
+            PORT = 2717
 
-        
-        self.client = MongoClient(host="mongoContainer", port=27017, username=os.environ['DB_USERNAME'],
-                                  password=os.environ['DB_PASWD'])
+
+        self.client = MongoClient(host=DB_HOST, port=PORT, username=DB_USERNAME,
+                                  password=DB_PASSWD)
         self.db = self.client["Nestmatics"]
 
         self.ridesCollection = self.db["rides"]

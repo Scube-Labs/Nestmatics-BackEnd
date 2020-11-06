@@ -40,14 +40,6 @@ class DropStrategyDao(ParentDao):
                                                  {"days."+dayNum+".configurations": config}})
         return cursor.modified_count
 
-config = ["5f98f5ab28b88b39ef01c96f",
-          "5f98f5ab28b88b39ef01c973",
-          "5f98f5ab28b88b39ef01c977",
-          "5f98f5ab28b88b39ef01c97b",
-          "5f98f5ab28b88b39ef01c97f",
-          "5f98f5ab28b88b39ef01c983",
-          "5f98f5ab28b88b39ef01c987",
-          "5f98f5ab28b88b39ef01c98b"]
 
 
 
