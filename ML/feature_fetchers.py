@@ -4,12 +4,7 @@ from datetime import datetime, timedelta
 import requests
 import json
 
-MAX_REQUEST_AREA = 0.74
-API_KEY = '5aa45f527ec96b53372c4f12808b6f94' #TODO change to config
-
-
-#TODO precipitation units
-
+MAX_REQUEST_AREA = 0.75  #Square degrees.
 
 def fetch_historical_precipitation_data(date, state):
     """Fetchs precipitation data of a given day from a given state.
@@ -28,10 +23,10 @@ def fetch_historical_precipitation_data(date, state):
     data_points = []
     for i in range(0, len(sites)): 
         try:
-            if type(sites[i][5]) == str or type(sites[i][6]) == str or type(sites[i][7]) == str: #Case with missing data
+            if type(sites[i][5]) == str or type(sites[i][6]) == str or type(sites[i][7]) == str: # Case with missing data, which contains a string indicating it.
                 continue
 
-            data_points.append([sites[i][5], sites[i][6], sites[i][7]]) # index: 5 -> lat, 6 -> lon, 7 -> prec
+            data_points.append([sites[i][5], sites[i][6], sites[i][7]]) #  5 -> lat, 6 -> lon, 7 -> prec
 
         except:
             continue
@@ -69,36 +64,13 @@ def fetch_historical_temperature_data(date, state):
     return data_points                
 
 
-def fetch_terrain_data(north_lat, south_lat, east_lon, west_lon):
-
-    """Gather terrain data from OpenStreetMap given a region.
-
-    Raises:
-        ValueError: Invalid area size.
-
-    Returns:
-        [dict]: dictionary of the OpenStreetMap data as specified in their website.
-    """
-
-    if (abs(north_lat - south_lat) * abs(east_lon - west_lon)) > MAX_REQUEST_AREA: # OpenStreeMap API square degree limit per request.
-        raise ValueError("Requested area is too big.")
-    
-    request_link = "https://api.openstreetmap.org/api/0.6/map.json?bbox=" + str(west_lon) + "," + str(south_lat) + "," + str(east_lon) + "," + str(north_lat)
-    response = requests.get(request_link)
-
-    return json.loads(response.content.decode('utf-8'))
-
-
-#TODO fetch from file
-
-
-def fetch_weather_forecast_data(lat, lon, date):
-    """Gathers weather forcast for the specified location up to 7 days.
+def fetch_weather_forecast_data(lat, lon, date, api_key):
+    """Gathers weather forcast for the specified location up to 7 days in the future.
 
     Args:
         lat (float): Latitud of region of interest.
-        lon ([type]): Longitud of region of interest.
-        date ([type]): Requested date, up to 7 days in the future from current day.
+        lon ([float]): Longitud of region of interest.
+        date ([string]): Requested date in iso format YYYY-MM-DD, up to 7 days in the future from current day.
 
     Raises:
         ValueError: Requested date not in forecast of the next seven days.
@@ -107,12 +79,33 @@ def fetch_weather_forecast_data(lat, lon, date):
         [[float, float]]: Two element array in which the first element is the expected temperature and the second one the precipitation.
     """
 
-    request_link = "https://api.openweathermap.org/data/2.5/onecall?lat=" + str(lat) + "&lon=" + str(lon) + "&appid=" + API_KEY + "&exclude=current,minutely,hourly,alerts&units=imperial"
-    response = request('GET', request_link).json()
+    request_link = "https://api.openweathermap.org/data/2.5/onecall?lat=" + str(lat) + "&lon=" + str(lon) + "&appid=" + api_key + "&exclude=current,minutely,hourly,alerts&units=imperial"
+    response = requests.get(request_link).json()
     
     for day in response['daily']:
         if datetime.utcfromtimestamp(day['dt']).strftime('%Y-%m-%d') == date:
             return [day['temp']['day'], day['rain']]
 
     raise ValueError('Invalid date')
+
+
+def fetch_terrain_data(north_lat, south_lat, east_lon, west_lon):
+
+    """Gather terrain data from OpenStreetMap given a region.
+
+    Raises:
+        ValueError: Invalid area size.
+
+    Returns:
+        [dict]: dictionary of the OpenStreetMap data as specified in their website(https://wiki.openstreetmap.org/wiki/API_v0.6).
+        [int]: request response code
+    """
+
+    if (abs(north_lat - south_lat) * abs(east_lon - west_lon)) > MAX_REQUEST_AREA: # OpenStreeMap API square degree limit per request.
+        raise ValueError("Requested area is too big.")
+    
+    request_link = "https://api.openstreetmap.org/api/0.6/map.json?bbox=" + str(west_lon) + "," + str(south_lat) + "," + str(east_lon) + "," + str(north_lat)
+    response = requests.get(request_link)
+    return json.loads(response.content.decode('utf-8')), response.status_code
+
 
