@@ -13,12 +13,12 @@ class UsersHandler(ParentHandler):
         """
         Function to get all users in the database.
         :return:
-            response with status code 404: Response code due to there not being any users in the system. Response
+            response with status code 404: Status code due to there not being any users in the system. Response
                 will have the format:
                 {
                     "Error": "error information string"
                 }
-            response with status code 200: Response code acknowledges request was successful. Response will have the
+            response with status code 200: Status code acknowledges request was successful. Response will have the
                 format:
                 [
                     {
@@ -141,7 +141,6 @@ class UsersHandler(ParentHandler):
 
             if user["type"] == TYPES[0] or user["type"] == TYPES[1]:
 
-               # if (user["email"].find('@gmail.com') != -1) or (user["email"].find('@skootel.com') != -1):
                 if re.match(r"^[\w.\-]{1,25}@(skootel|gmail)\.com(\W|$)", user["email"]):
                     findUser = UsersDao().getUserByEmail(user['email'])
                     if findUser is not None:

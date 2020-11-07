@@ -1,6 +1,6 @@
 from flask import jsonify, make_response
 from datetime import datetime
-from pprint import pprint
+from random import random, uniform
 
 from Handlers.ParentHandler import ParentHandler
 from DAOs.ServiceAreaDao import ServiceAreaDao
@@ -9,49 +9,151 @@ SERVICEAREAKEYS = {"area_name": str, "coords":dict}
 WEATHERKEYS= {"precipitation":float, "temperature":float, "service_area":dict, "timestamp":str}
 SAPROPERTIESKEYS = {"timestamp":str, "service_area":dict, "bitmap_file":str}
 
-
 class ServiceAreaHandler(ParentHandler):
 
     def getAllServiceAreas(self):
+        """
+        Function to get all service areas in the database
+        :return:
+        response with status code 500: Signals an error on the server
+
+        response with status code 404: Status code due to there not being any service areas in the system. Response
+        will have the format:
+        {
+            "Error": "error information string"
+        }
+
+        response with status code 200: Status code acknowledges request was successful. Response from database
+            will contain all service areas, and will have the format:
+        [
+            {   "_id": id of service area,
+                "area_name": name of service area,
+                "coords": {
+                    "coordinates": [
+                        [
+                            -67.152729,
+                            18.2176116
+                        ]
+                        .
+                        .
+                    ],
+                    "type": "LineString" }
+                },
+                 .
+                 .
+                 .
+         ]
+        """
         try:
             area = ServiceAreaDao().getAllServiceAreas()
-            if area is None:
+            if area is None or len(area) == 0:
                 response = make_response(jsonify(Error="No service areas on system"), 404)
             else:
-                response = make_response(jsonify(Ok=area), 200)
+                response = make_response(jsonify(ok=area), 200)
             return response
         except Exception as e:
             response = make_response(jsonify(Error=str(e)), 500)
             return response
 
-    def getServiceArea(self, areaid=None, name=None):
+    def getServiceArea(self, areaid):
+        """
+        Function to Get a Specific Service Area from the database using the document id as an identifier. Will perform
+        validation for id to verify it is not empty and it has the correct length. Will also verify id belongs to an
+        actual service area in the database.
+        :param areaid: ID of the database document holding the service area information.
+        :return: response with status code 404: Response code due to the document id not existing on the service area
+                collection in the database. Response will have the format:
+                {
+                    "Error": "error information string"
+                }
+            response with status code 400: Response code due to the id passed as a parameter not being valid. Response
+                will have the same format as the 404 response explained above.
+
+            response with status code 200: Response code acknowledges request was successful. Response will have the
+                format:
+                    {
+                        "_id": id of service area,
+                        "area_name": name of service area,
+                        "coords": {
+                            "coordinates": [
+                                coordinates of service area
+                                ],
+                        "type": (optional) type of polygon coordinates
+                    }
+            response with status code 500: Response code signifies there was an error in the server while processing
+            the request.
+        """
         try:
-            area = None
-            if areaid is not None:
-                area = self.getSArea(areaid)
-            else:
-                area = ServiceAreaDao().getServiceAreaByName(name)
+            if areaid == None:
+                return make_response(jsonify(Error="No areaid passed as parameter"), 400)
+            if self.verifyIDString(areaid) == False:
+                return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
+
+            area = self.getSArea(areaid)
             if area is None:
-                response = make_response(jsonify(Error="No service area with specified ID or name on system"), 404)
+                response = make_response(jsonify(Error="No service area with specified ID "), 404)
             else:
-                response = make_response(jsonify(Ok=area), 200)
+                response = make_response(jsonify(ok=area), 200)
             return response
         except Exception as e:
             response = make_response(jsonify(Error=str(e)), 500)
             return response
 
     def getWeatherForDay(self, areaid, timestamp):
+        """
+        Function to get Weather information for a specified day on a specified area. Weather information is collected
+        whenever a new prediction is made, and stored in the database, therefore, availability is subject to the
+        creation of a prediction or the upload of new data for a day.
+
+        :param areaid: ID of the service area of interest
+
+        :param timestamp: timestamp of the day to get the weather from
+        :return:
+        response with status code 404: Response code due to the document id not existing on the service area
+                collection in the database. Response will have the format:
+                {
+                    "Error": "error information string"
+                }
+        response with status code 400: Response code due to the id passed as a parameter not being valid or the
+            timestamp having an erroneous format. Response will have the same format as the 404 response
+            explained above.
+
+            response with status code 200: Response code acknowledges request was successful. Response will have the
+                format:
+                {   "precipitation": 36.827,
+                    "temperature": 9.1968,
+                    "service_area": {
+                        "name": "Mayaguez",
+                        "_id": "5f91c682bc71a04fda4b9dc6"
+                    },
+                    "timestamp": "2013-09-14T08:00:00.000000"
+                }
+
+        response with status code 404: Response code signifies there was not found an entry with specified areaid
+            or with the specified timestamp.
+
+        response with status code 500: Response code signifies there was an error in the server while processing
+            the request.
+        """
         try:
+            if areaid == None:
+                return make_response(jsonify(Error="No areaid passed as parameter"), 400)
+            if self.verifyIDString(areaid) == False:
+                return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
+
             area = self.getSArea(areaid)
             if area is None:
                 return make_response(jsonify(Error="No service area with specified ID or name on system"), 404)
 
-            date= datetime.strptime(timestamp, '%Y-%m-%d').isoformat()
+            date = self.toIsoFormat(timestamp)
+            if date == -1:
+                return make_response(jsonify(Error='Date in wrong format. It should be YYYY-MM-DD'), 400)
+
             weather = self.getWeather(areaid, date)
             if weather is None:
                 response = make_response(jsonify(Error="No weather data for that day on the specified area"), 404)
             else:
-                response = make_response(jsonify(Ok=weather), 200)
+                response = make_response(jsonify(ok=weather), 200)
             return response
         except Exception as e:
             response = make_response(jsonify(Error=str(e)), 500)
@@ -67,7 +169,7 @@ class ServiceAreaHandler(ParentHandler):
             if result is None:
                 response = make_response(jsonify(Error="No amenities on specified area"), 404)
             else:
-                response = make_response(jsonify(Ok=result), 200)
+                response = make_response(jsonify(ok=result), 200)
             return response
         except Exception as e:
             response = make_response(jsonify(Error=str(e)), 500)
@@ -83,7 +185,7 @@ class ServiceAreaHandler(ParentHandler):
             if result is None:
                 response = make_response(jsonify(Error="No buildings on specified area"), 404)
             else:
-                response = make_response(jsonify(Ok=result), 200)
+                response = make_response(jsonify(ok=result), 200)
             return response
         except Exception as e:
             response = make_response(jsonify(Error=str(e)), 500)
@@ -99,143 +201,407 @@ class ServiceAreaHandler(ParentHandler):
             if result is None:
                 response = make_response(jsonify(Error="No street info on specified area"), 404)
             else:
-                response = make_response(jsonify(Ok=result), 200)
+                response = make_response(jsonify(ok=result), 200)
             return response
         except Exception as e:
             response = make_response(jsonify(Error=str(e)), 500)
             return response
 
     def getBuildings(self, areaid):
+        """
+        Function that can be accessed by external classes to get buildings information for a specified area ID.
+        Will return information straight from the database.
+        :param areaid: ID of area from which to get building information
+        :return: dictionary containing the format:
+            {
+                "id": id of building entry
+                "timestamp": time stamp of when the buildings information was inserted in DB,
+                "service_area": {
+                    "name": name of service area this buildings information belongs to
+                    "_id": ID of service area this buildings information belongs to
+                    },
+                "bitmap_file": file where bitmap of the buildings is stored
+            }
+
+        """
         return ServiceAreaDao().getBuildingsOfArea(areaid)
 
     def getStreets(self, areaid):
+        """
+        Function that can be accessed by external classes to get streets information for a specified area ID.
+        Will return information straight from the database.
+        :param areaid: ID of area of interest
+        :return: dictionary containing the format:
+            {
+                "id": id of street entry
+                "timestamp": time stamp of when the street information was inserted in DB,
+                "service_area": {
+                    "name": name of service area this street information belongs to
+                    "_id": ID of service area this street information belongs to
+                    },
+                "bitmap_file": file where bitmap of the streets is stored
+            }
+        """
         return ServiceAreaDao().getStreetsOfArea(areaid)
 
     def getWeather(self, areaid, timestamp):
+        """
+        Function that can be accessed by external classes to get weather information for a specified area ID and date.
+        Will return information straight from the database.
+        :param areaid: id of area of interest
+        :param timestamp: date of weather information
+        :return: Dictionary of weather data:
+        {   "precipitation": precipitation for area,
+                    "temperature": temperature for area,
+                    "service_area": {
+                        "name": name of service area,
+                        "_id": id of service area
+                    },
+                    "timestamp": the date this information belongs to
+                }
+        """
         return ServiceAreaDao().getWeatherData(areaid, timestamp)
 
     def getAmenities(self, areaid):
+        """
+        Function that can be accessed by external classes to get amenitites information for a specified area ID.
+        Will return information straight from the database.
+        :param areaid: ID of area of interest
+        :return: dictionary containing the format:
+            {
+                "id": id of amenities entry
+                "timestamp": time stamp of when the amenities information was inserted in DB,
+                "service_area": {
+                    "name": name of service area this amenities information belongs to
+                    "_id": ID of service area this amenities information belongs to
+                    },
+                "bitmap_file": file where bitmap of the amenities is stored
+            }
+        """
         return ServiceAreaDao().getAmenitiesOfArea(areaid)
 
     def getSArea(self, areaid=None, name=None):
+        """
+        Function that can be accessed by external classes to get service area information for a specified area ID.
+        Will return information straight from the database.
+        :param areaid: ID of area of interest
+        :param name: name of the area of interest
+        :return: Service area information
+        """
         if areaid is None:
             return ServiceAreaDao().getServiceAreaByName(name)
         else:
             return ServiceAreaDao().getServiceAreaById(areaid)
 
     def insertServiceArea(self, sa_json):
+        """
+        Function to insert a service area in the database. Will validate JSON parameter corresponding to the request body of
+        the API route /nestmatics/areas. Validation will make sure request.json has the required keys and also that
+        the value of keys are of the correct type. If values are not expected, if keys are missing, if there
+        is already a service area with the same name, if there are less than 4 coordinates, 4xx client errors will
+        be issued. If request is accepted, the json parameter with the new service area information will be inserted
+        in the database.
+
+        :param sa_json: json containing the service area information to be inserted into the database
+        :return: ID of newly inserted service area
+        if json is valid, response will be of the format:
+            {
+                "ok":{
+                    "id": id of inserted document
+                }
+            }
+        """
         try:
             for key in SERVICEAREAKEYS:
                 if key not in sa_json:
-                    return jsonify(Error='Missing fields from submission: ' + key)
+                    return make_response(jsonify(Error='Missing fields from submission: ' + key), 400)
                 keyType = SERVICEAREAKEYS[key]
                 print("key type: ", keyType)
-                print("user[key]: ", type(sa_json[key]))
+                print("user["+key+"]: ", type(sa_json[key]))
                 if type(sa_json[key]) is not keyType:
-                    return jsonify(Error='Key ' + key + ' is not the expected type: ' + str(keyType))
+                    return make_response(jsonify(Error='Key ' + key + ' is not the expected type: ' + str(keyType)),
+                                         400)
+                if key == "area_name":
+                    if len(sa_json["area_name"]) == 0:
+                        sa_json["area_name"] = datetime.now().isoformat()
 
+                if key == "coords":
+                    if "coordinates" not in sa_json[key]:
+                        return make_response(jsonify(Error='Missing fields from submission: ' + "coordinates"), 400)
+                    if len(sa_json[key]["coordinates"])< 4:
+                        return make_response(jsonify(Error="There have to be at least 4 coordinates to define an"
+                                                           "area"), 400)
+
+            # Looking for areas with the same name, in which case there would be a conflict
             if self.getSArea(name=sa_json["area_name"]):
                 return jsonify(Error='There is already an area with this name')
 
-            if len(sa_json["coords"]["coordinates"]) < 2:
-                return jsonify(Error='Area has to be defined at least by 4 coordinate points')
-
+            # Insert Service Area in database
             id = ServiceAreaDao().insertServiceArea(sa_json)
             print(id)
+
+            # If id is none after attempting to enter there may have been an error
             if id is None:
-                response = make_response(jsonify(Error="Error on insertion"), 404)
+                response = make_response(jsonify(Error="Error on insertion"), 500)
             else:
-                response = make_response(jsonify(ok=id), 200)
+                # no error, return id
+                response = make_response(jsonify(ok={"_id":id}), 201)
             return response
         except Exception as e:
-            return jsonify(Error=str(e))
+            return make_response(jsonify(Error=str(e)), 500)
+
+    def editServiceAreaName(self, areaid, areaname):
+        """
+        Function to modify a service area name
+        :param areaid: ID of the service area to modify
+        :param areaname: new name to give to service area
+        :return:
+        """
+        try:
+            result = ServiceAreaDao().editServiceAreaName(str(areaid), str(areaname))
+            if result is None:
+                response = make_response(jsonify(Error="No area with that ID"), 404)
+            elif result == 0:
+                response = make_response(jsonify(Error="area name not different from current entry"), 403)
+            else:
+                response = make_response(jsonify(ok="edited "+ str(result)+" areas"), 200)
+            return response
+        except:
+            response = make_response(jsonify(Error="there was an error on the request"), 500)
+            return response
 
     def insertWeatherData(self, data):
+        """
+        Function to insert weather data. Weather information is collected whenever a new prediction is made,
+        and stored in the database if it follows the correct format. This function will validate the json passed as a
+        parameter has the correct  fields and field types, also, if there already exists weahter data for the proposed
+        day. Json should have the format:
+
+        {   "precipitation": precipitation for area,
+                    "temperature": temperature for area,
+                    "service_area": {
+                        "name": name of service area,
+                        "_id": id of service area
+                    },
+                    "timestamp": the date this information belongs to
+                }
+
+        :param data: weather data to insert in the database.
+        :return:
+
+        if json to insert is not valid (incorrect fields, types or duplicated information, or error in server),
+        function will return an error dictionary of the format
+            {
+                "Error": "error information string"
+            }
+        if json is valid, response will be of the format:
+            {
+                "ok":{
+                    "id": id of inserted document
+                }
+            }
+        """
         try:
             for key in WEATHERKEYS:
                 if key not in data:
-                    return jsonify(Error='Missing fields from submission: ' + key)
+                    return {"Error":'Missing fields from submission: ' + key}
                 if key == "service_area":
                     self.verifyInnerDict(data["service_area"], self.SERVICEAREADICTKEYS)
                 keyType = WEATHERKEYS[key]
-                print("key type: ", keyType)
-                print("user["+key+"]: ", type(data[key]))
+
                 if type(data[key]) is not keyType:
-                    return jsonify(Error='Key ' + key + ' is not the expected type: ' + str(keyType))
+                    return {"Error":'Key ' + key + ' is not the expected type: ' + str(keyType)}
+
+            date = self.toIsoFormat(data["timestamp"])
+            if date == -1:
+                return {"Error":'Date in wrong format. It should be YYYY-MM-DD'}
+            data["timestamp"] = date
 
             weather = self.getWeather(data["service_area"]["_id"], data["timestamp"])
             if weather:
-                return jsonify(Error={'There is already weather data for this day': weather})
+                return {"Error":{'There is already weather data for this day': weather}}
 
             id = ServiceAreaDao().insertWeatherData(data)
             print(id)
-
+            if id is None:
+                response = {"Error":"Error on insertion"}
+            else:
+                # no error, return id
+                response = {"ok":{"_id": id}}
+            return response
         except Exception as e:
             return str(e)
 
     def insertAmenitiesData(self, data):
+        """
+        Function to insert amenities data. Amenities data is collected when a new service area is inserted in the system.
+        This function will validate the json passed as a parameter has the correct  fields and field types, also,
+        if there already exists amenities data for the proposed area. Json should have the format:
+
+        {
+                "id": id of amenities entry
+                "timestamp": time stamp of when the amenities information was inserted in DB,
+                "service_area": {
+                    "name": name of service area this amenities information belongs to
+                    "_id": ID of service area this amenities information belongs to
+                    },
+                "bitmap_file": file where bitmap of the amenities is stored
+        }
+
+        :param data: weather data to insert in the database.
+        :return:
+
+        if json to insert is not valid (incorrect fields, types or duplicated information, or error in server),
+        function will return an error dictionary of the format
+            {
+                "Error": "error information string"
+            }
+        if json is valid, response will be of the format:
+            {
+                "ok":{
+                    "id": id of inserted document
+                }
+            }
+        """
         try:
-            for key in SAPROPERTIESKEYS:
-                if key not in data:
-                    return {"Error": 'Missing fields from submission: ' + key}
-                if key == "service_area":
-                    self.verifyInnerDict(data["service_area"], self.SERVICEAREADICTKEYS)
-                keyType = SAPROPERTIESKEYS[key]
-                print("key type: ", keyType)
-                print("user[" + key + "]: ", type(data[key]))
-                if type(data[key]) is not keyType:
-                    return {"Error": 'Key ' + key + ' is not the expected type: ' + str(keyType)}
+            validation = self.verifySAPropertiesKeys(data)
+            if "Error" in validation:
+                return validation
 
             amenities = self.getAmenities(data["service_area"]["_id"])
             if amenities:
                 return {"Error": {'There is already an amenities bitmap for this area': amenities}}
 
             id = ServiceAreaDao().insertAmenitiesData(data)
-            print("amenities: "+ id)
+            if id is None:
+                response = {"Error": "Error on insertion"}
+            else:
+                # no error, return id
+                response = {"ok": {"_id": id}}
+            return response
         except Exception as e:
             return str(e)
 
     def insertBuildingsData(self, data):
-        try:
-            for key in SAPROPERTIESKEYS:
-                if key not in data:
-                    return {"Error": 'Missing fields from submission: ' + key}
-                if key == "service_area":
-                    self.verifyInnerDict(data["service_area"], self.SERVICEAREADICTKEYS)
-                keyType = SAPROPERTIESKEYS[key]
-                print("key type: ", keyType)
-                print("user[" + key + "]: ", type(data[key]))
-                if type(data[key]) is not keyType:
-                    return {"Error": 'Key ' + key + ' is not the expected type: '+ str(keyType)}
+        """
+        Function to insert buildings data. This data is collected when a new service area is inserted in the system.
+        This function will validate the json passed as a parameter has the correct  fields and field types, also,
+        if there already exists buildings data for the proposed area. Json should have the format:
 
-            print(type(data["service_area"]["_id"]))
+        {
+                "id": id of buildings entry
+                "timestamp": time stamp of when the buildings information was inserted in DB,
+                "service_area": {
+                    "name": name of service area this buildings information belongs to
+                    "_id": ID of service area this buildings information belongs to
+                    },
+                "bitmap_file": file where bitmap of the buildings is stored
+        }
+
+        :param data: buildings data in json format to insert in the database.
+        :return:
+
+        if json to insert is not valid (incorrect fields, types or duplicated information, or error in server),
+        function will return an error dictionary of the format
+            {
+                "Error": "error information string"
+            }
+        if json is valid, response will be of the format:
+            {
+                "ok":{
+                    "id": id of inserted document
+                }
+            }
+        """
+        try:
+            validation = self.verifySAPropertiesKeys(data)
+            if "Error" in validation:
+                return validation
+
             buildings = self.getBuildings(data["service_area"]["_id"])
             if buildings:
                 return {"Error":{'There is already a buildings bitmap for this area': buildings}}
 
             id = ServiceAreaDao().insertBuildingsData(data)
-            print(id)
+            if id is None:
+                response = {"Error": "Error on insertion"}
+            else:
+                # no error, return id
+                response = {"ok": {"_id": id}}
+            return response
         except Exception as e:
             return str(e)
 
     def insertStreetData(self, data):
+        """
+        Function to insert streets data. This data is collected when a new service area is inserted in the system.
+        This function will validate the json passed as a parameter has the correct  fields and field types, also,
+        if there already exists buildings data for the proposed area. Json should have the format:
+
+        {
+                "id": id of streets entry
+                "timestamp": time stamp of when the streets information was inserted in DB,
+                "service_area": {
+                    "name": name of service area this streets information belongs to
+                    "_id": ID of service area this streets information belongs to
+                    },
+                "bitmap_file": file where bitmap of the streets is stored
+        }
+
+        :param data: streets data in json format to insert in the database.
+        :return:
+
+        if json to insert is not valid (incorrect fields, types or duplicated information, or error in server),
+        function will return an error dictionary of the format
+            {
+                "Error": "error information string"
+            }
+        if json is valid, response will be of the format:
+            {
+                "ok":{
+                    "id": id of inserted document
+                }
+            }
+        """
         try:
-            for key in SAPROPERTIESKEYS:
-                if key not in data:
-                    return {"Error":'Missing fields from submission: ' + key}
-                if key == "service_area":
-                    self.verifyInnerDict(data["service_area"], self.SERVICEAREADICTKEYS)
-                keyType = SAPROPERTIESKEYS[key]
-                print("key type: ", keyType)
-                print("user[" + key + "]: ", type(data[key]))
-                if type(data[key]) is not keyType:
-                    return {"Error": 'Key ' + key + ' is not the expected type: '+ str(keyType)}
+            validation = self.verifySAPropertiesKeys(data)
+            if "Error" in validation:
+                return validation
 
             street = self.getStreets(data["service_area"]["_id"])
             if street:
                 return {"Error":{'There is already a streets bitmap for this area': street}}
 
             id = ServiceAreaDao().insertStreetData(data)
-            print(id)
+            if id is None:
+                response = {"Error": "Error on insertion"}
+            else:
+                # no error, return id
+                response = {"ok": {"_id": id}}
+            return response
         except Exception as e:
             return str(e)
+
+    def verifySAPropertiesKeys(self, data):
+        for key in SAPROPERTIESKEYS:
+            if key not in data:
+                return {"Error": 'Missing fields from submission: ' + key}
+            if key == "service_area":
+                self.verifyInnerDict(data["service_area"], self.SERVICEAREADICTKEYS)
+            keyType = SAPROPERTIESKEYS[key]
+            print("key type: ", keyType)
+            print("user[" + key + "]: ", type(data[key]))
+            if type(data[key]) is not keyType:
+                return {"Error": 'Key ' + key + ' is not the expected type: ' + str(keyType)}
+
+            if key == "bitmap_file":
+                if len("bitmap_file") == 0:
+                    return {"Error": 'bitmap file path should not be an empty string'}
+
+        date = self.toIsoFormat(data["timestamp"])
+        if date == -1:
+            return {"Error": 'Date in wrong format. It should be YYYY-MM-DD'}
+        data["timestamp"] = date
+
+        return data
+

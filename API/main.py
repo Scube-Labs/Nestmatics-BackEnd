@@ -287,6 +287,36 @@ def deleteUser(userid=None):
 
 @app.route('/nestmatics/areas', methods=['GET'])
 def getAllServiceAreas():
+    """
+    Route to get all Service areas in the database.
+    :return:
+        if request is successful, will return a response object with the id of the inserted object with format:
+        { "ok":[
+            {
+                "_id": id of service area,
+                "area_name": name of service area,
+                "coords": {
+                    "coordinates": [
+                        [
+                            -67.152729,
+                            18.2176116
+                        ]
+                        .
+                        .
+                    ],
+                    "type": "LineString"
+                }
+            },
+             .
+             .
+             .  ]
+         }
+         if error in request, will return a 400, 404, 500 or 405 ststus code with corresponding information, following the
+        format:
+        {
+            "Error": "error information string"
+        }
+    """
     if request.method == 'GET':
         return ServiceAreaHandler().getAllServiceAreas()
     else:
@@ -294,6 +324,28 @@ def getAllServiceAreas():
 
 @app.route('/nestmatics/areas/<areaid>', methods=['GET'])
 def getServiceArea(areaid=None):
+    """
+    Route to retrieve service area information identified by the areaid used as parameter
+    :param areaid: ID of the service area to request
+    :return:
+        if request is successful (status code 200), will return a response object with the information of requested
+        user. Response will have the format:
+           {
+            "_id": id of service area,
+            "area_name": name of service area,
+            "coords": {
+                "coordinates": [
+                    coordinates of service area
+                ],
+                "type": (optional) type of polygon coordinates
+            }
+
+        if error in request, will return a 400, 404, 500 or 405 status code with corresponding information, following
+        the format:
+        {
+            "Error": "error information string"
+        }
+    """
     if request.method == 'GET':
         return ServiceAreaHandler().getServiceArea(areaid=areaid)
     else:
@@ -301,13 +353,43 @@ def getServiceArea(areaid=None):
 
 @app.route('/nestmatics/areas', methods=['POST'])
 def postServiceArea():
+    """
+    Route to insert a Service Area in the database. Service Area to be inserted should have the following structure:
+    {
+        "_id": id of service area,
+        "area_name": name of service area,
+        "coords": {
+            "coordinates": [
+                coordinates of service area
+            ],
+            "type": (optional) type of polygon coordinates
+    }
+    :return:
+        if request is successful, will return a response object with the id of the inserted object with format:
+        { "ok":
+            { "_id": id_Number  }
+        }
+        ** id_Number refers to the db id for the newly inserted field
+
+        if error in request, will return a 400, 404, 500 or 405 error with corresponding information, following the
+        format:
+        {
+            "Error": "error information string"
+        }
+    """
     if request.method == 'POST':
         return ServiceAreaHandler().insertServiceArea(request.json)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 @app.route('/nestmatics/areas/<areaid>/date/<date>/weather', methods=['GET'])
-def getWeaterData(areaid=None, date=None):
+def getWeatherData(areaid=None, date=None):
+    """
+    Route to get weather data from a specified location on a specified date
+    :param areaid: ID of area requested weather belongs to
+    :param date: date of requested weather information
+    :return:
+    """
     if request.method == 'GET':
         return ServiceAreaHandler().getWeatherForDay(areaid, date)
     else:
