@@ -1,10 +1,11 @@
 import numpy as np
 from utils import haversine, create_blank_image
 import datetime
+from datetime import date
 import holidays
 from PIL import Image, ImageDraw
 
-#TODO check valids date
+
 
 AMENITIES_TYPE = {
     "Substenance" : ["bar", "bbq", "biergarten", "cafe", "drinking_water", "fast_food", "food_court", "ice_cream", "pub", "restaurant"],
@@ -14,61 +15,122 @@ AMENITIES_TYPE = {
     "Entertainment": ["arts_centre", "brothel", "casino", "cinema", "community_centre", "fountain", "gambling", "nightclub", "planetarium", "public_bookcase", "social_centre", "stripclub", "studio", "swingerclub", "theatre"]
 }
 
-def make_temperature_features(data, north_lat, south_lat, east_lon, west_lon, meter_per_pixel = 1):
 
-    x = int(haversine([north_lat, west_lon], [north_lat, east_lon])/meter_per_pixel) #columns
-    y = int(haversine([north_lat, west_lon], [south_lat, west_lon])/meter_per_pixel) #rows
+def make_weather_features(data, north_lat, south_lat, east_lon, west_lon):
+    """Calculate the most apropriate precipitation or temperature value from a list for a specified region.
 
-    if len(data) == 1: # Set all values the same since there's only one data point.
-        return np.full((y, x), data[0][2])
-    elif len(data) > 1: # Set all values to the closest one to the middle of the area.
+    Args:
+        data (array): Array populated by len = 3 arrays with the following format: [lon, lat, value]
+        north_lat (float): Norht latitude of service area.
+        south_lat (float): South latitude of service area.
+        east_lon (float): East longituded of service area.
+        west_lon (float): West longituded of service area.
 
-        mid_lat = (north_lat + south_lat)/2
-        mid_lon = (east_lon + west_lon)/2
+    Raises:
+        ValueError: empty data array.
 
-        closest_point_dist = None
-        closest_point_temp = None
+    Returns:
+        float: Value of Precipitaion in inches or temperature in Fahrenheit for the given service area region.
+    """
 
-        for data_point in data:
-            distance = haversine([mid_lat, mid_lon], [data_point[0], data_point[1]])
-            if closest_point_dist is None or closest_point_dist > distance:
-                closest_point_dist = distance
-                closest_point_temp = data_point[2]
-
-        return np.full((y, x), closest_point_temp, dtype=float)
-        
-    else:
-        raise ValueError("data field empty.")
-
-
-def make_precipitation_features(data, north_lat, south_lat, east_lon, west_lon, meter_per_pixel = 1):
-    x = int(haversine([north_lat, west_lon], [north_lat, east_lon])/meter_per_pixel) #columns
-    y = int(haversine([north_lat, west_lon], [south_lat, west_lon])/meter_per_pixel) #rows
-
-    if len(data) == 1: # Set all values the same since there's only one data point.
-        return np.full((y, x), data[0][2])
-    elif len(data) > 1: # Set all values to the closest one to the middle of the area.
+    if len(data) == 1: # Only one data point given.
+        return data[0][2]
+    elif len(data) > 1: # Find out the closest data point to the middle of the region.
 
         mid_lat = (north_lat + south_lat)/2
         mid_lon = (east_lon + west_lon)/2
 
         closest_point_dist = None
-        closest_point_prec = None
+        closest_point_val = None
 
         for data_point in data:
-            distance = haversine([mid_lat, mid_lon], [data_point[0], data_point[1]])
-            if closest_point_dist is None or closest_point_dist > distance:
+            distance = haversine([mid_lat, mid_lon], [data_point[0], data_point[1]]) #Calculate distance to the middle of the region from weather station location.
+            if closest_point_dist is None or closest_point_dist > distance: 
                 closest_point_dist = distance
-                closest_point_prec = data_point[2]
+                closest_point_val = data_point[2]
 
-        return np.full((y, x), closest_point_prec)
+        return closest_point_val
         
     else:
         raise ValueError("data field empty.")
 
-#TODO integrate meter_per_pixel
-def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
+
+def make_rides_features(data, north_lat, south_lat, east_lon, west_lon, meter_per_pixel=1):
+    """Create ride matrixes for the total amount of rides and divided by the hour. Size is determined by the given coords and pixel definition.
+
+    Args:
+        data (array): array with multiple len = 3 arrays in whitch the ride data is stored in the following format [lat (float), lon(float), hour (int)].
+        north_lat (float): Norht latitude of service area.
+        south_lat (float): South latitude of service area.
+        east_lon (float): East longituded of service area.
+        west_lon (float): West longituded of service area.
+        meter_per_pixel (int, optional): pixel size in relation to real distances. Defaults to 1 (1mx1m).
+
+    Returns:
+        np.array: 2 dim matrix representing the total amount of rides from the specified service area.
+        np.array: 3 dim matrix repressenting the total amount of rids from the specified service area, 3rd dim divides the result by the hour(len(shape[2]) = 24)
+
+    """
+
+    #Calculate matrix size(like an image bitmap)
+    img_x = int(haversine((north_lat, west_lon), (north_lat, east_lon))/meter_per_pixel)
+    img_y = int(haversine((north_lat, west_lon), (south_lat, west_lon))/meter_per_pixel)
+
+    #Create empty matrix
+    ride_matrix = np.zeros((img_x, img_y, 24), dtype = np.float)
     
+    #Populate matrix
+    for ride in data:
+        x = int(haversine((north_lat, west_lon), (north_lat, ride[1]))/meter_per_pixel)
+        y = int(haversine((north_lat, west_lon), (ride[0], west_lon))/meter_per_pixel)
+        try: 
+            ride_matrix[x][y][ride[2]] += 1
+        except:
+            continue
+    
+    #Calculate total rides of day.
+    total_ride = np.sum(ride_matrix, axis=-1)
+    
+    return total_ride, ride_matrix 
+        
+
+def make_temporal_features(date): 
+    """Determine the day of the week, month and if its a holiday from a given day.
+
+    Args:
+        date (string): Date to analyse in iso format, YYYY-MM-DD.
+
+    Returns:
+        weekday int: Number of the weekday(Monday=0 - Sunday=6)
+        month int: Number of the month(January=1, December=12)
+        holiday int: 1 if its a holiday, 0 otherwise.
+    """
+    d = datetime.datetime.fromisoformat(date)
+
+    weekday = d.weekday()
+    month = d.month
+
+    pr_holidays = holidays.UnitedStates(state='PR') 
+    holiday = date in pr_holidays
+
+    return weekday, month, holiday * 1
+
+
+def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
+    """Process the openstreetmap data to gather the terrain features.
+
+    Args:
+        data (dict): Dictionary object from OpenStreetMap.
+        north_lat (float): Norht latitude of service area.
+        south_lat (float): South latitude of service area.
+        east_lon (float): East longituded of service area.
+        west_lon (float): West longituded of service area.
+
+    Returns:
+        Object: Image object representing streets bitmap.
+        Object: Image object representing buildings bitmap.
+        Dict: Dictionary compose of the Image object representing the amenities bitmaps.
+    """
     #Getting ways and node objects
     ways_raw = []
     nodes_raw = []
@@ -79,7 +141,7 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
                 continue
             if e["type"] == "node":
                 nodes_raw.append(e)
-    #TODO change matrix to single number
+    
     
     #Filter elements (ways, buildings, ammenities)
     ways = {}
@@ -91,7 +153,7 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
             if "highway" in e["tags"]:
                 if e["tags"]["highway"] not in ways: #Get type of way and save it to dict with empty array.
                     ways[e["tags"]["highway"]] = []
-                ways[e["tags"]["highway"]].append(e) #Insert street element on array of designated key in dict.
+                ways[e["tags"]["highway"]].append(e)
                 continue
             if "building" in e["tags"]:
                 if e["tags"]["building"] == "yes":
@@ -105,14 +167,13 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
     #Dict that has the id node to gps info.
     node_to_gps_dict = {}
 
-    #Extra node coordinates, and get node amenities.
+    #Extract node coordinates, and get node type amenities.
     for e in nodes_raw:
         if "tags" in e:
             if "amenity" in e["tags"]:
                 if e["tags"]["amenity"] not in amenities:
                     amenities[e["tags"]["amenity"]] = []
                 amenities[e["tags"]["amenity"]].append(e)
-                continue
         else:        
             node_to_gps_dict[e['id']] = [e['lat'], e['lon']]       
 
@@ -170,7 +231,7 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
             
             line.append(sub_line)
 
-        # What type fits?
+        # Group by amenity type
         for t in AMENITIES_TYPE:
             if key in AMENITIES_TYPE[t]:
                 if t not in amenities_to_draw:
@@ -193,47 +254,21 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
     #Add roads to black image
     draw_street = ImageDraw.Draw(img_streets)
     for line in lines_to_draw:
-        draw_street.line(line, fill='white', width=1)#TODO relate width to street type(maybe)
-    #img_streets.save('street.bmp')
+        draw_street.line(line, fill='white', width=1)
 
     #Add buildings to black image
     draw_buildings = ImageDraw.Draw(img_buildings)
     for line in buildings_to_draw:
-        draw_buildings.polygon(line, fill='white')#TODO relate width to street type(maybe)
-    #img_buildings.save('building.bmp') #TODO this to DB
-
+        draw_buildings.polygon(line, fill='white')
     
     for key in amenities_to_draw:
         draw_amenities = ImageDraw.Draw(img_amenities[key])
 
-        for element in amenities_to_draw[key]:
+        for element in amenities_to_draw[key][0]:
             if len(element) == 1: #Point
-                draw_amenities.ellipse((element[0][1]-10, element[0][1]-10, element[0][1]+10, element[0][1]+10) ,fill='white', outline='white') # create a 20 m radious circle #TODO justify this size
+                draw_amenities.ellipse((element[0][1]-15, element[0][1]-15, element[0][1]+15, element[0][1]+15) ,fill='white', outline='white') # create a 30 m radious circle
             else:
                 draw_amenities.polygon(element, fill='white')
 
     return img_streets, img_buildings, img_amenities
 
-
-def make_rides_features(data, north_lat, south_lat, east_lon, west_lon, meter_per_pixel=1):
-    #data [lat, lon, time(hour)]
-    img_x = int(haversine((north_lat, west_lon), (north_lat, east_lon))/meter_per_pixel)
-    img_y = int(haversine((north_lat, west_lon), (south_lat, west_lon))/meter_per_pixel)
-    ride_matrix = np.zeros((img_x, img_y, 24), dtype = np.int8)
-    
-    for ride in data:
-        x = int(haversine((north_lat, west_lon), (north_lat, ride[1]))/meter_per_pixel)
-        y = int(haversine((north_lat, west_lon), (ride[0], west_lon))/meter_per_pixel)
-        ride_matrix[x][y][ride[2]] += 1
-    
-    return ride_matrix #TODO change matrix to single number
-        
-
-def make_temporal_features(date): 
-    weekday = datetime.datetime.strptime(date, '%Y-%m-%d').weekday()
-    month = datetime.datetime.strptime(date, '%Y-%m-%d').month()
-    pr_holidays = holidays.UnitedStates(state='PR') 
-    holiday = date in pr_holidays
-
-    return weekday, month, holiday
-    #TODO personalized holidays
