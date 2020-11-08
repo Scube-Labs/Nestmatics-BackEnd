@@ -19,11 +19,50 @@ def home():
 
 # ------------------------ Rides API routes -----------------------------------------#
 
-@app.route('/nestmatics/rides/position/area/<areaid>/date/<date>', methods=['GET'])
-def getRidesCoordinates(areaid=None, date=None):
+@app.route('/nestmatics/rides/area/<areaid>/date/<date>', methods=['GET'])
+def getRidesForDateAndArea(areaid=None, date=None):
+    """
+    Route to get coordinates of rides for a specified area on a specified day
+    :param areaid: ID of area to get rides from
+    :param date: date on which rides happened
+    :return:
+    """
     if request.method == 'GET':
         if areaid == None or date == None:
-            return jsonify(Error="URI does not have all parameters needed"), 404
+            return jsonify(Error="URI does not have all parameters needed"), 400
+        list = RidesHandler().getRidesForDateAndArea(date=date, areaid=areaid)
+        return list
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/rides/interval/area/<areaid>/date/<date>/start/<starttime>/end/<endtime>', methods=['GET'])
+def getRidesForTimeInterval(areaid=None, date=None, starttime=None, endtime=None):
+    """
+    Route to get coordinates of rides for a specified area on a specified day
+    :param areaid: ID of area to get rides from
+    :param date: date on which rides happened
+    :return:
+    """
+    if request.method == 'GET':
+        if areaid == None or date == None:
+            return jsonify(Error="URI does not have all parameters needed"), 400
+        list = RidesHandler().getRidesForTimeIntervalAndArea(date=date, areaid=areaid,
+                                                             time_gt=starttime, time_lt=endtime)
+        return list
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/rides/coords/area/<areaid>/date/<date>', methods=['GET'])
+def getRidesCoordinates(areaid=None, date=None):
+    """
+    Route to get coordinates of rides for a specified area on a specified day
+    :param areaid: ID of area to get rides from
+    :param date: date on which rides happened
+    :return:
+    """
+    if request.method == 'GET':
+        if areaid == None or date == None:
+            return jsonify(Error="URI does not have all parameters needed"), 400
         list = RidesHandler().getRidesCoordsForDateAndArea(date=date, areaid=areaid)
         return list
     else:
@@ -51,6 +90,13 @@ def getRidesEndingAtNest(nestid=None,date=None,areaid=None):
 
 @app.route('/nestmatics/rides', methods=['POST'])
 def postRides():
+    """
+    Route to insert Rides from a provided csv file in the request.
+    :return:
+        if request was valid: response object with status code 201 containing JSON with inserted rides IDs, skipped
+            rides and the ids of stats entry for the uploaded days
+        if request was invalid: response object with status code 400, 500 or 405 along with json with error message
+    """
     if request.method == 'POST':
         if 'file' not in request.files:
             return make_response(jsonify(Error="No file was uploaded"), 400)
@@ -68,16 +114,31 @@ def postRides():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
             return RidesHandler().insertRides(file, area)
+        else:
+            return make_response(jsonify(Error="File format not allowed or file name not provided"), 400)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 def allowed_file(filename):
+    """
+    Helper method ro verify if file is of a csv format
+    :param filename: name of provided file
+    :return:
+    """
     return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'csv'
 
 # ------------------------ Rides Stats API routes -----------------------------------#
 
 @app.route('/nestmatics/stats/area/<areaid>/date/<date>', methods=['GET'])
 def getRidesStats(areaid=None,date=None):
+    """
+    Route to get ride stats for a specified date and area
+    :param areaid: ID of area to get stats from
+    :param date: date of stats
+    :return:
+        if request was valid: response object with status code 201 containing JSON with rides stats
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
+    """
     if request.method == 'GET':
         return RideStatsHandler().getStatsForDate(date, areaid)
     else:
@@ -114,6 +175,12 @@ def getTotalRevenue(areaid=None,date=None):
 # ------------------------ Nest API routes ------------------------------------------#
 @app.route('/nestmatics/nests', methods=['POST'])
 def postNests():
+    """
+    Route to insert Nests into the database
+   :return:
+        if request was valid: response object with status code 201 containing JSON with id of new nest
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
+    """
     if request.method == 'POST':
         return NestsHandler().insertNests(request.json)
     else:
