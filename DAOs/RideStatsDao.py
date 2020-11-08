@@ -4,54 +4,35 @@ from DAOs.ParentDao import ParentDao
 class RideStatsDao(ParentDao):
 
     def getStatsForDateAndArea(self, date, areaid):
-        statsCollection = self.db["ride_stats"]
-        cursor = statsCollection.find_one({"date": date, "service_area._id": ObjectId(areaid)})
-        if cursor is not None:
-            cursor["_id"] = str(cursor["_id"])
-            cursor["service_area"]["_id"] = str(cursor["service_area"]["_id"])
-        return cursor
+        cursor = self.statsCollection.find_one({"date": date, "service_area": areaid})
+        return self.returnOne(cursor)
 
     def getTotalNumberOfRides(self, date, areaid, until_time=None):
-        statsCollection = self.db["ride_stats"]
-        cursor = statsCollection.find_one({"date": date, "service_area._id": ObjectId(areaid)},
+        cursor = self.statsCollection.find_one({"date": date, "service_area": areaid},
                                           {"total_rides": 1, "date": 1})
-        if cursor is not None:
-            cursor["_id"] = str(cursor["_id"])
-        return cursor
+        return self.returnOne(cursor)
 
     def getTotalRideTime(self, date, areaid, until_time=None):
-        statsCollection = self.db["ride_stats"]
-        cursor = statsCollection.find_one({"date": date, "service_area._id": ObjectId(areaid)},
+        cursor = self.statsCollection.find_one({"date": date, "service_area": areaid},
                                           {"total_ride_time": 1, "date": 1})
-        if cursor is not None:
-            cursor["_id"] = str(cursor["_id"])
-        return cursor
+        return self.returnOne(cursor)
 
     def getTotalActiveVehicles(self, date, areaid, until_time=None):
-        statsCollection = self.db["ride_stats"]
-        cursor = statsCollection.find_one({"date": date, "service_area._id": ObjectId(areaid)},
+        cursor = self.statsCollection.find_one({"date": date, "service_area": areaid},
                                           {"total_active_vehicles": 1, "date": 1})
-        if cursor is not None:
-            cursor["_id"] = str(cursor["_id"])
-        return cursor
+        return self.returnOne(cursor)
 
     def getTotalRevenue(self, date, areaid, until_time=None):
-        statsCollection = self.db["ride_stats"]
-        cursor = statsCollection.find_one({"date": date, "service_area._id": ObjectId(areaid)},
+        cursor = self.statsCollection.find_one({"date": date, "service_area": areaid},
                                           {"total_revenue": 1, "date": 1})
-        if cursor is not None:
-            cursor["_id"] = str(cursor["_id"])
-        return cursor
+        return self.returnOne(cursor)
 
     def insertStats(self, item):
-        statsCollection = self.db["ride_stats"]
-        _id = statsCollection.insert_one(item)
-        returnAck = (str(_id.inserted_id))
-        return returnAck
+        cursor = self.statsCollection.insert_one(item)
+        return self.insertOne(cursor)
 
     def deleteStatsByDate(self, date):
-        statsCollection = self.db["rides"]
-        x = statsCollection.delete_many({"date":date})
-        return x.deleted_count
+        cursor = self.statsCollection.delete_many({"date":date})
+        return cursor.deleted_count
 
 #print(RideStatsDao().getStatsForDateAndArea("2013-09-21","5f91c682bc71a04fda4b9dc7"))

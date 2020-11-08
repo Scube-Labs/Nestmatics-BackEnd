@@ -1,12 +1,14 @@
-from flask import jsonify
+from flask import jsonify, make_response
 from math import pow, sqrt, pi, sin, cos, atan2
 from datetime import datetime
 from Handlers.ParentHandler import ParentHandler
+import csv
 
 from Handlers.RideStatsHandler import RideStatsHandler
 from DAOs.RidesDao import RidesDAO
 
-RIDESKEYS=["bird_id","date", "service_area","ride_started_at","ride_completed_at", "ride_cost", "ride_distance","ride_duration", "coords"]
+RIDESKEYS=["bird_id", "dt", "start_time", "end_time", "ride_cost", "start_long", "start_lat",
+           "end_lat", "end_long"]
 
 class RidesHandler(ParentHandler):
 
@@ -28,49 +30,164 @@ class RidesHandler(ParentHandler):
         rides_at_nest = self.startAtNest(nestid, rides, start)
         return jsonify(rides_at_nest)
 
-    def insertRides(self, rides_json):
+    def testCSV(self, file):
+        file_data = file.read().decode('utf-8').split("\n")
+        csv_reader = csv.reader(file_data)
+        counter = 0
+        line_count = 0
+        keys = {}
+        currentDate = None
+        prevDate = None
+
+        for row in csv_reader:
+            if line_count == 0:
+                for key in RIDESKEYS:
+                    if key not in row:
+                        return jsonify(Error='Missing fields from submission: ' + key)
+                    indexKey = row.index(key)
+                    keys[key] = indexKey
+                print(keys)
+                line_count += 1
+                continue
+
+            if prevDate is None:
+                prevDate = self.toIsoFormat(row[keys['dt']])
+
+            currentDate = self.toIsoFormat(row[keys['dt']])
+
+            if currentDate != prevDate:
+                return jsonify("changed dates on index ", line_count)
+
+            prevDate = currentDate
+            line_count += 1
+
+        return jsonify("success")
+
+    def insertRides(self, file, area):
+       # try:
+        line_count = 0
+        file_data = file.read().decode('utf-8').split("\n")
+        csv_reader = csv.reader(file_data)
+
         ack = []
-        nack=[]
+        nack = []
+        stats_ids = []
         total_rides = 0
         revenue = 0
-        total_ride_time = 0
         total_active_vehicles = {}
-        date = rides_json[0]["date"]
-        service_area = rides_json[0]["service_area"]
-        for item in rides_json:
-            for key in RIDESKEYS:
-                if key not in item:
-                    return jsonify(Error='Missing credentials from submission: ' + key)
-                elif key == "service_area":
-                    self.verifyInnerDict(item[key], self.SERVICEAREADICTKEYS)
-                elif key == "coords":
-                    self.verifyInnerDict(item[key], self.COORDSDICTKEYS)
 
-            findRides = RidesDAO().getRidesForTimeAndVechicleId(item["ride_started_at"], item["date"], item["service_area"]["_id"],
-                                                          item["bird_id"])
+        service_area = area
+
+        repeatedRides = 0
+        currentDate = None
+        prevDate = None
+        keys = {}
+
+        for row in csv_reader:
+            if len(row) == 0:
+                break
+
+            if line_count == 0:
+                for key in RIDESKEYS:
+                    if key not in row:
+                        return jsonify(Error='Missing fields from submission: ' + key)
+                    index = row.index(key)
+                    keys[key] = index
+                print(keys)
+                line_count += 1
+                continue
+
+            if prevDate is None:
+                prevDate = self.toIsoFormat(row[keys['dt']])
+
+            currentDate = self.toIsoFormat(row[keys['dt']])
+
+            if currentDate != prevDate:
+                item = {
+                    "total_rides": total_rides,
+                    "service_area": service_area,
+                    "total_revenue": revenue,
+                    "date": prevDate,
+                    "total_active_vehicles": total_active_vehicles
+                }
+                total_rides = 0
+                revenue = 0
+                total_active_vehicles = {}
+
+                # insert stats for this date
+                id = RideStatsHandler().insertStats(item)
+
+                if "ok" in id:
+                    stats_ids.append(id["ok"])
+
+                break
+
+            prevDate = currentDate
+
+            startTime = self.toIsoFormat(row[keys["start_time"]])
+            endTime = self.toIsoFormat(row[keys["end_time"]])
+            bird_id = str(row[keys["bird_id"]])
+
+            findRides = RidesDAO().getRidesForTimeAndVechicleId(startTime,
+                                                                endTime,
+                                                                service_area,
+                                                                bird_id)
             #print(findRides)
             if findRides is not None:
-                nack.append(findRides)
-                if len(nack) == len(rides_json):
-                    return jsonify([{"error": "There is already rides stored for this day"},{"rejected": nack}])
+                repeatedRides += 1
+                #nack.append(findRides)
                 continue
             else:
-                bird_id = str(item["bird_id"])
+                bird_id = bird_id
                 if bird_id in total_active_vehicles:
                     total_active_vehicles[bird_id] += 1
-                    print("bird_id: "+ bird_id+ ", "+ str(total_active_vehicles[bird_id]))
+
                 else:
                     total_active_vehicles[bird_id] = 1
-                    print("new bird_id: " + bird_id + ", " + str(total_active_vehicles[bird_id]))
-                revenue += item["ride_cost"]
-                total_ride_time += item["ride_duration"]
-                total_rides += 1
-                item["date"] = datetime.strptime(item["date"], '%Y-%m-%d').isoformat()
-                ack.append(RidesDAO().insertRide(item))
 
-        _id = RideStatsHandler().insertStats(revenue, total_active_vehicles, total_ride_time,
-                                       total_rides, date, service_area)
-        return jsonify({"inserted": ack}, {"rejected": nack}, {"stats":_id})
+                cost = row[keys["ride_cost"]]
+                if len(cost) != 0:
+                    print(cost)
+                    revenue += float(cost)
+                total_rides += 1
+
+                ride = {
+                    "date": currentDate,
+                    "bird_id": bird_id,
+                    "start_time": startTime,
+                    "end_time": endTime,
+                    "service_area": {"_id": service_area},
+                    "ride_cost": row[keys["ride_cost"]],
+                    "coords": {
+                        "start_lat": row[keys["start_lat"]],
+                        "start_lon": row[keys["start_long"]],
+                        "end_lat": row[keys["end_lat"]],
+                        "end_long": row[keys["end_long"]]
+                    }
+                }
+                id = RidesDAO().insertRide(ride)
+
+                ack.append(id)
+
+                line_count += 1
+
+        # item = {
+        #     "total_rides": total_rides,
+        #     "service_area": service_area,
+        #     "total_revenue": revenue,
+        #     "date": prevDate,
+        #     "total_active_vehicles": total_active_vehicles
+        # }
+        #
+        # # insert stats for this date
+        # id = RideStatsHandler().insertStats(item)
+        #
+        # if "ok" in id:
+        #     stats_ids.append(id["ok"])
+
+        return make_response(jsonify(ok={"inserted": ack,"stats_ids":stats_ids, "rejected": repeatedRides}),201)
+        # except Exception as e:
+        #     return make_response(jsonify(Error=str(e)), 500)
 
     def deleteRidesByDate(self, date):
         count = RidesDAO().deleteRidesByDate(date)

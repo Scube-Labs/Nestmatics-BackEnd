@@ -25,17 +25,14 @@ class RideStatsHandler(ParentHandler):
         stats = RideStatsDao().getTotalRevenue(date, areaid)
         return jsonify(stats)
 
-    def insertStats(self, revenue, totalact, ridetime, totalRides, date, area):
-        item = {
-            "total_rides":totalRides,
-            "service_area": area,
-            "total_revenue": revenue,
-            "date": date,
-            "total_ride_time": ridetime,
-            "total_active_vehicles":totalact
-        }
+    def insertStats(self, item):
+        print(item)
+        findStats = RideStatsDao().getStatsForDateAndArea(item["date"], item["service_area"])
+        if findStats is not None:
+            return {"Error": "Already stats for this date and area"}
+
         _id = RideStatsDao().insertStats(item)
-        return _id
+        return {"ok": _id}
 
     def deleteRideStatsByDate(self, date):
         x = RideStatsDao().deleteStatsByDate(date)

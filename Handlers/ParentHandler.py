@@ -31,7 +31,10 @@ class ParentHandler:
                 newdate = datetime.strptime(date, '%Y-%m-%d').isoformat()
             return newdate
         except Exception as e:
-            return -1
+            try:
+                return datetime.strptime(date, '%Y-%m-%d %H:%M:%S').isoformat()
+            except:
+                return -1
 
     def verifyIDString(self, id):
         if len(id) == 24:

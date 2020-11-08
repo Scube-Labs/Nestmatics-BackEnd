@@ -1,11 +1,8 @@
 from flask import Flask, jsonify, request, make_response
 
-# Import Cross-Origin Resource Sharing to enable
-# services on other ports on this machine or on other
-# machines to access this app
-from flask_cors import CORS, cross_origin
-
 from API import app
+import os
+from werkzeug.utils import secure_filename
 
 from Handlers.RidesHandler import RidesHandler
 from Handlers.NestsHandler import NestsHandler
@@ -16,10 +13,9 @@ from Handlers.DropStrategyHandler import DropStrategyHandler
 from Handlers.ExperimentsHandler import ExperimentsHandler
 from Handlers.ModelHandler import ModelHandler
 
-
 @app.route('/', methods=['GET'])
 def home():
-    return "henlo"
+    return "This is the Nestmatics API"
 
 # ------------------------ Rides API routes -----------------------------------------#
 
@@ -56,9 +52,27 @@ def getRidesEndingAtNest(nestid=None,date=None,areaid=None):
 @app.route('/nestmatics/rides', methods=['POST'])
 def postRides():
     if request.method == 'POST':
-        return RidesHandler().insertRides(rides_json=request.json)
+        if 'file' not in request.files:
+            return make_response(jsonify(Error="No file was uploaded"), 400)
+        file = request.files['file']
+
+        if 'area' not in request.form:
+            return make_response(jsonify(Error="No area was specified"), 400)
+        area = request.form['area']
+        print(area)
+        if file.filename == "":
+            return make_response(jsonify(Error="No file"), 400)
+        if file and allowed_file(file.filename):
+            print(type(file))
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+            return RidesHandler().insertRides(file, area)
     else:
         return jsonify(Error="Method not allowed."), 405
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'csv'
 
 # ------------------------ Rides Stats API routes -----------------------------------#
 

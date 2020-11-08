@@ -5,77 +5,39 @@ from DAOs.ParentDao import ParentDao
 class RidesDAO(ParentDao):
 
     def getRidesForDateAndArea(self, date, areaid):
-        ridesCollection = self.db["rides"]
-        cursor = ridesCollection.find({"date": date, "service_area._id": areaid})
-        results = []
-        if cursor is not None:
-            for x in cursor:
-                x["_id"] = str(x["_id"])
-                results.append(x)
-        return results
+        cursor = self.ridesCollection.find({"date": date, "service_area._id": areaid})
+        return self.returnMany(cursor)
 
     def getRidesCoordsForDateAndArea(self, date, areaid):
-        ridesCollection = self.db["rides"]
-        cursor = ridesCollection.find({"date": date, "service_area._id": areaid}, {"coords": 1, "_id":0, "date": 1})
-        results = []
-        if cursor is not None:
-            for x in cursor:
-                x["_id"] = str(x["_id"])
-                results.append(x)
-        return results
+        cursor = self.ridesCollection.find({"date": date, "service_area._id": areaid}, {"coords": 1, "_id":0, "date": 1})
+        return self.returnMany(cursor)
 
     def getRidesWithCoordinates(self, start_lat, start_lon):
-        ridesCollection = self.db["rides"]
-        cursor = ridesCollection.find({"coords.start_lat": start_lat, "coords.start_lon": start_lon})
-        results = []
-        if cursor is not None:
-            for x in cursor:
-                x["_id"] = str(x["_id"])
-                results.append(x)
-        return results
+        cursor = self.ridesCollection.find({"coords.start_lat": start_lat, "coords.start_lon": start_lon})
+        return self.returnMany(cursor)
 
     def getRidesForTimeAndVechicleId(self, started_at, date, areaid, bird_id):
-        ridesCollection = self.db["rides"]
-        cursor = ridesCollection.find_one({"ride_started_at": started_at, "date": date,
+        cursor = self.ridesCollection.find_one({"ride_started_at": started_at, "date": date,
                                            "service_area._id": areaid, "bird_id":bird_id})
-        if cursor is not None:
-            cursor["_id"] = str(cursor["_id"])
-        return cursor
+        return self.returnOne(cursor)
 
     def getRidesForTimeIntervalAndArea(self, time_gt, time_lt, areaid):
-        ridesCollection = self.db["rides"]
-        cursor = ridesCollection.find({"ride_started_at": {"$gte": time_gt, "$lte":time_lt},
+        cursor = self.ridesCollection.find({"ride_started_at": {"$gte": time_gt, "$lte":time_lt},
                                        "service_area._id": areaid})
-        results = []
-        if cursor is not None:
-            for x in cursor:
-                x["_id"] = str(x["_id"])
-                results.append(x)
-        return results
+        return self.returnMany(cursor)
 
     def getRidesForDateIntervalAndArea(self, date_gt, date_lt, areaid):
-        print(date_gt)
-        print(date_lt)
-       # date_gt =datetime.strptime(date_gt, '%Y-%m-%d').isoformat()
-       # date_lt = datetime.strptime(date_lt, '%Y-%m-%d').isoformat()
+        #print(date_gt)
+        #print(date_lt)
         cursor = self.ridesCollection.find({"date": {"$gte": date_gt,"$lte": date_lt},
                                        "service_area._id": areaid})
-        results = []
-        if cursor is not None:
-            for x in cursor:
-                x["_id"] = str(x["_id"])
-                results.append(x)
-        return results
+        return self.returnMany(cursor)
 
     def insertRide(self, ride):
-        rideCollection = self.db["rides"]
-        _id = rideCollection.insert_one(ride)
-        returnAck = (str(_id.inserted_id))
-        return returnAck
+        cursor = self.ridesCollection.insert_one(ride)
+        return self.insertOne(cursor)
 
     def deleteRidesByDate(self, date):
-        rideCollection = self.db["rides"]
-        x = rideCollection.delete_many({"date":date})
-        return x.deleted_count
+        cursor = self.ridesCollection.delete_many({"date":date})
+        return cursor.deleted_count
 
-#print(RidesDAO().getRidesForDateIntervalAndArea("2020-10-5", "2020-10-12", "5f91c682bc71a04fda4b9dc6"))
