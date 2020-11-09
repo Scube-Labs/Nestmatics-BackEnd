@@ -311,30 +311,50 @@ class NestsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getNestConfigurationsForNest(self, nestid):
+        """
+        Gets Nest congifurations that belong to a specified Nest
+        :param nestid: ID of nest that nest configurations belong to
+        :return:
+        response with status code 200: if request was valid, will return rseponse with Nest configurations
+            belonging to the specified ID
+        response with status code 400: if id does not follow correct format, will issue a json with a error information
+        response with status code 404: no nest configurations for nest id provided
+        response with status code 500: if an error happened in the server
+        """
         try:
+            if not self.verifyIDString(nestid):
+                return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
             nests = NestsDao().getNestConfigurationsForNest(nestid)
             if nests is None or len(nests) == 0:
-                response = make_response(jsonify(error="there was an error on the request. Or"
-                                                 "No Nest Configuration with that ID"), 404)
+                response = make_response(jsonify(Error="No nest configurations for this nest id"), 404)
             else:
-                response = make_response(jsonify(nests), 200)
+                response = make_response(jsonify(ok=nests), 200)
             return response
-        except:
-            response = make_response(jsonify("there was an error on the request"), 400)
-            return response
+        except Exception as e:
+            return make_response(jsonify(Error=str(e)), 500)
 
     def getNestConfigurationFromId(self, nestconfigid):
+        """
+        Gets Nest congifuration that belong to a specified ID
+        :param nestid: ID of nest configuration to find
+        :return:
+        response with status code 200: if request was valid, will return rseponse with Nest configurations
+            belonging to the specified ID
+        response with status code 400: if id does not follow correct format, will issue a json with a error information
+        response with status code 404: no nest configurations for nest id provided
+        response with status code 500: if an error happened in the server
+        """
         try:
+            if not self.verifyIDString(nestconfigid):
+                return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
             nests = self.getNestConfig(nestconfigid)
             if nests is None:
-                response = make_response(jsonify(error="there was an error on the request. Or"
-                                                 "No Nest Configuration with that ID"), 404)
+                response = make_response(jsonify(Error="No nest configurations for this id"), 404)
             else:
-                response = make_response(jsonify(nests), 200)
+                response = make_response(jsonify(ok=nests), 200)
             return response
-        except:
-            response = make_response(jsonify("there was an error on the request"), 400)
-            return response
+        except Exception as e:
+            return make_response(jsonify(Error=str(e)), 500)
 
     def getNestConfig(self, nestconfigid):
         config = NestsDao().getNestConfigurationFromID(nestconfigid)
@@ -342,30 +362,31 @@ class NestsHandler(ParentHandler):
 
     def calculateNestConfigurationStats(self, nestconfigid):
         from Handlers.RidesHandler import RidesHandler
-        try:
-            nestConfig = NestsDao().getNestConfigurationFromID(nestconfigid)
-        except:
-            return "error in nest Config Id"
+
+        if not self.verifyIDString(nestconfigid):
+            return {"Error":"Nest ID must be a valid 24-character hex string"}
+
+        nestConfig = NestsDao().getNestConfigurationFromID(nestconfigid)
+
         if nestConfig is not None:
             config_start_date = nestConfig["start_date"]
             config_end_date = nestConfig["end_date"]
 
-            try:
-                nest = NestsDao().findNestById(nestConfig["nest"]["_id"])
-            except:
-                return "error in nest Id"
+            nest = NestsDao().findNestById(nestConfig["nest"])
+            if nest is None:
+                return {"Error":"No nest with this ID"}
 
             print(nest["nest_name"])
-            area_id = nest["service_area"]["_id"]
+            area_id = nest["service_area"]
             print(area_id)
 
             rides = RidesHandler().getRidesForDateIntervalAndArea(config_start_date, config_end_date, area_id)
 
             revenue = 0
             nest_active_vehicles = []
-            nest_ride_time = 0
             rides_started = []
             rides_ended = []
+            total_rides = 0
 
             if rides is not None or len(rides) != 0:
                 from Handlers.RidesHandler import RidesHandler
@@ -373,11 +394,9 @@ class NestsHandler(ParentHandler):
                 for i in rides:
                     ride_coords = {"lat": i["coords"]["start_lat"], "lon": i["coords"]["start_lon"]}
                     if RidesHandler().areCoordsInsideNest(nest["coords"], 30, ride_coords):
-
-                        revenue += RidesHandler().calculateRideCost(i["ride_cost"],
-                                                                    RIDE_MINUTE_RATE, i["ride_duration"])
+                        total_rides += 1
+                        revenue += i["ride_cost"]
                         nest_active_vehicles.append(i["bird_id"])
-                        nest_ride_time += i["ride_duration"]
                         rides_started.append(i)
                     else:
                         ride_coords = {"lat": i["coords"]["end_lat"], "lon": i["coords"]["end_lon"]}
@@ -388,53 +407,91 @@ class NestsHandler(ParentHandler):
                 item = {
                     "vehicle_qty":nestConfig["vehicle_qty"],
                     "revenue": revenue,
+                    "total_rides": total_rides,
                     "active_vehicles": nest_active_vehicles,
-                    "nest_ride_time": nest_ride_time,
                     "rides_started_nest": rides_started,
                     "rides_end_nest": rides_ended
                 }
                 return item
         else:
-            return "no nestconfig with this id"
+            return {"Error":"No nest config with this ID"}
 
     def getNestConfigurationStats(self, nestconfigid):
         try:
+            if not self.verifyIDString(nestconfigid):
+                return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
             result = self.calculateNestConfigurationStats(nestconfigid)
             if result is None:
-                response = make_response(jsonify(error="there was an error on the request. Or"
-                                                 "No Nest Configuration with that ID"), 404)
+                return make_response(jsonify(Error="No rides happened to include that nest configuration "), 404)
+            if "Error" in result:
+                return make_response(jsonify(result), 400)
             else:
-                response = make_response(jsonify(result), 200)
+                response = make_response(jsonify(ok=result), 200)
             return response
-        except:
-            response = make_response(jsonify("there was an error on the request"), 400)
-            return response
+        except Exception as e:
+            return make_response(jsonify(Error=str(e)), 500)
 
-    def editNestConfiguration(self, nestconfigId, vehicleqty):
+    def editNestConfiguration(self, nestconfigid, vehicleqty):
+        """
+        Edits Nest configuration
+        :param nestconfigid: ID of nest configuration to update
+        :param vehicleqty: vehicle qty to update
+        :return:
+        response with status code 200: if request was valid, will return response with number of entries modified
+        response with status code 400: if id does not follow correct format or quantity is not a number,
+            will issue a json with a error information
+        response with status code 404: no nest configurations for nest id provided
+        response with status code 500: if an error happened in the server
+        """
         try:
-            result = NestsDao().editNestConfiguration(str(nestconfigId), int(vehicleqty))
+            if not self.verifyIDString(nestconfigid):
+                return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
+
+            nests = self.getNestConfig(nestconfigid)
+            if nests is None:
+                return make_response(jsonify(Error="No nest configurations for this id"), 404)
+
+            if type(vehicleqty) != int:
+                return make_response(jsonify(Error="Vehicle qty must be a number"), 400)
+
+            result = NestsDao().editNestConfiguration(str(nestconfigid), int(vehicleqty))
             print(result)
             if result is None:
-                response = make_response(jsonify(error="No Nest Configuration with that ID"), 404)
+                response = make_response(jsonify(Error="No Nest Configuration with that ID"), 404)
             elif result == 0:
-                response = make_response(jsonify("Vehicle qty not different from current entry"), 200)
+                response = make_response(jsonify(Error="Vehicle qty not different from current entry"), 400)
             else:
-                response = make_response(jsonify("edited " + str(result) + " entry"), 200)
+                response = make_response(jsonify(ok="edited " + str(result) + " entry"), 200)
             return response
-        except:
-            response = make_response(jsonify("there was an error on the request"), 400)
-            return response
+        except Exception as e:
+            return make_response(jsonify(Error=str(e)), 500)
 
-    def deleteNestConfiguration(self, nestconfigId):
+    def deleteNestConfiguration(self, nestconfigid):
+        """
+        Deletes a specified Nest configuration
+        :param nestconfigId: ID of Nest to delete
+        :return:
+        response with status code 200: if request was valid, will return response with number of entries deleted
+        response with status code 400: if id does not follow correct format or quantity is not a number,
+            will issue a json with a error information
+        response with status code 404: no nest configurations for nest id provided
+        response with status code 500: if an error happened in the server
+        """
         try:
-            result = NestsDao().deleteNestConfigurationByID(nestconfigId)
-            if result is None:
-                response = make_response(jsonify("request found errors"), 404)
+            if not self.verifyIDString(nestconfigid):
+                return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
+
+            nests = self.getNestConfig(nestconfigid)
+            if nests is None:
+                return make_response(jsonify(Error="No nest configurations for this id"), 404)
+
+            result = NestsDao().deleteNestConfigurationByID(nestconfigid)
+            if result is None or result == 0:
+                response = make_response(jsonify(Error="No configurations deleted"), 404)
             else:
-                response = make_response(jsonify("deleted "+ str(result)+ " entry"), 200)
+                response = make_response(jsonify(ok="deleted "+ str(result)+ " entry"), 200)
             return response
-        except:
-            response = make_response(jsonify("there was an error on the request"), 400)
-            return response
+        except Exception as e:
+            return make_response(jsonify(Error=str(e)), 500)
 
 

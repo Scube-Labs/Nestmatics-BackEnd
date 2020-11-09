@@ -282,6 +282,14 @@ def postNestConfigurations():
 
 @app.route('/nestmatics/nests/nestconfig/nest/<nestid>', methods=['GET'])
 def findNestConfigurationsForNest(nestid=None):
+    """
+    Finds Nest configurations for a specified nest
+    :param nestid: ID of nest from which to look for nest configurations
+    :return:
+    if request was valid: response object with status code 200 containing the requested nest configurations
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'GET':
         return NestsHandler().getNestConfigurationsForNest(nestid)
     else:
@@ -289,6 +297,14 @@ def findNestConfigurationsForNest(nestid=None):
 
 @app.route('/nestmatics/nests/nestconfig/<nestconfigid>', methods=['GET'])
 def findNestConfiguration(nestconfigid=None):
+    """
+    Finds Nest configurations identified by provided nest vonfiguration id
+    :param nestid: ID of nest configuration to find
+    :return:
+    if request was valid: response object with status code 200 containing the requested nest configuration
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'GET':
         return NestsHandler().getNestConfigurationFromId(nestconfigid)
     else:
@@ -296,6 +312,14 @@ def findNestConfiguration(nestconfigid=None):
 
 @app.route('/nestmatics/nests/nestconfig/<nestconfigid>', methods=['DELETE'])
 def deleteNestConfiguration(nestconfigid=None):
+    """
+    Deletes a Nest Configuration
+    :param nestconfigid: ID of nest config to delete
+    :return:
+    if request was valid: response object with status code 200 containing the number of entries deleted
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'DELETE':
         return NestsHandler().deleteNestConfiguration(nestconfigid)
     else:
@@ -303,6 +327,14 @@ def deleteNestConfiguration(nestconfigid=None):
 
 @app.route('/nestmatics/nests/nestconfig/<nestconfigid>', methods=['PUT'])
 def editNestConfiguration(nestconfigid=None):
+    """
+    Edits a specified nest configuration's vehicle qty
+    :param nestconfigid: ID of nest configuration to update
+    :return:
+    if request was valid: response object with status code 200 containing the number of entries updated
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'PUT':
         if "vehicle_qty" not in request.json:
             return jsonify(Error="BODY should have a vehicle_qty key"), 404
