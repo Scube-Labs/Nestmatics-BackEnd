@@ -102,13 +102,6 @@ class NestsHandler(ParentHandler):
                 return make_response(jsonify(Error="Service area ID must be a valid 24-character hex string"), 400)
             if not self.verifyIDString(user_id):
                 return make_response(jsonify(Error="User ID must be a valid 24-character hex string"), 400)
-            user = UsersHandler().getUserExternal(user_id)
-            if user is None:
-                return make_response(jsonify(Error="There is no User with this user ID"), 404)
-
-            area = ServiceAreaHandler().getSArea(areaid)
-            if area is None:
-                return make_response(jsonify(Error="There is no Area with this area ID"), 404)
 
             nests = self.getNestByArea(areaid, user_id)
             if nests is None or len(nests) == 0:
@@ -120,6 +113,12 @@ class NestsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getNestByArea(self, sa_id, user_id):
+        area = ServiceAreaHandler().getSArea(sa_id)
+        if area is None:
+            return {"Error":"There is no Area with this area ID"}
+        user = UsersHandler().getUser(user_id)
+        if user is None:
+            return {"Error":"There is no User with this user ID"}
         nests = NestsDao().findNestsByServiceAreaId(sa_id, user_id)
         return nests
 
@@ -478,6 +477,7 @@ class NestsHandler(ParentHandler):
         response with status code 500: if an error happened in the server
         """
         try:
+            from Handlers.ExperimentsHandler import ExperimentsHandler
             if not self.verifyIDString(nestconfigid):
                 return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
 
@@ -489,6 +489,8 @@ class NestsHandler(ParentHandler):
             if result is None or result == 0:
                 response = make_response(jsonify(Error="No configurations deleted"), 404)
             else:
+                experiments = ExperimentsHandler().deleteExperimen
+
                 response = make_response(jsonify(ok="deleted "+ str(result)+ " entry"), 200)
             return response
         except Exception as e:

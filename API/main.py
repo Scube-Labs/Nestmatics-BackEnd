@@ -614,6 +614,21 @@ def editDropStrategy(dropid=None, daynum=None):
 
 @app.route('/nestmatics/experiment', methods=['POST'])
 def postExperiment():
+    """
+    Route to insert a user in the system
+    :return:
+        if request is successful, will return a response object with the id of the inserted object with format:
+        { "ok":
+            { "_id": id_Number  }
+        }
+        ** id_Number refers to the db id for the newly inserted field
+
+        if error in request, will return a 400, 404, 500 or 405 error with corresponding information, following the
+        format:
+        {
+            "Error": "error information string"
+        }
+    """
     if request.method == 'POST':
         if request.json is None:
             return make_response(jsonify(Error="No body was included in request"), 400)
@@ -623,6 +638,14 @@ def postExperiment():
 
 @app.route('/nestmatics/experiment/<experimentid>', methods=['GET'])
 def getExperimentFromID(experimentid=None):
+    """
+    Route to get an experiment from a provided ID
+    :param experimentid: ID of experiment to retreive
+    :return:
+    if request was valid: response object with status code 200 containing the experiment requested
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'GET':
         return ExperimentsHandler().getExperimentFromID(experimentid)
     else:
@@ -630,6 +653,15 @@ def getExperimentFromID(experimentid=None):
 
 @app.route('/nestmatics/experiment/area/<areaid>/user/<userid>', methods=['GET'])
 def getExperimentsForAreaID(areaid=None, userid=None):
+    """
+    Gets experiments related to an area ID
+    :param areaid: ID of service area
+    :param userid: ID of user. Needed to retrieve Nests that belong to that user
+    :return:
+    if request was valid: response object with status code 200 containing the experiments requested
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'GET':
         return ExperimentsHandler().getExperimentsForArea(areaid, userid)
     else:
@@ -637,6 +669,14 @@ def getExperimentsForAreaID(areaid=None, userid=None):
 
 @app.route('/nestmatics/experiment/nest/<nestid>', methods=['GET'])
 def getExperimentsForNestID(nestid=None):
+    """
+    Get all experiments belonging to a specified nest id
+    :param nestid: ID of nest from which to get experiments
+    :return:
+    if request was valid: response object with status code 200 containing the experiments requested
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'GET':
         return ExperimentsHandler().getExperimentsOfNest(nestid)
     else:
@@ -645,7 +685,7 @@ def getExperimentsForNestID(nestid=None):
 @app.route('/nestmatics/experiment/<experimentid>', methods=['DELETE'])
 def deleteExperiment(experimentid=None):
     if request.method == 'DELETE':
-        return ExperimentsHandler().deleteExperiment(experimentid)
+        return ExperimentsHandler().deleteExperimentByID(experimentid)
     else:
         return jsonify(Error="Method not allowed."), 405
 

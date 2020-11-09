@@ -22,21 +22,14 @@ class ExperimentsDao(ParentDao):
 
     def editExperiment(self, experimentid, name):
         cursor = self.experimentCollection.update_one({"_id": ObjectId(experimentid)},
-                                                        {"$set":
-                                                        {"name": name}})
+                                                        {"$set":{"name": name}})
         return cursor.modified_count
 
     def deleteExperiment(self, experimentid):
         cursor = self.experimentCollection.delete_one({"_id": ObjectId(experimentid)})
         return cursor.deleted_count
 
-item = {
-    "name": "experiment1",
-    "nest_id": "5f95a0c6efb54db872a2cbc4",
-    "config1": "5f98f5ab28b88b39ef01c96f",
-    "config2": "5f9e402c40e273ac3ff2d51d",
-    "date":"2020-10-20T00:00:00"
-}
-
-#print(ExperimentsDao().getExperimentsForNest("5f95a0c6efb54db872a2cbc4"))
-
+    def deleteExperimentByNestConfig(self, nestconfig):
+        cursor = self.experimentCollection.delete_one({"$or":[{"config1":nestconfig},
+                                                              {"config2":nestconfig}]})
+        return cursor.deleted_count
