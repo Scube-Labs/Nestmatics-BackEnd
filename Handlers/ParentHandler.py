@@ -12,13 +12,13 @@ class ParentHandler:
     def verifyInnerDict(self,innerDict, innerDictKeys):
         for key in innerDictKeys:
             if key not in innerDict:
-                return jsonify(Error='Missing keys from submission: ' + key)
+                return make_response(jsonify(Error='Missing keys from submission: ' + key),400)
 
             keyType = innerDictKeys[key]
             print("key type: ", keyType)
             print("user[" + key + "]: ", type(innerDict[key]))
             if type(innerDict[key]) is not keyType:
-                return jsonify(Error='Key ' + key + ' is not the expected type: ' + str(keyType))
+                return make_response(jsonify(Error='Key ' + key + ' is not the expected type: ' + str(keyType)), 400)
         return 1
 
     def toIsoFormat(self, date):

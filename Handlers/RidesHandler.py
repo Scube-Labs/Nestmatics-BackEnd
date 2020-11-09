@@ -42,6 +42,9 @@ class RidesHandler(ParentHandler):
             response = make_response(jsonify(Error=str(e)), 500)
             return response
 
+    def getRidesForDateIntervalAndArea(self,date_greaterT, date_lessT, area_id):
+        rides = RidesDAO().getRidesForDateIntervalAndArea(date_greaterT, date_lessT, area_id)
+        return rides
 
     def getRidesCoordsForDateAndArea(self, date, areaid):
         """

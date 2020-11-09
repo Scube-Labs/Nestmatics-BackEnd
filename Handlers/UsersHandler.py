@@ -78,7 +78,7 @@ class UsersHandler(ParentHandler):
             if self.verifyIDString(userid) == False:
                 return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
 
-            user = UsersDao().getUserByID(userid)
+            user = self.getUserExternal(userid)
             if user is None:
                 response = make_response(jsonify(Error="No user with this id"), 404)
             else:
@@ -86,6 +86,9 @@ class UsersHandler(ParentHandler):
             return response
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
+
+    def getUserExternal(self, userid):
+        return UsersDao().getUserByID(userid)
 
     def getUserByEmail(self, email):
         """

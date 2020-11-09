@@ -179,29 +179,58 @@ def postNests():
     Route to insert Nests into the database
    :return:
         if request was valid: response object with status code 201 containing JSON with id of new nest
-        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+            error message
     """
     if request.method == 'POST':
+        if request.json is None:
+            return make_response(jsonify(Error="No body was included in request"), 400)
         return NestsHandler().insertNests(request.json)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 @app.route('/nestmatics/nests/area/<areaid>/user/<userid>', methods=['GET'])
 def getNestsOnArea(userid=None, areaid=None):
+    """
+    Get Nests on Service Area specified
+    :param userid: ID of user that created said Nests
+    :param areaid: ID of area to get Nests from
+    :return:
+    if request was valid: response object with status code 200 containing Nests on area specified
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'GET':
-        return NestsHandler().getNestsByServiceAreaId(sa_id=areaid, user_id=userid)
+        return NestsHandler().getNestsByServiceAreaId(areaid=areaid, user_id=userid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 @app.route('/nestmatics/nests/names/area/<areaid>/user/<userid>', methods=['GET'])
 def getNestsName(userid=None, areaid=None):
+    """
+    Get Nest Names of Service Area specified
+    :param userid: ID of user that created said Nests
+    :param areaid: ID of area to get Nests from
+    :return:
+    if request was valid: response object with status code 200 containing Nest names on area specified
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'GET':
-        return NestsHandler().getNestNames(sa_id=areaid, user_id=userid)
+        return NestsHandler().getNestNames(areaid=areaid, user_id=userid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 @app.route('/nestmatics/nests/nest/<nestid>', methods=['GET'])
 def getNest(nestid=None):
+    """
+    Get a specific Nest
+    :param nestid: ID of Nest to find
+    :return:
+    if request was valid: response object with status code 200 containing Nest identified by provided id
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'GET':
         return NestsHandler().getNestById(nest_id=nestid)
     else:
@@ -216,9 +245,19 @@ def deleteNest(nestid=None):
 
 @app.route('/nestmatics/nests/nest/<nestid>', methods=['PUT'])
 def editNest(nestid=None):
+    """
+    Edit Nest name of specified nest id
+    :param nestid: ID of nest to modify
+    :return:
+    if request was valid: response object with status code 200 containing number of Nest modified
+    if request was invalid: response object with status code 400, 404,304, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'PUT':
         if "nest_name" not in request.json:
-            return jsonify(Error="BODY should have a nest_name key"), 404
+            return jsonify(Error="BODY should have a nest_name key"), 400
+        if nestid is None:
+            return jsonify(Error="nest id is empty"), 400
         return NestsHandler().editNest(nestid, request.json["nest_name"])
     else:
         return jsonify(Error="Method not allowed."), 405
@@ -227,7 +266,16 @@ def editNest(nestid=None):
 
 @app.route('/nestmatics/nests/nestconfig', methods=['POST'])
 def postNestConfigurations():
+    """
+    Route to insert a new Nest Configuration into the database
+    :return:
+    if request was valid: response object with status code 201 containing the id of newly entered document
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'POST':
+        if request.json is None:
+            return make_response(jsonify(Error='BODY empty'),400)
         return NestsHandler().insertNestConfiguration(request.json)
     else:
         return jsonify(Error="Method not allowed."), 405
@@ -277,7 +325,6 @@ def getAllUsers():
                 "email": user_email,
                 "type": user_type
             },
-            .
             .
             .
 
@@ -459,6 +506,8 @@ def postServiceArea():
         }
     """
     if request.method == 'POST':
+        if request.json is None:
+            return make_response(jsonify(Error="No JSON body was included in request"), 400)
         return ServiceAreaHandler().insertServiceArea(request.json)
     else:
         return jsonify(Error="Method not allowed."), 405
@@ -509,6 +558,8 @@ def getMostRecentDropStrategy(areaid=None):
 @app.route('/nestmatics/drop', methods=['POST'])
 def postDropStrategy():
     if request.method == 'POST':
+        if request.json is None:
+            return make_response(jsonify(Error="No body was included in request"), 400)
         return DropStrategyHandler().insertDropStrategy(request.json)
     else:
         return jsonify(Error="Method not allowed."), 405
@@ -532,6 +583,8 @@ def editDropStrategy(dropid=None, daynum=None):
 @app.route('/nestmatics/experiment', methods=['POST'])
 def postExperiment():
     if request.method == 'POST':
+        if request.json is None:
+            return make_response(jsonify(Error="No body was included in request"), 400)
         return ExperimentsHandler().insertExperiment(request.json)
     else:
         return jsonify(Error="Method not allowed."), 405
