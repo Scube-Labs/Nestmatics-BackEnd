@@ -146,20 +146,32 @@ def getRidesStats(areaid=None,date=None):
 
 @app.route('/nestmatics/stats/ridesnum/area/<areaid>/date/<date>', methods=['GET'])
 def getTotalNumberOfRides(areaid=None,date=None):
+    """
+    Route to only get the number of rides according to rides stats stored for an area on a specific date
+    :param areaid: ID of area from which to obtain number of rides
+    :param date: date from which to retreive the total number of rides
+    :return:
+    if request was valid: response object with status code 201 containing JSON with number of rides
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with err
+    """
     if request.method == 'GET':
         return RideStatsHandler().getTotalNumberOfRides(date, areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
-@app.route('/nestmatics/stats/ridetime/area/<areaid>/date/<date>', methods=['GET'])
-def getTotalRideTime(areaid=None,date=None):
-    if request.method == 'GET':
-        return RideStatsHandler().getTotalRideTime(date, areaid)
-    else:
-        return jsonify(Error="Method not allowed."), 405
-
 @app.route('/nestmatics/stats/activevehicles/area/<areaid>/date/<date>', methods=['GET'])
 def getTotalActiveVehicles(areaid=None,date=None):
+    """
+    Route to only get the total active vehicles according to rides stats stored for an area on a
+        specific date
+    :param areaid: ID of area from which to obtain the total active vehicles
+    :param date: date from which to retreive the total active vehicles
+    :return:
+    if request was valid: response object with status code 201 containing JSON with the total
+        active vehicles
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json
+        with error message
+    """
     if request.method == 'GET':
         return RideStatsHandler().getTotalActiveVehicles(date, areaid)
     else:
@@ -167,6 +179,17 @@ def getTotalActiveVehicles(areaid=None,date=None):
 
 @app.route('/nestmatics/stats/revenue/area/<areaid>/date/<date>', methods=['GET'])
 def getTotalRevenue(areaid=None,date=None):
+    """
+    Route to only get the total revenue according to rides stats stored for an area on a
+        specific date
+    :param areaid: ID of area from which to obtain the total revenue
+    :param date: date from which to retreive the total revenue
+    :return:
+    if request was valid: response object with status code 201 containing JSON with the total
+        revenue for provided area and date
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json
+        with error message
+    """
     if request.method == 'GET':
         return RideStatsHandler().getTotalRevenue(date, areaid)
     else:
@@ -688,6 +711,9 @@ def deleteExperiment(experimentid=None):
     Route to delete an experiment
     :param experimentid:
     :return:
+    if request was valid: response object with status code 200 containing the number of experiments deleted
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
     """
     if request.method == 'DELETE':
         print("delete experiment")
@@ -701,6 +727,9 @@ def editExperiment(experimentid=None):
     Route to edit experiments name
     :param experimentid:
     :return:
+    if request was valid: response object with status code 200 containing the number of edited experimetns
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
     """
     if request.method == 'PUT':
         if "name" not in request.json:
@@ -720,6 +749,14 @@ def getReportForExperiment(experimentid=None):
 
 @app.route('/nestmatics/ml/<modelid>', methods=['GET'])
 def getModelFromID(modelid=None):
+    """
+    Route to get a model from a specified ID
+    :param modelid: ID of model to retrieve
+    :return:
+    if request was valid: response object with status code 200 containing model information
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'GET':
         return ModelHandler().getModelForID(modelid)
     else:
@@ -727,13 +764,29 @@ def getModelFromID(modelid=None):
 
 @app.route('/nestmatics/ml/area/<areaid>', methods=['GET'])
 def getModelsForArea(areaid=None):
+    """
+    Get all models in a specific area
+    :param areaid: ID of area to retrieve model information from
+    :return:
+    if request was valid: response object with status code 200 containing model information
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'GET':
         return ModelHandler().getModelsForArea(areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
-@app.route('/nestmatics/ml/area/<areaid>/recent', methods=['GET'])
+@app.route('/nestmatics/ml/recent/area/<areaid>', methods=['GET'])
 def getMostRecentModel(areaid=None):
+    """
+    Gets most recent model (last made model for area)
+    :param areaid: ID of area from which to look for model
+    :return:
+    if request was valid: response object with status code 200 containing model information
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
     if request.method == 'GET':
         return ModelHandler().getMostRecentModel(areaid)
     else:
@@ -743,6 +796,12 @@ def getMostRecentModel(areaid=None):
 
 @app.route('/nestmatics/ml/prediction/area/<areaid>/date/<date>', methods=['GET'])
 def getPredictionForDate(areaid=None, date=None):
+    """
+    Route to get Predictions for a specified area and date
+    :param areaid: Id of area from which to get predictions
+    :param date: date of prediction to retreive
+    :return:
+    """
     if request.method == 'GET':
         return ModelHandler().getPredictionForDate(areaid, date)
     else:
@@ -750,6 +809,12 @@ def getPredictionForDate(areaid=None, date=None):
 
 @app.route('/nestmatics/ml/prediction/area/<areaid>/date/<date>/features', methods=['GET'])
 def getPredictionFeatures(areaid=None, date=None):
+    """
+    Get predictions features for a specified area and date
+    :param areaid: Id of area from which to get predictions
+    :param date: date of prediction to retreive
+    :return:
+    """
     if request.method == 'GET':
         return ModelHandler().getPredictionFeatures(areaid, date)
     else:

@@ -13,28 +13,32 @@ class ModelDao(ParentDao):
         return self.returnMany(cursor)
 
     def getModelByArea(self, areaid):
-        cursor = self.modelCollection.find({"service_area._id":areaid})
+        cursor = self.modelCollection.find({"service_area":areaid})
         return self.returnMany(cursor)
 
     def getMostRecentModelForArea(self, areaid):
-        cursor = self.modelCollection.find({"service_area._id": areaid}).sort([("creation_date", -1)]).limit(1)
+        cursor = self.modelCollection.find({"service_area": areaid}).sort([("creation_date", -1)]).limit(1)
         return self.returnMany(cursor)
 
     def insertModel(self, model):
         cursor = self.modelCollection.insert_one(model)
         return self.insertOne(cursor)
 
+# --------------------------- Predictions ------------------------------------------------
+
     def getPredictionForDate(self, areaid, predictionDate):
-        cursor = self.predictionsCollection.find_one({"service_area._id": areaid, "prediction_date":predictionDate})
+        cursor = self.predictionsCollection.find_one({"service_area": areaid,
+                                                      "prediction_date":predictionDate})
         return self.returnOne(cursor)
 
     def getPredictionFeatures(self, areaid, predictionDate):
-        cursor = self.predictionsCollection.find_one({"service_area._id": areaid, "prediction_date": predictionDate},
-                                                 {"features": 1})
+        cursor = self.predictionsCollection.find_one({"service_area": areaid,
+                                                      "prediction_date": predictionDate},
+                                                    {"features": 1})
         return self.returnOne(cursor)
 
     def getErrorMetricForPredictions(self, areaid):
-        cursor = self.predictionsCollection.find_one({"service_area._id": areaid},
+        cursor = self.predictionsCollection.find_one({"service_area": areaid},
                                                      {"error_metric": 1}).sort([("prediction_date", -1)]).limit(30)
         return self.returnMany(cursor)
 
@@ -43,7 +47,7 @@ class ModelDao(ParentDao):
         return self.returnOne(cursor)
 
     def getPredictionByArea(self, areaid):
-        cursor = self.predictionsCollection.find_one({"service_area._id":areaid}, {"_id":1})
+        cursor = self.predictionsCollection.find_one({"service_area":areaid}, {"_id":1})
         return self.returnOne(cursor)
 
     def insertPrediction(self, prediction):

@@ -4,7 +4,7 @@ from datetime import datetime
 from Handlers.ParentHandler import ParentHandler
 from DAOs.DropStrategyDao import DropStrategyDao
 
-DROPSTRATEGYKEYS = {"days":list, "start_date":str, "end_date":str, "service_area":dict}
+DROPSTRATEGYKEYS = {"days":list, "start_date":str, "end_date":str, "service_area":str}
 
 class DropStrategyHandler(ParentHandler):
 
@@ -127,7 +127,7 @@ class DropStrategyHandler(ParentHandler):
                 return make_response(jsonify(Error="No drop strategy for that drop id"), 404)
 
             drop = DropStrategyDao().deleteDropStrategy(dropid)
-            if drop is None or drop is 0:
+            if drop is None or drop == 0:
                 return make_response(jsonify(Error="No drop strategies were deleted"), 404)
             else:
                 response = make_response(jsonify(Ok='Deleted ' + str(drop) + " strategies"), 200)

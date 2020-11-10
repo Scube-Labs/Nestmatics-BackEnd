@@ -115,7 +115,7 @@ class ExperimentsHandler(ParentHandler):
         response with status code 200: if request was valid, will return rseponse with Nthe experiment
             that belongs to the specified ID
         response with status code 400: if id does not follow correct format, will issue a json with a error information
-        response with status code 404: no nest configurations for nest id provided
+        response with status code 404: no experiment for id provided
         response with status code 500: if an error happened in the server
         """
         try:
@@ -164,7 +164,7 @@ class ExperimentsHandler(ParentHandler):
             that belongs to the specified area ID
         response with status code 400: if id does not follow correct format, will issue a json with a error
             information
-        response with status code 404: no nest configurations for nest id provided or no area/user for ids provided
+        response with status code 404:  experiments on area or no user for ids provided
         response with status code 500: if an error happened in the server
         """
         try:
@@ -200,7 +200,7 @@ class ExperimentsHandler(ParentHandler):
         :return:
         response with status code 200: if request was valid, will return the amount of experiments edited
         response with status code 400: if id does not follow correct format, will issue a json with a error information
-        response with status code 404: no nest configurations for nest id provided
+        response with status code 404: experiment for id provided
         response with status code 500: if an error happened in the server
         """
         try:
@@ -227,6 +227,14 @@ class ExperimentsHandler(ParentHandler):
             return make_response(jsonify(str(e)), 500)
 
     def deleteExperimentByNestConfig(self, nestConfig):
+        """
+        Deletes experiments that have the specified nestconfig ID
+        :param nestConfig: ID of nest configurations to delete
+        :return:
+        If there were experiments for provided nestconfig id, it will return the number of experiments
+            deleted
+        If there were no experiments that meet the criteria, return error dictionary with error information
+        """
         result = ExperimentsDao().deleteExperimentByNestConfig(nestConfig)
         if result is None or result == 0:
             return {"Error":"No experiments deleted"}
