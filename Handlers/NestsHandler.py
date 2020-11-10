@@ -104,6 +104,8 @@ class NestsHandler(ParentHandler):
                 return make_response(jsonify(Error="User ID must be a valid 24-character hex string"), 400)
 
             nests = self.getNestByArea(areaid, user_id)
+            if "Error" in nests:
+                return make_response(jsonify(Error=nests["Error"]), 404)
             if nests is None or len(nests) == 0:
                 response = make_response(jsonify(Error="No Nest with on that area or from that user"), 404)
             else:

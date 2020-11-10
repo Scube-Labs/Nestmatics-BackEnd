@@ -99,6 +99,36 @@ class ServiceAreaHandler(ParentHandler):
             response = make_response(jsonify(Error=str(e)), 500)
             return response
 
+    def editServiceAreaName(self, areaid, name):
+        """
+        Function To edit a Service area name
+        :param areaid: Id of area to edit
+        :param name: name to update area with
+         :return:
+        """
+       # try:
+        if not self.verifyIDString(areaid):
+            return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
+
+        area = self.getSArea(areaid)
+        if area is None:
+            return make_response(jsonify(Error="No area with that ID"), 404)
+
+        if not type(name) == str:
+            name = str(name)
+        if len(name) == 0:
+            return make_response(jsonify(Error="empty area name"), 400)
+
+        result = ServiceAreaDao().editServiceAreaName(areaid, name)
+        print(result)
+        if result is None or result == 0:
+            response = make_response(jsonify(Error="No service area was modified, maybe no changes where found"), 403)
+        else:
+            response = make_response(jsonify(ok="edited "+ str(result)+" nests"), 200)
+        return response
+        # except Exception as e:
+        #     return make_response(jsonify(Error=str(e)), 500)
+
     def getWeatherForDay(self, areaid, timestamp):
         """
         Function to get Weather information for a specified day on a specified area. Weather information is collected
@@ -222,7 +252,6 @@ class ServiceAreaHandler(ParentHandler):
                     },
                 "bitmap_file": file where bitmap of the buildings is stored
             }
-
         """
         return ServiceAreaDao().getBuildingsOfArea(areaid)
 
@@ -349,26 +378,6 @@ class ServiceAreaHandler(ParentHandler):
             return response
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
-
-    def editServiceAreaName(self, areaid, areaname):
-        """
-        Function to modify a service area name
-        :param areaid: ID of the service area to modify
-        :param areaname: new name to give to service area
-        :return:
-        """
-        try:
-            result = ServiceAreaDao().editServiceAreaName(str(areaid), str(areaname))
-            if result is None:
-                response = make_response(jsonify(Error="No area with that ID"), 404)
-            elif result == 0:
-                response = make_response(jsonify(Error="area name not different from current entry"), 403)
-            else:
-                response = make_response(jsonify(ok="edited "+ str(result)+" areas"), 200)
-            return response
-        except:
-            response = make_response(jsonify(Error="there was an error on the request"), 500)
-            return response
 
     def insertWeatherData(self, data):
         """

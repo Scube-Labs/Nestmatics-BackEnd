@@ -433,3 +433,4 @@ class RidesHandler(ParentHandler):
             calc = ride_cost
         return calc
 
+#print(RidesHandler().deleteRidesByDate("2020-03-03T00:00:00"))

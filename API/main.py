@@ -68,8 +68,8 @@ def getRidesCoordinates(areaid=None, date=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
-@app.route('/nestmatics/rides/startat/nest/<nestid>/date/<date>/hour/<hour>/area/<areaid>', methods=['GET'])
-def getRidesStartingAtNest(nestid=None,date=None,hour=None,areaid=None):
+@app.route('/nestmatics/rides/startat/nest/<nestid>/date/<date>/area/<areaid>', methods=['GET'])
+def getRidesStartingAtNest(nestid=None,date=None,areaid=None):
     if request.method == 'GET':
         if areaid == None or date == None or nestid == None:
             return jsonify(Error="URI does not have all parameters needed"), 404
@@ -564,6 +564,24 @@ def postServiceArea():
         if request.json is None:
             return make_response(jsonify(Error="No JSON body was included in request"), 400)
         return ServiceAreaHandler().insertServiceArea(request.json)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/nestmatics/areas/<areaid>', methods=['PUT'])
+def editServiceArea(areaid=None):
+    """
+    Edits a specified nest configuration's vehicle qty
+    :param nestconfigid: ID of nest configuration to update
+    :return:
+    if request was valid: response object with status code 200 containing the number of entries updated
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
+    if request.method == 'PUT':
+        if "area_name" not in request.json:
+            return jsonify(Error="BODY should have a area_name key"), 404
+        return ServiceAreaHandler().editServiceAreaName(areaid, request.json["area_name"])
     else:
         return jsonify(Error="Method not allowed."), 405
 
