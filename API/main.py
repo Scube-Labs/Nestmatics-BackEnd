@@ -584,6 +584,14 @@ def getWeatherData(areaid=None, date=None):
 
 @app.route('/nestmatics/drop/area/<areaid>/date/<sdate>/<edate>', methods=['GET'])
 def getDropStrategyForDate(areaid=None, sdate=None, edate=None):
+    """
+    Gets a drop strategy between two dates. Intended so the request will receive all drop strategies
+    between the specified start and end date
+    :param areaid: ID of area that drop strategy belongs to
+    :param sdate: start date of drop strategy to find
+    :param edate: end date of drop strategy to find
+    :return:
+    """
     if request.method == 'GET':
         return DropStrategyHandler().getDropStrategyForDate(sdate, edate, areaid)
     else:
@@ -612,6 +620,22 @@ def getMostRecentDropStrategy(areaid=None):
 
 @app.route('/nestmatics/drop', methods=['POST'])
 def postDropStrategy():
+    """
+    Route to insert a drop strategy in the system
+    :return:
+        if request is successful, will return a response object with the id of the inserted object with
+        format:
+        { "ok":
+            { "_id": id_Number  }
+        }
+        ** id_Number refers to the db id for the newly inserted field
+
+        if error in request, will return a 400, 403, 404, 500 or 405 error with corresponding information,
+        following the format:
+        {
+            "Error": "error information string"
+        }
+    """
     if request.method == 'POST':
         if request.json is None:
             return make_response(jsonify(Error="No body was included in request"), 400)

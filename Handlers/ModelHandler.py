@@ -275,13 +275,13 @@ class ModelHandler(ParentHandler):
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
 
-    def editPrediction(self, predictionid):
+    def editPrediction(self, predictionid, prediction, features, error_metric):
         try:
-            newPrediction = self.createPredictionTest()
+
             model = ModelDao().editPrediction(predictionid,
-                                              newPrediction["prediction"],
-                                              newPrediction["features"],
-                                              newPrediction["error_metric"])
+                                              prediction,
+                                              features,
+                                              error_metric)
             if len(model) == 0:
                 response = json.dumps({"error":"there was an error on the request. Or no Nest with that ID"})
             else:
@@ -297,87 +297,4 @@ class ModelHandler(ParentHandler):
         else:
             return True
 
-    def createPredictionTest(self):
-        item = {
-                "model_id": "5f91c682bc71a04fda4b9dfb"
-            ,
-            "prediction": [
-                [
-                    [4, 1, 6, 3, 7],
-                    [4, 1, 6, 3, 7]
-                ],
-                [
-                    [4, 1, 6, 3, 7],
-                    [4, 1, 6, 3, 7]
-                ],
-                [
-                    [4, 1, 6, 3, 7],
-                    [4, 1, 6, 3, 7]
-                ]
-            ],
-            "prediction_date": "2013-09-14",
-            "creation_date": datetime.now().isoformat(),
-            "features": {
-                "weather": {
-                    "precipitation": round(uniform(10, 30), 4),
-                    "temperature": round(uniform(10, 30), 4)
-                },
-                "rides": round(uniform(0, 100), 4),
-                "buildings": round(uniform(0, 100), 4),
-                "streets": round(uniform(0, 100), 4),
-                "ammenities": round(uniform(0, 100), 4)
-            },
-            "error_metric": round(uniform(0, 100), 4)
-        }
-        return item
-
-prediction = {
-                "model_id": "5fa02d0d02cd2f01e92f3463"
-            ,
-            "prediction": [
-                [
-                    [4, 1, 6, 3, 7],
-                    [4, 1, 6, 3, 7]
-                ],
-                [
-                    [4, 1, 6, 3, 7],
-                    [4, 1, 6, 3, 7]
-                ],
-                [
-                    [4, 1, 6, 3, 7],
-                    [4, 1, 6, 3, 7]
-                ]
-            ],
-            "service_area": {
-                    "name": "Mayaguez",
-                    "_id":  "5f91c682bc71a04fda4b9dc6"
-                },
-            "prediction_date": "2013-09-15",
-            "creation_date": datetime.now().isoformat(),
-            "features": {
-                "weather": {
-                    "precipitation": round(uniform(10, 30), 4),
-                    "temperature": round(uniform(10, 30), 4)
-                },
-                "rides": round(uniform(0, 100), 4),
-                "buildings": round(uniform(0, 100), 4),
-                "streets": round(uniform(0, 100), 4),
-                "amenities": round(uniform(0, 100), 4)
-            },
-            "error_metric": round(uniform(0, 100), 4)
-        }
-
-model = {
-    "model_file": "usr/model4",
-    "creation_date": "2013-09-21",
-    "service_area": {
-        "name": "Mayaguez",
-        "_id":  "5f91c682bc71a04fda4b9dc6"
-    },
-    "training_error": 60.48272,
-    "critical_val_error": 100.38153,
-    "validation_error": 8.03033
-}
-
-#print(ModelHandler().getPredictionFeatures("5f91c682bc71a04fda4b9dc6", "2013-09-15"))
 
