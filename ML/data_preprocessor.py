@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import timedelta
+import datetime
+from datetime import datetime as dt
 from feature_makers import make_rides_features, make_temporal_features, make_weather_features
 from feature_fetchers import fetch_weather_forecast_data, fetch_historical_precipitation_data, fetch_historical_temperature_data
 from PIL import Image
@@ -32,14 +34,18 @@ def fetch_ride_data(month, day, dataframe):
 
 def create_input_output_matrix(date, streets, buildings, amenities, ride_data, days_before_ride_data, north_lat, south_lat, east_lon, west_lon, meter_per_pixel=5):
     
-    _, y = make_rides_features(ride_data, north_lat, south_lat, east_lon, west_lon, meter_per_pixel=meter_per_pixel)
+    if ride_data is not None: #Case for validation or training.
+        _, y = make_rides_features(ride_data, north_lat, south_lat, east_lon, west_lon, meter_per_pixel=meter_per_pixel)
+    else:
+        y = None
     
     x = None
-    #Previous ride data
+
+    # Previous ride data
     for day in days_before_ride_data:
-        if day is None:
+        if day is None: 
             day = []
-        total_rides, _ = make_rides_features(day, top, bottom, right, left, meter_per_pixel=meter_per_pixel)
+        total_rides, _ = make_rides_features(day, north_lat, south_lat, east_lon, west_lon, meter_per_pixel=meter_per_pixel)
         if x is None:
             x = total_rides
         else:
@@ -48,25 +54,26 @@ def create_input_output_matrix(date, streets, buildings, amenities, ride_data, d
     # Street and Buildings
     x = np.dstack([
             x,
-            np.rot90(skimage.measure.block_reduce(np.asarray(Image.open(streets)), (meter_per_pixel, meter_per_pixel), func=np.max), k=3),
-            np.rot90(skimage.measure.block_reduce(np.asarray(Image.open(buildings)), (meter_per_pixel, meter_per_pixel), func=np.max), k=3)
+            np.rot90(skimage.measure.block_reduce(np.asarray(Image.open(streets)), (meter_per_pixel, meter_per_pixel), func=np.max), k=3), #Images are loaded sidewades
+            np.rot90(skimage.measure.block_reduce(np.asarray(Image.open(buildings)), (meter_per_pixel, meter_per_pixel), func=np.max), k=3) #Images are loaded sidewades
            ])
 
     # Amenities
     for key in amenities:
         x = np.dstack([
             x,
-            np.rot90(skimage.measure.block_reduce(np.asarray(Image.open(amenities[key])), (meter_per_pixel, meter_per_pixel), func=np.max).astype(np.float16), k=3)
+            np.rot90(skimage.measure.block_reduce(np.asarray(Image.open(amenities[key])), (meter_per_pixel, meter_per_pixel), func=np.max).astype(np.float16), k=3) #Images are loaded sidewades
         ])
 
     # Weather
-    if datetime.today() > datetime(date.year, date.month, date.day):
-        precipitation = fetch_historical_precipitation_data(str(date), 'PR')
-        temperature = fetch_historical_temperature_data(str(date), 'PR')
+    date = datetime.datetime.strptime(date, '%Y-%m-%d')
+    if datetime.date.today() > datetime.date(date.year, date.month, date.day): # Past date
+        precipitation = fetch_historical_precipitation_data(dt.strftime(date, format='%Y-%m-%d'), 'PR')
+        temperature = fetch_historical_temperature_data(dt.strftime(date, format='%Y-%m-%d'), 'PR')
         precipitation = make_weather_features(precipitation, north_lat, south_lat, east_lon, west_lon)
         temperature = make_weather_features(temperature, north_lat, south_lat, east_lon, west_lon)
     else:
-        temperature, precipitation = fetch_weather_forecast_data(str(date))
+        temperature, precipitation = fetch_weather_forecast_data(dt.strftime(date, format='%Y-%m-%d')) #Forecast
 
     x = np.dstack([x, 
             np.full((x.shape[0], x.shape[1]), precipitation),
@@ -169,8 +176,6 @@ def create_train_val_sets(ride_data_path, save_path, streets, buildings, ameniti
             write.writerow([(line)])
 
 
-
-
 def blur(array, iteration=1):
 
     if iteration == 0:
@@ -184,7 +189,7 @@ def blur(array, iteration=1):
         iy = non_zeros[1][i]
 
         if ix+1 < array.shape[0]:
-            res[ix+1, iy] = 1
+            res[ix+1, iy] = 1 #TODO change to +=
             if iy+1 < array.shape[1]:
                 res[ix, iy+1] = 1
                 res[ix+1, iy+1] = 1
