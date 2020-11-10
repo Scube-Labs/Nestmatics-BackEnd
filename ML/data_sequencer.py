@@ -3,7 +3,7 @@ import numpy as np
 import math
 import random
 from feature_makers import make_temporal_features
-from utils import blur
+from data_preprocessor import blur
 
 class DataSequencer(Sequence):
    
@@ -33,7 +33,7 @@ class DataSequencer(Sequence):
             for layer in range(0, y.shape[2]):
                 y[:,:,layer] = blur(y[:,:,layer], iteration=self.blur)
            
-            # x = x.astype(np.float)
+            
             if self.augmentation:
                 if random.randint(0, 1) == 1: # 50% chance of flip 
                     x = np.flipud(x)
