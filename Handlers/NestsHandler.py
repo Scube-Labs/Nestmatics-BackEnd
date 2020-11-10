@@ -489,9 +489,10 @@ class NestsHandler(ParentHandler):
             if result is None or result == 0:
                 response = make_response(jsonify(Error="No configurations deleted"), 404)
             else:
-                experiments = ExperimentsHandler().deleteExperimen
+                experiments = ExperimentsHandler().deleteExperimentByNestConfig(nestconfigid)
 
-                response = make_response(jsonify(ok="deleted "+ str(result)+ " entry"), 200)
+                response = make_response(jsonify(ok={"configs":"deleted "+ str(result)+ " configurations",
+                                                     "experiments":experiments}), 200)
             return response
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)

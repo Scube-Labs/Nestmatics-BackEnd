@@ -30,6 +30,6 @@ class ExperimentsDao(ParentDao):
         return cursor.deleted_count
 
     def deleteExperimentByNestConfig(self, nestconfig):
-        cursor = self.experimentCollection.delete_one({"$or":[{"config1":nestconfig},
+        cursor = self.experimentCollection.delete_many({"$or":[{"config1":nestconfig},
                                                               {"config2":nestconfig}]})
         return cursor.deleted_count

@@ -1,6 +1,7 @@
 from flask import jsonify, make_response
 from math import pow, sqrt
 from datetime import datetime
+import re
 
 class ParentHandler:
     def __init__(self):
@@ -37,8 +38,8 @@ class ParentHandler:
                 return -1
 
     def verifyIDString(self, id):
-        if len(id) == 24:
-            print(len(id))
-            return True
-        else:
+        try:
+            match = re.match("^[0-9a-fA-F]{24}$", id)
+            return bool(match)
+        except:
             return False

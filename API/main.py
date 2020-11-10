@@ -684,13 +684,24 @@ def getExperimentsForNestID(nestid=None):
 
 @app.route('/nestmatics/experiment/<experimentid>', methods=['DELETE'])
 def deleteExperiment(experimentid=None):
+    """
+    Route to delete an experiment
+    :param experimentid:
+    :return:
+    """
     if request.method == 'DELETE':
+        print("delete experiment")
         return ExperimentsHandler().deleteExperimentByID(experimentid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 @app.route('/nestmatics/experiment/<experimentid>', methods=['PUT'])
 def editExperiment(experimentid=None):
+    """
+    Route to edit experiments name
+    :param experimentid:
+    :return:
+    """
     if request.method == 'PUT':
         if "name" not in request.json:
             return jsonify(Error="BODY should have a name key"), 404

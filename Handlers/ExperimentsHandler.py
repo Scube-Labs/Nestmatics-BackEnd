@@ -221,14 +221,16 @@ class ExperimentsHandler(ParentHandler):
             elif result == 0:
                 response = make_response(jsonify(Error="Experiment not different from before"), 403)
             else:
-                response = make_response(jsonify(ok="Edited "+ str(result)+" nests"), 200)
+                response = make_response(jsonify(ok="Edited "+ str(result)+" experiment"), 200)
             return response
         except Exception as e:
             return make_response(jsonify(str(e)), 500)
 
     def deleteExperimentByNestConfig(self, nestConfig):
-        result = ExperimentsDao().deleteExperiment(nestConfig)
-        return result
+        result = ExperimentsDao().deleteExperimentByNestConfig(nestConfig)
+        if result is None or result == 0:
+            return {"Error":"No experiments deleted"}
+        return {"ok":"deleted "+ str(result)+" experiments"}
 
     def deleteExperimentByID(self, experimentid):
         """
@@ -237,15 +239,18 @@ class ExperimentsHandler(ParentHandler):
         :return:
         """
         try:
+            if not self.verifyIDString(experimentid):
+                return make_response(jsonify(Error="experiment ID must be a valid 24-character hex string"), 400)
+
             result = ExperimentsDao().getExperimentFromID(experimentid)
             if result is None:
                 return make_response(jsonify(Error="No experiment for that experiment id"), 404)
 
-            result = self.deleteExperiment(experimentid)
+            result = ExperimentsDao().deleteExperiment(experimentid)
             if result is None or result == 0:
                 return make_response(jsonify(Error="No experiments were deleted"), 404)
             else:
-                response = make_response(jsonify(Ok='Deleted ' + str(result) + " experiment"), 200)
+                response = make_response(jsonify(ok='Deleted ' + str(result) + " experiment"), 200)
             return response
         except Exception as e:
             return make_response(jsonify(str(e)), 500)
