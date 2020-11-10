@@ -67,8 +67,8 @@ def make_rides_features(data, north_lat, south_lat, east_lon, west_lon, meter_pe
         meter_per_pixel (int, optional): pixel size in relation to real distances. Defaults to 1 (1mx1m).
 
     Returns:
-        np.array: 2 dim matrix representing the total amount of rides from the specified service area.
-        np.array: 3 dim matrix repressenting the total amount of rids from the specified service area, 3rd dim divides the result by the hour(len(shape[2]) = 24)
+        numpy array: 2 dim matrix representing the total amount of rides from the specified service area.
+        numpy array: 3 dim matrix repressenting the total amount of rids from the specified service area, 3rd dim divides the result by the hour(len(shape[2]) = 24)
 
     """
 
