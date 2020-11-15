@@ -84,6 +84,8 @@ def fetch_weather_forecast_data(lat, lon, date, api_key):
     
     for day in response['daily']:
         if datetime.utcfromtimestamp(day['dt']).strftime('%Y-%m-%d') == date:
+            if 'rain' not in day:
+                return [day['temp']['day'], 0.0]
             return [day['temp']['day'], day['rain']]
 
     raise ValueError('Invalid date')
