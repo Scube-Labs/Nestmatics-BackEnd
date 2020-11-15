@@ -1,0 +1,51 @@
+# Use root/example as user/password credentials
+version: '3.7'
+
+services:
+
+  flask:
+    build: ./Nestmatics-backend
+    container_name: flask
+    restart: always
+    environment:
+      - APP_NAME=Nestmatics
+      - DB_USERNAME=root
+      - DB_PASWD=example
+      - MONGO_PORT=2717
+    expose:
+      - 8080
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+
+  mongo:
+    image: mongo
+    container_name: mongoContainer
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    expose:
+      - 27017
+#    ports:
+#      - 2717:27017
+    volumes:
+      - ./mongo_data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongoexpress
+    restart: always
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_SERVER: mongoContainer
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_SITE_BASEURL: /mongoadmin
+    ports:
+    - "8081:8081"
+
+
