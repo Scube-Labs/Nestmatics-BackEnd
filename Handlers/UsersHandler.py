@@ -9,6 +9,10 @@ TYPES = ["admin", "user"]
 
 class UsersHandler(ParentHandler):
 
+    def __init__(self):
+        super().__init__()
+        self.UsersDao = UsersDao()
+
     def getAllUsers(self):
         """
         Function to get all users in the database.
@@ -39,7 +43,7 @@ class UsersHandler(ParentHandler):
             the request.
         """
         try:
-            user = UsersDao().getAllUsers()
+            user = self.UsersDao.getAllUsers()
             if user is None or len(user) == 0:
                 response = make_response(jsonify(Error="No users on system"), 404)
             else:
@@ -88,7 +92,7 @@ class UsersHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getUserExternal(self, userid):
-        return UsersDao().getUserByID(userid)
+        return self.UsersDao.getUserByID(userid)
 
     def getUserByEmail(self, email):
         """
@@ -97,7 +101,7 @@ class UsersHandler(ParentHandler):
         :return:
         """
         try:
-            user = UsersDao().getUserByEmail(email)
+            user = self.UsersDao.getUserByEmail(email)
             if user is None:
                 response = make_response(jsonify(Error="No user with this email"), 404)
             else:
@@ -145,12 +149,12 @@ class UsersHandler(ParentHandler):
             if user["type"] == TYPES[0] or user["type"] == TYPES[1]:
 
                 if re.match(r"^[\w.\-]{1,25}@(skootel|gmail)\.com(\W|$)", user["email"]):
-                    findUser = UsersDao().getUserByEmail(user['email'])
+                    findUser = self.UsersDao.getUserByEmail(user['email'])
                     if findUser is not None:
                         return make_response(jsonify(Error='User already registered'), 403)
 
                     print(user)
-                    id = UsersDao().insertUser(user)
+                    id = self.UsersDao.insertUser(user)
                     print(id)
                     if id is None:
                         response = make_response(jsonify(Error="Error on insertion"), 404)
@@ -194,12 +198,12 @@ class UsersHandler(ParentHandler):
             if self.verifyIDString(userid) == False:
                 return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
 
-            findUser = UsersDao().getUserByID(userid)
+            findUser = self.UsersDao.getUserByID(userid)
             if findUser is None:
                 response = make_response(jsonify(Error="No User with that ID"), 404)
                 return response
 
-            result = UsersDao().deleteUser(str(userid))
+            result = self.UsersDao.deleteUser(str(userid))
             if result == 0 or result is None:
                 response = make_response(jsonify(Error="No User was deleted"), 404)
             else:

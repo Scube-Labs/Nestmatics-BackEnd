@@ -22,6 +22,10 @@ MODELKEYS = {"model_file":str, "creation_date":str, "service_area":str, "trainin
 
 class ModelHandler(ParentHandler):
 
+    def __init__(self):
+        super().__init__()
+        self.ModelDao = ModelDao()
+
     def insertModel(self, model_json):
         """
         Function to insert a model information in the database. Will validate JSON parameter corresponding to the
@@ -53,7 +57,7 @@ class ModelHandler(ParentHandler):
                     if not self.verifyIDString(model_json[key]):
                         return {"Error":"experiment ID must be a valid 24-character hex string"}
 
-            findModel = ModelDao().getModelByArea(model_json["service_area"])
+            findModel = self.ModelDao.getModelByArea(model_json["service_area"])
             if len(findModel) != 0:
                 for model in findModel:
                     print(model)
@@ -66,7 +70,7 @@ class ModelHandler(ParentHandler):
 
             model_json["creation_date"] = creation_date
 
-            id = ModelDao().insertModel(model_json)
+            id = self.ModelDao.insertModel(model_json)
             print("id ", id)
             if id is None:
                 response = {"Error":"Error on insertion"}
@@ -92,7 +96,7 @@ class ModelHandler(ParentHandler):
             if not self.verifyIDString(areaid):
                 return make_response(jsonify(Error="Area ID must be a valid 24-character hex string"), 400)
 
-            model = ModelDao().getModelByArea(areaid)
+            model = self.ModelDao.getModelByArea(areaid)
             if len(model) == 0:
                 response = make_response(jsonify(Error="No models for that area ID"), 404)
             else:
@@ -117,7 +121,7 @@ class ModelHandler(ParentHandler):
             if not self.verifyIDString(modelid):
                 return make_response(jsonify(Error="Model ID must be a valid 24-character hex string"), 400)
 
-            model = ModelDao().getModelByID(modelid)
+            model = self.ModelDao.getModelByID(modelid)
             if model is None:
                 response = make_response(jsonify(Error="No model with that ID"), 404)
             else:
@@ -141,7 +145,7 @@ class ModelHandler(ParentHandler):
         try:
             if not self.verifyIDString(areaid):
                 return make_response(jsonify(Error="Area ID must be a valid 24-character hex string"), 400)
-            model = ModelDao().getMostRecentModelForArea(areaid)
+            model = self.ModelDao.getMostRecentModelForArea(areaid)
             if model is None or len(model) == 0:
                 response = make_response(jsonify(Error="No model for specified area"), 404)
             else:
@@ -191,7 +195,7 @@ class ModelHandler(ParentHandler):
             if not self.verifyIDString(predict_json["model_id"]):
                 return make_response(jsonify(Error="model ID must be a valid 24-character hex string"), 400)
 
-            model = ModelDao().getModelByID(predict_json["model_id"])
+            model = self.ModelDao.getModelByID(predict_json["model_id"])
             if model is None:
                 return json.dumps({"Error":"No model for this ID"})
 
@@ -207,13 +211,13 @@ class ModelHandler(ParentHandler):
             predict_json["creation_date"] = creation_date
 
             # verify if there is another prediction for that day
-            findPrediction = ModelDao().getPredictionForDate(model["service_area"],
+            findPrediction = self.ModelDao.getPredictionForDate(model["service_area"],
                                                              predict_json["prediction_date"])
             if findPrediction is not None:
                 print(findPrediction)
                 return json.dumps({"Error":"There is already a prediction for this date"})
 
-            id = ModelDao().insertPrediction(predict_json)
+            id = self.ModelDao.insertPrediction(predict_json)
             print("id ", id)
             if id is None:
                 response = {"Error":"Error on insertion"}
@@ -246,11 +250,11 @@ class ModelHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getPrediction(self, areaid, date):
-        prediction = ModelDao().getPredictionForDate(areaid, date)
+        prediction = self.ModelDao.getPredictionForDate(areaid, date)
         return prediction
 
     def getPredictionErrorMetrics(self, areaid):
-        predictions = ModelDao().getErrorMetricForPredictions(areaid)
+        predictions = self.ModelDao.getErrorMetricForPredictions(areaid)
         return predictions
 
     def getPredictionFeatures(self, areaid, date):
@@ -266,7 +270,7 @@ class ModelHandler(ParentHandler):
             if not exists:
                 return make_response(jsonify(Error="No prediction for that area ID"), 404)
 
-            features = ModelDao().getPredictionFeatures(areaid, predict_date)
+            features = self.ModelDao.getPredictionFeatures(areaid, predict_date)
             if features is None:
                 response = make_response(jsonify(Error="No prediction for that date"), 404)
             else:
@@ -278,7 +282,7 @@ class ModelHandler(ParentHandler):
     def editPrediction(self, predictionid, prediction, features, error_metric):
         try:
 
-            model = ModelDao().editPrediction(predictionid,
+            model = self.ModelDao.editPrediction(predictionid,
                                               prediction,
                                               features,
                                               error_metric)
@@ -291,7 +295,7 @@ class ModelHandler(ParentHandler):
             return json.dumps({"Error":str(e)})
 
     def verifyPredictionExistsForArea(self, areaid):
-        prediction = ModelDao().getPredictionByArea(areaid)
+        prediction = self.ModelDao.getPredictionByArea(areaid)
         if prediction is None:
             return False
         else:

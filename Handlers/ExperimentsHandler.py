@@ -10,6 +10,11 @@ EXPERIMENTSKEYS = {"nest_id":str, "name":str, "config1":str, "config2":str, "dat
 
 class ExperimentsHandler(ParentHandler):
 
+    def __init__(self, nestsHandler):
+        super().__init__()
+        self.NestsHandler = nestsHandler
+        self.ExperimentsDao = ExperimentsDao()
+
     def insertExperiment(self, experiment_json):
         """
         Function to insert an experiment in the database. Will validate JSON parameter corresponding to the
@@ -48,16 +53,16 @@ class ExperimentsHandler(ParentHandler):
                 return make_response(jsonify(Error='Date in wrong format. It should be YYYY-MM-DD'), 400)
             experiment_json["date"] = date
 
-            if not NestsHandler().verifyNestExists(experiment_json["nest_id"]):
+            if not self.NestsHandler.verifyNestExists(experiment_json["nest_id"]):
                 return make_response(jsonify(Error='No Nest for nest ID: '+ str(experiment_json["nest_id"])), 404)
 
-            config1 = NestsHandler().getNestConfig(experiment_json["config1"])
+            config1 = self.NestsHandler.getNestConfig(experiment_json["config1"])
 
             if config1 is None:
                 return make_response(jsonify(Error='No Nest Configuration for config1 id: '
                                                    +str(experiment_json["config1"])), 404)
 
-            config2 = NestsHandler().getNestConfig(experiment_json["config2"])
+            config2 = self.NestsHandler.getNestConfig(experiment_json["config2"])
 
             if config2 is None:
                 return make_response(jsonify(Error='No Nest Configuration for config2 id: '
@@ -67,13 +72,13 @@ class ExperimentsHandler(ParentHandler):
             if config1["nest"] != config2["nest"]:
                 return make_response(jsonify(Error='Experiments have to be on the same nest'), 400)
 
-            experiment = ExperimentsDao().getExperimentForConfigurations(experiment_json["config1"],
+            experiment = self.ExperimentsDao.getExperimentForConfigurations(experiment_json["config1"],
                                                                          experiment_json["config2"])
 
             if experiment is not None:
                 return make_response(jsonify(Error='There is already an experiment for these two configurations'), 403)
 
-            id = ExperimentsDao().insertExperiment(experiment_json)
+            id = self.ExperimentsDao.insertExperiment(experiment_json)
 
             if id is None:
                 response = make_response(jsonify(Error="Error on insertion"), 500)
@@ -93,11 +98,11 @@ class ExperimentsHandler(ParentHandler):
             if not self.verifyIDString(nestid):
                 return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
 
-            nest = NestsHandler().getNestById(nestid)
+            nest = self.NestsHandler.getNestById(nestid)
             if nest == None:
                 return make_response(jsonify(Error="No nest has this ID"), 400)
 
-            result = ExperimentsDao().getExperimentsForNest(nestid)
+            result = self.ExperimentsDao.getExperimentsForNest(nestid)
             if result is None or len(result) == 0:
                 response = make_response(jsonify(Error="No experiments for nest ID"), 404)
             else:
@@ -122,7 +127,7 @@ class ExperimentsHandler(ParentHandler):
             if not self.verifyIDString(experimentid):
                 return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
 
-            result = ExperimentsDao().getExperimentFromID(experimentid)
+            result = self.ExperimentsDao.getExperimentFromID(experimentid)
             if result is None:
                 response = make_response(jsonify(Error="No experiments for experiment ID"), 404)
             else:
@@ -133,18 +138,18 @@ class ExperimentsHandler(ParentHandler):
             return response
 
     def getConfigCalculationsForReport(self, experimentid):
-        experiment = ExperimentsDao().getExperimentFromID(experimentid)
+        experiment = self.ExperimentsDao.getExperimentFromID(experimentid)
         if experiment is None:
             return make_response(jsonify(Error='No experiment with this id'), 404)
 
-        report = {"config1": NestsHandler().calculateNestConfigurationStats(experiment["config1"]),
-                  "config2": NestsHandler().calculateNestConfigurationStats(experiment["config2"])}
+        report = {"config1": self.NestsHandler.calculateNestConfigurationStats(experiment["config1"]),
+                  "config2": self.NestsHandler.calculateNestConfigurationStats(experiment["config2"])}
 
         return report
 
     def getReportForExperiment(self, experimentid):
         try:
-            result = ExperimentsHandler().getConfigCalculationsForReport(experimentid)
+            result = self.getConfigCalculationsForReport(experimentid)
             if result is None:
                 response = make_response(jsonify(Error="Error in getting configuration stats"), 404)
             else:
@@ -173,13 +178,13 @@ class ExperimentsHandler(ParentHandler):
             if not self.verifyIDString(user_id):
                 return make_response(jsonify(Error="user ID must be a valid 24-character hex string"), 400)
 
-            nests = NestsHandler().getNestByArea(areaid, user_id)
+            nests = self.NestsHandler.getNestByArea(areaid, user_id)
             if "Error" in nests:
                 return make_response(jsonify(Error="No User or no area found by provided IDs"), 404)
 
             experiments = []
             for item in nests:
-                experiment = ExperimentsDao().getExperimentsForNest(item["_id"])
+                experiment = self.ExperimentsDao.getExperimentsForNest(item["_id"])
                 if experiment is not None:
                     for result in experiment:
                         experiments.append(result)
@@ -211,11 +216,11 @@ class ExperimentsHandler(ParentHandler):
             if type(name) != str or len(name) == 0:
                 return make_response(jsonify(Error="Name is empty or is not a string"), 400)
 
-            experiment = ExperimentsDao().getExperimentFromID(experimentid)
+            experiment = self.ExperimentsDao.getExperimentFromID(experimentid)
             if experiment is None:
                 return make_response(jsonify(Error="No experiment with that id"), 404)
 
-            result = ExperimentsDao().editExperiment(experimentid, name)
+            result = self.ExperimentsDao.editExperiment(experimentid, name)
             if result is None:
                 response = make_response(jsonify(Error="No experiment with that id"), 404)
             elif result == 0:
@@ -235,7 +240,7 @@ class ExperimentsHandler(ParentHandler):
             deleted
         If there were no experiments that meet the criteria, return error dictionary with error information
         """
-        result = ExperimentsDao().deleteExperimentByNestConfig(nestConfig)
+        result = self.ExperimentsDao.deleteExperimentByNestConfig(nestConfig)
         if result is None or result == 0:
             return {"Error":"No experiments deleted"}
         return {"ok":"deleted "+ str(result)+" experiments"}
@@ -250,11 +255,11 @@ class ExperimentsHandler(ParentHandler):
             if not self.verifyIDString(experimentid):
                 return make_response(jsonify(Error="experiment ID must be a valid 24-character hex string"), 400)
 
-            result = ExperimentsDao().getExperimentFromID(experimentid)
+            result = self.ExperimentsDao.getExperimentFromID(experimentid)
             if result is None:
                 return make_response(jsonify(Error="No experiment for that experiment id"), 404)
 
-            result = ExperimentsDao().deleteExperiment(experimentid)
+            result = self.ExperimentsDao.deleteExperiment(experimentid)
             if result is None or result == 0:
                 return make_response(jsonify(Error="No experiments were deleted"), 404)
             else:

@@ -1,10 +1,16 @@
 from flask import jsonify, make_response
 from pprint import pprint
+
 from Handlers.ParentHandler import ParentHandler
-from Handlers.ServiceAreaHandler import ServiceAreaHandler
+
 from DAOs.RideStatsDao import RideStatsDao
 
 class RideStatsHandler(ParentHandler):
+
+    def __init__(self, saHandler):
+        super().__init__()
+        self.ServiceAreaHandler = saHandler
+        self.RideStatsDao = RideStatsDao()
 
     def getStatsForDate(self, date, areaid):
         try:
@@ -15,11 +21,11 @@ class RideStatsHandler(ParentHandler):
             if predict_date == -1 or predict_date is None:
                 return make_response(jsonify(Error="Date in wrong format. It should be YYYY-MM-DD"), 400)
 
-            exists = ServiceAreaHandler().getSArea(areaid)
+            exists = self.ServiceAreaHandler.getSArea(areaid)
             if not exists:
                 return make_response(jsonify(Error="No stats for that area ID"), 404)
 
-            stats = RideStatsDao().getStatsForDateAndArea(predict_date, areaid)
+            stats = self.RideStatsDao.getStatsForDateAndArea(predict_date, areaid)
             if stats is None:
                 response = make_response(jsonify(Error="No stats for that date"), 404)
             else:
@@ -37,11 +43,11 @@ class RideStatsHandler(ParentHandler):
             if predict_date == -1 or predict_date is None:
                 return make_response(jsonify(Error="Date in wrong format. It should be YYYY-MM-DD"), 400)
 
-            exists = ServiceAreaHandler().getSArea(areaid)
+            exists = self.ServiceAreaHandler.getSArea(areaid)
             if not exists:
                 return make_response(jsonify(Error="No stats for that area ID"), 404)
 
-            stats = RideStatsDao().getTotalNumberOfRides(predict_date, areaid)
+            stats = self.RideStatsDao.getTotalNumberOfRides(predict_date, areaid)
             if stats is None:
                 response = make_response(jsonify(Error="No stats for that date"), 404)
             else:
@@ -59,11 +65,11 @@ class RideStatsHandler(ParentHandler):
             if predict_date == -1 or predict_date is None:
                 return make_response(jsonify(Error="Date in wrong format. It should be YYYY-MM-DD"), 400)
 
-            exists = ServiceAreaHandler().getSArea(areaid)
+            exists = self.ServiceAreaHandler.getSArea(areaid)
             if not exists:
                 return make_response(jsonify(Error="No stats for that area ID"), 404)
 
-            stats = RideStatsDao().getTotalActiveVehicles(predict_date, areaid)
+            stats = self.RideStatsDao.getTotalActiveVehicles(predict_date, areaid)
             if stats is None:
                 response = make_response(jsonify(Error="No stats for that date"), 404)
             else:
@@ -81,11 +87,11 @@ class RideStatsHandler(ParentHandler):
             if predict_date == -1 or predict_date is None:
                 return make_response(jsonify(Error="Date in wrong format. It should be YYYY-MM-DD"), 400)
 
-            exists = ServiceAreaHandler().getSArea(areaid)
+            exists = self.ServiceAreaHandler.getSArea(areaid)
             if not exists:
                 return make_response(jsonify(Error="No stats for that area ID"), 404)
 
-            stats = RideStatsDao().getTotalRevenue(predict_date, areaid)
+            stats = self.RideStatsDao.getTotalRevenue(predict_date, areaid)
             if stats is None:
                 response = make_response(jsonify(Error="No stats for that date"), 404)
             else:
@@ -96,14 +102,14 @@ class RideStatsHandler(ParentHandler):
 
     def insertStats(self, item):
         print(item)
-        findStats = RideStatsDao().getStatsForDateAndArea(item["date"], item["service_area"])
+        findStats = self.RideStatsDao.getStatsForDateAndArea(item["date"], item["service_area"])
         if findStats is not None:
             return {"Error": "Already stats for this date and area"}
 
-        _id = RideStatsDao().insertStats(item)
+        _id = self.RideStatsDao.insertStats(item)
         return {"ok": _id}
 
     def deleteRideStatsByDate(self, date):
-        x = RideStatsDao().deleteStatsByDate(date)
+        x = self.RideStatsDao.deleteStatsByDate(date)
         return x
 

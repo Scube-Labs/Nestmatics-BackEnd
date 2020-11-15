@@ -4,16 +4,19 @@ from datetime import datetime
 from Handlers.ParentHandler import ParentHandler
 import csv
 
-from Handlers.RideStatsHandler import RideStatsHandler
-from Handlers.ServiceAreaHandler import ServiceAreaHandler
 from DAOs.RidesDao import RidesDAO
-
-RidesDAO = RidesDAO()
 
 RIDESKEYS=["bird_id", "dt", "start_time", "end_time", "ride_cost", "start_long", "start_lat",
            "end_lat", "end_long"]
 
 class RidesHandler(ParentHandler):
+
+    def __init__(self, rideStatsHandler, ServiceAreaHandler, NestsHandler):
+        super().__init__()
+        self.RidesDao = RidesDAO()
+        self.ServiceAreaHandler = ServiceAreaHandler
+        self.NestsHandler = NestsHandler
+        self.RideStatsHandler = rideStatsHandler
 
     def getRidesForDateAndArea(self, date, areaid):
         """
@@ -27,14 +30,14 @@ class RidesHandler(ParentHandler):
                 return make_response(jsonify(Error="No areaid passed as parameter"), 400)
             if self.verifyIDString(areaid) == False:
                 return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
-            if ServiceAreaHandler().getSArea(areaid) is None:
+            if self.ServiceAreaHandler.getSArea(areaid) is None:
                 return make_response(jsonify(Error="No Area with this ID"), 404)
 
             newDate = self.toIsoFormat(date)
             if newDate == -1:
                 return make_response(jsonify(Error='Date format should be YYYY-MM-DD'), 400)
 
-            rides = RidesDAO.getRidesForDateAndArea(newDate, areaid)
+            rides = self.RidesDao.getRidesForDateAndArea(newDate, areaid)
             if rides is None or len(rides) == 0:
                 response = make_response(jsonify(Error="No rides for this date or area"), 404)
             else:
@@ -45,7 +48,7 @@ class RidesHandler(ParentHandler):
             return response
 
     def getRidesForDateIntervalAndArea(self,date_greaterT, date_lessT, area_id):
-        rides = RidesDAO().getRidesForDateIntervalAndArea(date_greaterT, date_lessT, area_id)
+        rides = self.RidesDao.getRidesForDateIntervalAndArea(date_greaterT, date_lessT, area_id)
         return rides
 
     def getRidesCoordsForDateAndArea(self, date, areaid):
@@ -60,14 +63,14 @@ class RidesHandler(ParentHandler):
                 return make_response(jsonify(Error="No areaid passed as parameter"), 400)
             if self.verifyIDString(areaid) == False:
                 return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
-            if ServiceAreaHandler().getSArea(areaid) is None:
+            if self.ServiceAreaHandler.getSArea(areaid) is None:
                 return make_response(jsonify(Error="No Area with this ID"), 404)
 
             newDate = self.toIsoFormat(date)
             if newDate == -1:
                 return make_response(jsonify(Error='Date format should be YYYY-MM-DD'), 400)
 
-            rides = RidesDAO().getRidesCoordsForDateAndArea(newDate, areaid)
+            rides = self.RidesDao.getRidesCoordsForDateAndArea(newDate, areaid)
             if rides is None or len(rides) == 0:
                 response = make_response(jsonify(Error="No rides for this date or area"), 404)
             else:
@@ -90,7 +93,7 @@ class RidesHandler(ParentHandler):
                 return make_response(jsonify(Error="No areaid passed as parameter"), 400)
             if self.verifyIDString(areaid) == False:
                 return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
-            if ServiceAreaHandler().getSArea(areaid) is None:
+            if self.ServiceAreaHandler.getSArea(areaid) is None:
                 return make_response(jsonify(Error="No Area with this ID"), 404)
 
             newDate = self.toIsoFormat(date)
@@ -105,7 +108,7 @@ class RidesHandler(ParentHandler):
             if time_lt == -1:
                 return make_response(jsonify(Error='Time stamp format should be YYYY-MM-DD HH:MM:SS'), 400)
 
-            rides = RidesDAO().getRidesForTimeIntervalAndArea(newDate, time_gt, time_lt, areaid)
+            rides = self.RidesDao.getRidesForTimeIntervalAndArea(newDate, time_gt, time_lt, areaid)
             if rides is None or len(rides) == 0:
                 response = make_response(jsonify(Error="No rides for this time or area"), 404)
             else:
@@ -152,14 +155,14 @@ class RidesHandler(ParentHandler):
                 return make_response(jsonify(Error="Area ID must be a valid 24-character hex string"), 400)
             if self.verifyIDString(nestid) == False:
                 return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
-            if ServiceAreaHandler().getSArea(areaid) is None:
+            if self.ServiceAreaHandler.getSArea(areaid) is None:
                 return make_response(jsonify(Error="No Area with this ID"), 404)
 
             newDate = self.toIsoFormat(date)
             if newDate == -1:
                 return make_response(jsonify(Error='Date format should be YYYY-MM-DD'), 400)
 
-            rides = RidesDAO().getRidesForDateAndArea(newDate, areaid)
+            rides = self.RidesDao.getRidesForDateAndArea(newDate, areaid)
             if rides is None or len(rides) == 0:
                 return make_response(jsonify(Error='No rides for this date or area'), 404)
 
@@ -245,7 +248,7 @@ class RidesHandler(ParentHandler):
         try:
             if self.verifyIDString(area) == False:
                 return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
-            findArea = ServiceAreaHandler().getSArea(area)
+            findArea = self.ServiceAreaHandler.getSArea(area)
             if findArea is None:
                 return make_response(jsonify(Error="No area with this ID"), 404)
 
@@ -310,7 +313,7 @@ class RidesHandler(ParentHandler):
                     total_active_vehicles = {}
 
                     # insert stats for this date
-                    id = RideStatsHandler().insertStats(item)
+                    id = self.RideStatsHandler.insertStats(item)
 
                     if "ok" in id:
                         stats_ids.append(id["ok"])
@@ -322,7 +325,7 @@ class RidesHandler(ParentHandler):
 
                 bird_id = str(row[keys["bird_id"]])
 
-                findRides = RidesDAO().getRidesForTimeAndVechicleId(startTime,
+                findRides = self.RidesDao.getRidesForTimeAndVechicleId(startTime,
                                                                     currentDate,
                                                                     service_area,
                                                                     bird_id)
@@ -330,7 +333,7 @@ class RidesHandler(ParentHandler):
                     repeatedRides += 1
                     continue
                 else:
-                    bird_id = bird_id
+                    # bird_id = bird_id
                     if bird_id in total_active_vehicles:
                         total_active_vehicles[bird_id] += 1
 
@@ -349,15 +352,15 @@ class RidesHandler(ParentHandler):
                         "start_time": startTime,
                         "end_time": endTime,
                         "service_area": {"_id": service_area},
-                        "ride_cost": row[keys["ride_cost"]],
+                        "ride_cost": float(row[keys["ride_cost"]]),
                         "coords": {
                             "start_lat": row[keys["start_lat"]],
                             "start_lon": row[keys["start_long"]],
                             "end_lat": row[keys["end_lat"]],
-                            "end_long": row[keys["end_long"]]
+                            "end_lon": row[keys["end_long"]]
                         }
                     }
-                    id = RidesDAO().insertRide(ride)
+                    id = self.RidesDao.insertRide(ride)
 
                     ack.append(id)
 
@@ -375,7 +378,7 @@ class RidesHandler(ParentHandler):
             }
 
             # insert stats for this date
-            id = RideStatsHandler().insertStats(item)
+            id = self.RideStatsHandler.insertStats(item)
 
             if "ok" in id:
                 stats_ids.append(id["ok"])
@@ -390,8 +393,8 @@ class RidesHandler(ParentHandler):
         :param date: date to delete rides from
         :return:
         """
-        count = RidesDAO().deleteRidesByDate(date)
-        deletedStats = RideStatsHandler().deleteRideStatsByDate(date)
+        count = self.RidesDao.deleteRidesByDate(date)
+        deletedStats = self.RideStatsHandler.deleteRideStatsByDate(date)
         print("deleted entries: " + str(count) + ", deleted stats: "+str(deletedStats))
 
 # ----------------- Helper functions ----------------------------------------
@@ -403,8 +406,7 @@ class RidesHandler(ParentHandler):
         :param start: BOOLEAN, tells if coordinates are starting or ending coordinates
         :return: rides that started at provided nest
         """
-        from Handlers.NestsHandler import NestsHandler
-        nest = NestsHandler().findNest(nestid)
+        nest = self.NestsHandler.findNest(nestid)
 
         if nest is None:
             return "No nest on with this id"

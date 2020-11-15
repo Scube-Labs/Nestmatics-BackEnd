@@ -11,6 +11,10 @@ SAPROPERTIESKEYS = {"timestamp":str, "service_area":dict, "bitmap_file":str}
 
 class ServiceAreaHandler(ParentHandler):
 
+    def __init__(self):
+        super().__init__()
+        self.ServiceAreaDao = ServiceAreaDao()
+
     def getAllServiceAreas(self):
         """
         Function to get all service areas in the database
@@ -45,7 +49,7 @@ class ServiceAreaHandler(ParentHandler):
          ]
         """
         try:
-            area = ServiceAreaDao().getAllServiceAreas()
+            area = self.ServiceAreaDao.getAllServiceAreas()
             if area is None or len(area) == 0:
                 response = make_response(jsonify(Error="No service areas on system"), 404)
             else:
@@ -119,7 +123,7 @@ class ServiceAreaHandler(ParentHandler):
         if len(name) == 0:
             return make_response(jsonify(Error="empty area name"), 400)
 
-        result = ServiceAreaDao().editServiceAreaName(areaid, name)
+        result = self.ServiceAreaDao.editServiceAreaName(areaid, name)
         print(result)
         if result is None or result == 0:
             response = make_response(jsonify(Error="No service area was modified, maybe no changes where found"), 403)
@@ -253,7 +257,7 @@ class ServiceAreaHandler(ParentHandler):
                 "bitmap_file": file where bitmap of the buildings is stored
             }
         """
-        return ServiceAreaDao().getBuildingsOfArea(areaid)
+        return self.ServiceAreaDao.getBuildingsOfArea(areaid)
 
     def getStreets(self, areaid):
         """
@@ -271,7 +275,7 @@ class ServiceAreaHandler(ParentHandler):
                 "bitmap_file": file where bitmap of the streets is stored
             }
         """
-        return ServiceAreaDao().getStreetsOfArea(areaid)
+        return self.ServiceAreaDao.getStreetsOfArea(areaid)
 
     def getWeather(self, areaid, timestamp):
         """
@@ -289,7 +293,7 @@ class ServiceAreaHandler(ParentHandler):
                     "timestamp": the date this information belongs to
                 }
         """
-        return ServiceAreaDao().getWeatherData(areaid, timestamp)
+        return self.ServiceAreaDao.getWeatherData(areaid, timestamp)
 
     def getAmenities(self, areaid):
         """
@@ -307,7 +311,7 @@ class ServiceAreaHandler(ParentHandler):
                 "bitmap_file": file where bitmap of the amenities is stored
             }
         """
-        return ServiceAreaDao().getAmenitiesOfArea(areaid)
+        return self.ServiceAreaDao.getAmenitiesOfArea(areaid)
 
     def getSArea(self, areaid=None, name=None):
         """
@@ -318,9 +322,9 @@ class ServiceAreaHandler(ParentHandler):
         :return: Service area information
         """
         if areaid is None:
-            return ServiceAreaDao().getServiceAreaByName(name)
+            return self.ServiceAreaDao.getServiceAreaByName(name)
         else:
-            return ServiceAreaDao().getServiceAreaById(areaid)
+            return self.ServiceAreaDao.getServiceAreaById(areaid)
 
     def insertServiceArea(self, sa_json):
         """
@@ -366,7 +370,7 @@ class ServiceAreaHandler(ParentHandler):
                 return jsonify(Error='There is already an area with this name')
 
             # Insert Service Area in database
-            id = ServiceAreaDao().insertServiceArea(sa_json)
+            id = self.ServiceAreaDao.insertServiceArea(sa_json)
             print(id)
 
             # If id is none after attempting to enter there may have been an error
@@ -430,7 +434,7 @@ class ServiceAreaHandler(ParentHandler):
             if weather:
                 return {"Error":{'There is already weather data for this day': weather}}
 
-            id = ServiceAreaDao().insertWeatherData(data)
+            id = self.ServiceAreaDao.insertWeatherData(data)
             print(id)
             if id is None:
                 response = {"Error":"Error on insertion"}
@@ -481,7 +485,7 @@ class ServiceAreaHandler(ParentHandler):
             if amenities:
                 return {"Error": {'There is already an amenities bitmap for this area': amenities}}
 
-            id = ServiceAreaDao().insertAmenitiesData(data)
+            id = self.ServiceAreaDao.insertAmenitiesData(data)
             if id is None:
                 response = {"Error": "Error on insertion"}
             else:
@@ -531,7 +535,7 @@ class ServiceAreaHandler(ParentHandler):
             if buildings:
                 return {"Error":{'There is already a buildings bitmap for this area': buildings}}
 
-            id = ServiceAreaDao().insertBuildingsData(data)
+            id = self.ServiceAreaDao.insertBuildingsData(data)
             if id is None:
                 response = {"Error": "Error on insertion"}
             else:
@@ -581,7 +585,7 @@ class ServiceAreaHandler(ParentHandler):
             if street:
                 return {"Error":{'There is already a streets bitmap for this area': street}}
 
-            id = ServiceAreaDao().insertStreetData(data)
+            id = self.ServiceAreaDao.insertStreetData(data)
             if id is None:
                 response = {"Error": "Error on insertion"}
             else:

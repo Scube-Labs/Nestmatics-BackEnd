@@ -19,13 +19,12 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Apply CORS to this app
 CORS(app)
 
-RidesHandler = RidesHandler()
-RideStatsHandler = RideStatsHandler()
 UsersHandler = UsersHandler()
 ServiceAreaHandler = ServiceAreaHandler()
-
-NestsHandler = NestsHandler(UsersHandler, ServiceAreaHandler)
-
-DropStrategyHandler = DropStrategyHandler()
-ExperimentsHandler = ExperimentsHandler()
 ModelHandler = ModelHandler()
+RidesHandler = RidesHandler(RideStatsHandler, ServiceAreaHandler, NestsHandler)
+RideStatsHandler = RideStatsHandler(ServiceAreaHandler)
+NestsHandler = NestsHandler(UsersHandler, ServiceAreaHandler, RidesHandler)
+DropStrategyHandler = DropStrategyHandler(ServiceAreaHandler)
+ExperimentsHandler = ExperimentsHandler(NestsHandler)
+

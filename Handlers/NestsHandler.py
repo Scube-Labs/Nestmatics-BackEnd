@@ -13,11 +13,12 @@ RIDE_MINUTE_RATE = 0.10
 
 class NestsHandler(ParentHandler):
 
-    def __init__(self, usersHandler, saHandler):
+    def __init__(self, usersHandler, saHandler, ridesHandler):
         super().__init__()
         self.NestsDao = NestsDao()
         self.UsersHandler = usersHandler
         self.ServiceAreaHandler = saHandler
+        self.RidesHandler = ridesHandler
 
     # This implied, No nests can have the same name or location
     def insertNests(self, nests_json):
@@ -387,29 +388,33 @@ class NestsHandler(ParentHandler):
             area_id = nest["service_area"]
             print(area_id)
 
-            rides = RidesHandler().getRidesForDateIntervalAndArea(config_start_date, config_end_date, area_id)
+            rides = self.RidesHandler.getRidesForDateIntervalAndArea(config_start_date, config_end_date, area_id)
 
             revenue = 0
-            nest_active_vehicles = []
+            nest_active_vehicles = {}
             rides_started = []
             rides_ended = []
             total_rides = 0
 
             if rides is not None or len(rides) != 0:
-                from Handlers.RidesHandler import RidesHandler
+                # from Handlers.RidesHandler import RidesHandler
 
                 for i in rides:
-                    ride_coords = {"lat": i["coords"]["start_lat"], "lon": i["coords"]["start_lon"]}
-                    if RidesHandler().areCoordsInsideNest(nest["coords"], 30, ride_coords):
+                    ride_coords = {"lat": float(i["coords"]["start_lat"]), "lon": float(i["coords"]["start_lon"])}
+                    if self.RidesHandler.areCoordsInsideNest(nest["coords"], 30, ride_coords):
                         total_rides += 1
-                        revenue += i["ride_cost"]
-                        nest_active_vehicles.append(i["bird_id"])
-                        rides_started.append(i)
-                    else:
-                        ride_coords = {"lat": i["coords"]["end_lat"], "lon": i["coords"]["end_lon"]}
-                        if RidesHandler().areCoordsInsideNest(nest["coords"], 30, ride_coords):
+                        revenue += float(i["ride_cost"])
+                        bird_id = str(i["bird_id"])
+                        if bird_id in nest_active_vehicles:
+                            nest_active_vehicles[bird_id] += 1
+                        else:
+                            nest_active_vehicles[bird_id] = 1
 
-                            rides_ended.append(i)
+                        rides_started.append(i["_id"])
+                    else:
+                        ride_coords = {"lat": float(i["coords"]["end_lat"]), "lon": float(i["coords"]["end_long"])}
+                        if self.RidesHandler.areCoordsInsideNest(nest["coords"], 30, ride_coords):
+                            rides_ended.append(i["_id"])
 
                 item = {
                     "vehicle_qty":nestConfig["vehicle_qty"],

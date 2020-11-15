@@ -2,12 +2,16 @@ from flask import jsonify, make_response
 from datetime import datetime
 
 from Handlers.ParentHandler import ParentHandler
-from Handlers.ServiceAreaHandler import ServiceAreaHandler
 from DAOs.DropStrategyDao import DropStrategyDao
 
 DROPSTRATEGYKEYS = {"days":list, "start_date":str, "end_date":str, "service_area":str}
 
 class DropStrategyHandler(ParentHandler):
+
+    def __init__(self, saHandler):
+        super().__init__()
+        self.ServiceAreaHandler = saHandler
+        self.DropStrategyDao = DropStrategyDao()
 
     def insertDropStrategy(self, drop_json):
         try:
@@ -24,7 +28,7 @@ class DropStrategyHandler(ParentHandler):
                     if not self.verifyIDString(drop_json[key]):
                         return make_response(jsonify(Error="area ID must be a valid 24-character hex string"),
                                              400)
-                    area = ServiceAreaHandler().getSArea(drop_json[key])
+                    area = self.ServiceAreaHandler.getSArea(drop_json[key])
                     if area is None:
                         return make_response(jsonify(Error="There is no Area with this area ID"), 404)
 
@@ -51,7 +55,7 @@ class DropStrategyHandler(ParentHandler):
             if end_date < start_date:
                 return make_response(jsonify(Error="Start date has to be before end date"), 400)
 
-            drop = DropStrategyDao().getDropStrategyForDate(drop_json["start_date"],
+            drop = self.DropStrategyDao.getDropStrategyForDate(drop_json["start_date"],
                                                         drop_json["end_date"],
                                                         drop_json["service_area"])
             if len(drop) != 0:
@@ -59,7 +63,7 @@ class DropStrategyHandler(ParentHandler):
                                                    'date: '+ drop[0]["start_date"]+" to "+
                                                    drop[len(drop)-1]["end_date"]),403)
 
-            id = DropStrategyDao().insertDropStrategy(drop_json)
+            id = self.DropStrategyDao.insertDropStrategy(drop_json)
             print("id ", id)
             if id is None:
                 response = make_response(jsonify(Error="Error on insertion"), 500)
@@ -83,11 +87,11 @@ class DropStrategyHandler(ParentHandler):
             if end_date == -1 or end_date is None:
                 return make_response(jsonify(Error="Date in wrong format. It should be YYYY-MM-DD"), 400)
 
-            area = DropStrategyDao().getDropStrategiesForArea(areaid)
+            area = self.DropStrategyDao.getDropStrategiesForArea(areaid)
             if area is None or len(area) == 0:
                 return make_response(jsonify(Error="No drop strategy for specified area ID"), 404)
 
-            result = DropStrategyDao().getDropStrategyForDate(start_date, end_date, areaid)
+            result = self.DropStrategyDao.getDropStrategyForDate(start_date, end_date, areaid)
             if result is None or len(result) == 0:
                 response = make_response(jsonify(Error="No drop strategy for specified date"), 404)
             else:
@@ -102,7 +106,7 @@ class DropStrategyHandler(ParentHandler):
             if not self.verifyIDString(areaid):
                 return make_response(jsonify(Error="area ID must be a valid 24-character hex string"),
                                      400)
-            area = DropStrategyDao().getDropStrategiesForArea(areaid)
+            area = self.DropStrategyDao.getDropStrategiesForArea(areaid)
             if area is None or len(area) == 0:
                 return make_response(jsonify(Error="No drop strategy for specified area ID"), 404)
             else:
@@ -117,7 +121,7 @@ class DropStrategyHandler(ParentHandler):
             if not self.verifyIDString(dropid):
                 return make_response(jsonify(Error="area ID must be a valid 24-character hex string"),
                                      400)
-            drop = DropStrategyDao().getDropStrategyFromId(dropid)
+            drop = self.DropStrategyDao.getDropStrategyFromId(dropid)
             if drop is None:
                 return make_response(jsonify(Error="No drop strategy for that drop id"), 404)
             else:
@@ -133,7 +137,7 @@ class DropStrategyHandler(ParentHandler):
                 return make_response(jsonify(Error="area ID must be a valid 24-character hex string"),
                                      400)
 
-            drop = DropStrategyDao().getMostRecentDropStrategy(areaid)
+            drop = self.DropStrategyDao.getMostRecentDropStrategy(areaid)
             if drop is None or len(drop) == 0:
                 return make_response(jsonify(Error="No drop strategies for area"), 404)
             else:
@@ -145,13 +149,13 @@ class DropStrategyHandler(ParentHandler):
 
     def editDropStrategy(self, dropid, dayNum, config):
         try:
-            drop = DropStrategyDao().getDropStrategyFromId(dropid)
+            drop = self.DropStrategyDao.getDropStrategyFromId(dropid)
             if drop is None:
                 return make_response(jsonify(Error="No drop strategy for that drop id"), 404)
             if len(config) < 1:
                 return make_response(jsonify(Error="There should be at least one nest configuration to insert/update"), 404)
 
-            drop = DropStrategyDao().editDropStrategy(dropid,dayNum,config)
+            drop = self.DropStrategyDao.editDropStrategy(dropid,dayNum,config)
             if drop is None or drop == 0:
                 return make_response(jsonify(Error="No drop strategies were edited"), 404)
             else:
@@ -166,11 +170,11 @@ class DropStrategyHandler(ParentHandler):
             if not self.verifyIDString(dropid):
                 return make_response(jsonify(Error="area ID must be a valid 24-character hex string"),
                                      400)
-            drop = DropStrategyDao().getDropStrategyFromId(dropid)
+            drop = self.DropStrategyDao.getDropStrategyFromId(dropid)
             if drop is None:
                 return make_response(jsonify(Error="No drop strategy for that drop id"), 404)
 
-            drop = DropStrategyDao().deleteDropStrategy(dropid)
+            drop = self.DropStrategyDao.deleteDropStrategy(dropid)
             if drop is None or drop == 0:
                 return make_response(jsonify(Error="No drop strategies were deleted"), 404)
             else:
