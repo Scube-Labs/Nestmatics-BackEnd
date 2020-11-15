@@ -1,17 +1,24 @@
 from flask import Flask, jsonify, request, make_response
 
-from API import app
+from API import app, RidesHandler, NestsHandler, \
+    ServiceAreaHandler, UsersHandler, RideStatsHandler, ModelHandler, ExperimentsHandler, DropStrategyHandler
+
 import os
 from werkzeug.utils import secure_filename
 
-from Handlers.RidesHandler import RidesHandler
-from Handlers.NestsHandler import NestsHandler
-from Handlers.RideStatsHandler import RideStatsHandler
-from Handlers.UsersHandler import UsersHandler
-from Handlers.ServiceAreaHandler import ServiceAreaHandler
-from Handlers.DropStrategyHandler import DropStrategyHandler
-from Handlers.ExperimentsHandler import ExperimentsHandler
-from Handlers.ModelHandler import ModelHandler
+# from Handlers.RidesHandler import RidesHandler
+# from Handlers.NestsHandler import NestsHandler
+# from Handlers.RideStatsHandler import RideStatsHandler
+# from Handlers.UsersHandler import UsersHandler
+# from Handlers.ServiceAreaHandler import ServiceAreaHandler
+# from Handlers.DropStrategyHandler import DropStrategyHandler
+# from Handlers.ExperimentsHandler import ExperimentsHandler
+# from Handlers.ModelHandler import ModelHandler
+#
+# UserHandler =
+# NestHandler = NestsHandler()
+
+
 
 @app.route('/', methods=['GET'])
 def home():

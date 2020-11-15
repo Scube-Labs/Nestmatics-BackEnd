@@ -8,6 +8,8 @@ from Handlers.RideStatsHandler import RideStatsHandler
 from Handlers.ServiceAreaHandler import ServiceAreaHandler
 from DAOs.RidesDao import RidesDAO
 
+RidesDAO = RidesDAO()
+
 RIDESKEYS=["bird_id", "dt", "start_time", "end_time", "ride_cost", "start_long", "start_lat",
            "end_lat", "end_long"]
 
@@ -32,7 +34,7 @@ class RidesHandler(ParentHandler):
             if newDate == -1:
                 return make_response(jsonify(Error='Date format should be YYYY-MM-DD'), 400)
 
-            rides = RidesDAO().getRidesForDateAndArea(newDate, areaid)
+            rides = RidesDAO.getRidesForDateAndArea(newDate, areaid)
             if rides is None or len(rides) == 0:
                 response = make_response(jsonify(Error="No rides for this date or area"), 404)
             else:
@@ -118,15 +120,38 @@ class RidesHandler(ParentHandler):
         Get rides that start at a provided nest
         :param nestid: ID of nest to get coordinates from and verify if nest are within that area
         :param date: date where to get rides from
-        :param areaid: ID of area fromn wichh to get rides from
-        :param start: specify if its start or end coordinates of the rides
+        :param areaid: ID of area fromn wich to get rides from
+        :param start: a boolean parameter that specifies if you want rides that start (True) or end (False)
+            in the specified Nest area
         :return:
+            Response object with 400 status code: if there is an error in the request such as an incorrect ID format,
+            or incorrect date format
+
+            Response object with 404 status code: if there area no areas, nests or rides found for the parameters
+            specified, a 404 (NOT FOUND) status code will be issued in the response object.
+
+            Response object with 500 status code: if there was an error in the server
+
+            ** The previously mentionederror codes will return a JSON with the format:
+            {
+                "Error": error information string
+            }
+
+            Response object with 200 status code : if the request was successul a response ibject with the requested
+            information and 200 status code will be issued. Format of JSON response:
+            {
+                "ok":[{ride1}, {ride2}, ...... ]
+            }
+
         """
         try:
             if areaid == None:
                 return make_response(jsonify(Error="No areaid passed as parameter"), 400)
+
             if self.verifyIDString(areaid) == False:
-                return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
+                return make_response(jsonify(Error="Area ID must be a valid 24-character hex string"), 400)
+            if self.verifyIDString(nestid) == False:
+                return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
             if ServiceAreaHandler().getSArea(areaid) is None:
                 return make_response(jsonify(Error="No Area with this ID"), 404)
 
@@ -134,9 +159,9 @@ class RidesHandler(ParentHandler):
             if newDate == -1:
                 return make_response(jsonify(Error='Date format should be YYYY-MM-DD'), 400)
 
-            rides = RidesDAO().getRidesForDateAndArea(date, areaid)
+            rides = RidesDAO().getRidesForDateAndArea(newDate, areaid)
             if rides is None or len(rides) == 0:
-                return make_response(jsonify(Error='No rides for this date or area'), 400)
+                return make_response(jsonify(Error='No rides for this date or area'), 404)
 
             rides_at_nest = self.startAtNest(nestid, rides, start)
 
@@ -148,7 +173,6 @@ class RidesHandler(ParentHandler):
         except Exception as e:
             response = make_response(jsonify(Error=str(e)), 500)
             return response
-
 
     def testCSV(self, file):
         """
@@ -291,7 +315,6 @@ class RidesHandler(ParentHandler):
                     if "ok" in id:
                         stats_ids.append(id["ok"])
 
-
                 prevDate = currentDate
 
                 startTime = self.toIsoFormat(row[keys["start_time"]])
@@ -390,15 +413,19 @@ class RidesHandler(ParentHandler):
         nest_radius = nest["nest_radius"]
         nest_coords = nest["coords"]
 
+        ridesinnest = 0
         rides_at_nest = []
         for item in rides:
             if start:
-                rides_coords = {"lat":item["coords"]["start_lat"], "lon": item["coords"]["start_lon"]}
+                rides_coords = {"lat":float(item["coords"]["start_lat"]), "lon": float(item["coords"]["start_lon"])}
             else:
                 rides_coords = {"lat": item["coords"]["end_lat"], "lon": item["coords"]["end_lon"]}
             #print(rides_lat)
             if self.areCoordsInsideNest(nest_coords, 30, rides_coords):
                 rides_at_nest.append(item)
+                ridesinnest += 1
+
+        print(ridesinnest)
         return rides_at_nest
 
     def areCoordsInsideNest(self, nest_coords, radius, compare_coords):
@@ -433,4 +460,8 @@ class RidesHandler(ParentHandler):
             calc = ride_cost
         return calc
 
-#print(RidesHandler().deleteRidesByDate("2020-03-03T00:00:00"))
+# nest_coords = {
+#     "lat": 18.20516,
+#     "lon": -67.14222}
+# rides = RidesDAO().getRidesForDateAndArea("2020-03-03T00:00:00", "5fa5df52d2959eef671a408f")
+# print(RidesHandler().startAtNest("5faf54b0ece87a6df7fed08b", rides, True ))

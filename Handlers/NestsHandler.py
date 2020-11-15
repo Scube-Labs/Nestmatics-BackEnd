@@ -13,6 +13,12 @@ RIDE_MINUTE_RATE = 0.10
 
 class NestsHandler(ParentHandler):
 
+    def __init__(self, usersHandler, saHandler):
+        super().__init__()
+        self.NestsDao = NestsDao()
+        self.UsersHandler = usersHandler
+        self.ServiceAreaHandler = saHandler
+
     # This implied, No nests can have the same name or location
     def insertNests(self, nests_json):
         """
@@ -64,17 +70,17 @@ class NestsHandler(ParentHandler):
                 return make_response(jsonify(Error="There is no Area with this area ID"), 404)
 
             # Look for a nest with the same Name
-            findNest = NestsDao().findNestsByNestName(nests_json["service_area"], nests_json["nest_name"],
+            findNest = self.NestsDao.findNestsByNestName(nests_json["service_area"], nests_json["nest_name"],
                                                       nests_json["user"])
             if findNest is not None:
                 return make_response(jsonify(Error="There is already a nest with this name"), 403)
 
             # Look for Nest in with the same location
-            findNest = NestsDao().findNestByCoords(nests_json["coords"], nests_json["user"])
+            findNest = self.NestsDao.findNestByCoords(nests_json["coords"], nests_json["user"])
             if findNest is not None:
                 return make_response(jsonify(Error="There is already a nest in this location"), 403)
 
-            id = NestsDao().insertNest(nests_json)
+            id = self.NestsDao.insertNest(nests_json)
             if id is None:
                 response = make_response(jsonify(Error="Error on insertion"), 500)
             else:
@@ -121,7 +127,7 @@ class NestsHandler(ParentHandler):
         user = UsersHandler().getUser(user_id)
         if user is None:
             return {"Error":"There is no User with this user ID"}
-        nests = NestsDao().findNestsByServiceAreaId(sa_id, user_id)
+        nests = self.NestsDao.findNestsByServiceAreaId(sa_id, user_id)
         return nests
 
     def getNestById(self, nest_id):
@@ -149,7 +155,7 @@ class NestsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def findNest(self, nest_id):
-        nest = NestsDao().findNestById(nest_id)
+        nest = self.NestsDao.findNestById(nest_id)
         return nest
 
     def verifyNestExists(self, nestid):
@@ -184,7 +190,7 @@ class NestsHandler(ParentHandler):
             area = ServiceAreaHandler().getSArea(areaid)
             if area is None:
                 return make_response(jsonify(Error="There is no Area with this area ID"), 404)
-            nests = NestsDao().getNestsNamesFromArea(areaid, user_id)
+            nests = self.NestsDao.getNestsNamesFromArea(areaid, user_id)
             if nests is None or len(nests) == 0:
                 response = make_response(jsonify(Error="No nest on that area or from that user id"), 404)
             else:
@@ -202,7 +208,7 @@ class NestsHandler(ParentHandler):
             if nest is None:
                 return make_response(jsonify(Error="No Nest with that ID"), 404)
 
-            result = NestsDao().deleteNest(nestid)
+            result = self.NestsDao.deleteNest(nestid)
             if result is None or result == 0:
                 response = make_response(jsonify(Error="No Nests deleted"), 404)
             else:
@@ -238,7 +244,7 @@ class NestsHandler(ParentHandler):
             if len(nestName) == 0:
                 return make_response(jsonify(Error="empty nest name"), 400)
 
-            result = NestsDao().editNest(nestid, nestName)
+            result = self.NestsDao.editNest(nestid, nestName)
             if result is None or result == 0:
                 print(result)
                 response = make_response(jsonify(Error="No Nest was modified, maybe no changes where found"), 404)
@@ -292,16 +298,16 @@ class NestsHandler(ParentHandler):
 
             nest_id = nestConfig_json["nest"]
 
-            findNest = NestsDao().findNestById(nest_id)
+            findNest = self.NestsDao.findNestById(nest_id)
 
             if findNest is None:
                 return make_response(jsonify(Error= "There is no Nest with name this id: " + nest_id), 404)
 
-            findNestConfig = NestsDao().getNestConfiguration(startDate=startDate, nestid=nest_id)
+            findNestConfig = self.NestsDao.getNestConfiguration(startDate=startDate, nestid=nest_id)
             if findNestConfig is not None:
                 return make_response(jsonify(Error='There is already a nest configuration for this date'), 403)
 
-            id = NestsDao().insertNestConfiguration(nestConfig_json)
+            id = self.NestsDao.insertNestConfiguration(nestConfig_json)
             print("id ", id)
             if id is None:
                 response = make_response(jsonify(Error="Error on insertion"), 500)
@@ -325,7 +331,7 @@ class NestsHandler(ParentHandler):
         try:
             if not self.verifyIDString(nestid):
                 return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
-            nests = NestsDao().getNestConfigurationsForNest(nestid)
+            nests = self.NestsDao.getNestConfigurationsForNest(nestid)
             if nests is None or len(nests) == 0:
                 response = make_response(jsonify(Error="No nest configurations for this nest id"), 404)
             else:
@@ -358,7 +364,7 @@ class NestsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getNestConfig(self, nestconfigid):
-        config = NestsDao().getNestConfigurationFromID(nestconfigid)
+        config = self.NestsDao.getNestConfigurationFromID(nestconfigid)
         return config
 
     def calculateNestConfigurationStats(self, nestconfigid):
@@ -367,13 +373,13 @@ class NestsHandler(ParentHandler):
         if not self.verifyIDString(nestconfigid):
             return {"Error":"Nest ID must be a valid 24-character hex string"}
 
-        nestConfig = NestsDao().getNestConfigurationFromID(nestconfigid)
+        nestConfig = self.NestsDao.getNestConfigurationFromID(nestconfigid)
 
         if nestConfig is not None:
             config_start_date = nestConfig["start_date"]
             config_end_date = nestConfig["end_date"]
 
-            nest = NestsDao().findNestById(nestConfig["nest"])
+            nest = self.NestsDao.findNestById(nestConfig["nest"])
             if nest is None:
                 return {"Error":"No nest with this ID"}
 
@@ -455,7 +461,7 @@ class NestsHandler(ParentHandler):
             if type(vehicleqty) != int:
                 return make_response(jsonify(Error="Vehicle qty must be a number"), 400)
 
-            result = NestsDao().editNestConfiguration(str(nestconfigid), int(vehicleqty))
+            result = self.NestsDao.editNestConfiguration(str(nestconfigid), int(vehicleqty))
             print(result)
             if result is None:
                 response = make_response(jsonify(Error="No Nest Configuration with that ID"), 404)
@@ -487,7 +493,7 @@ class NestsHandler(ParentHandler):
             if nests is None:
                 return make_response(jsonify(Error="No nest configurations for this id"), 404)
 
-            result = NestsDao().deleteNestConfigurationByID(nestconfigid)
+            result = self.NestsDao.deleteNestConfigurationByID(nestconfigid)
             if result is None or result == 0:
                 response = make_response(jsonify(Error="No configurations deleted"), 404)
             else:
