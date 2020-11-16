@@ -13,10 +13,7 @@ class MyTestCase(unittest.TestCase):
         item = {
             "precipitation": round(uniform(10, 90), 4),
             "temperature": round(uniform(70, 90), 4),
-            "service_area": {
-                "name": "Mayaguez",
-                "_id": "5fa5df52d2959eef671a408f"
-            },
+            "service_area": "5fa5dfdfd2959eef671a4095",
             "timestamp": date
         }
 
@@ -100,21 +97,35 @@ class MyTestCase(unittest.TestCase):
         print("attempting test insertion of weather data")
         item = {
             "timestamp": "2013-09-14",
-            "service_area": {
-                "name": "Ponce",
-                "_id": "5fa5df8ed2959eef671a4092"
-            },
+            "service_area": "5fa5dfdfd2959eef671a4095",
             "bitmap_file": "Nestmatics/docs/maps/buildings1"
         }
         response = ServiceAreaHandler().insertBuildingsData(item)
         self.assertIn("ok", response, "Item was inserted successfully")
 
+    def test_insertStreetsData(self):
+        print("attempting test insertion of weather data")
+        item = {
+            "timestamp": "2013-09-14",
+            "service_area": "5fa5dfdfd2959eef671a4095",
+            "bitmap_file": "Nestmatics/docs/maps/streets"
+        }
+        response = ServiceAreaHandler().insertStreetData(item)
+        self.assertIn("ok", response, "Item was inserted successfully")
+
+    def test_insertAmenitiesData(self):
+        print("attempting test insertion of weather data")
+        item = {
+            "timestamp": "2013-09-14",
+            "service_area": "5fa5dfdfd2959eef671a4095",
+            "bitmap_file": "Nestmatics/docs/maps/amenities"
+        }
+        response = ServiceAreaHandler().insertAmenitiesData(item)
+        self.assertIn("ok", response, "Item was inserted successfully")
+
     def test_MissingKeyInsertBuildingsData(self):
         item = {
-            "service_area": {
-                "name": "Mayaguez",
-                "_id": "5fa5df52d2959eef671a408f"
-            },
+            "service_area":  "5fa5df52d2959eef671a408f",
             "bitmap_file": "Nestmatics/docs/maps/buildings1"
         }
 

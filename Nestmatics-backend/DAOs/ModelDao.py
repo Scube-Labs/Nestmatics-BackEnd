@@ -24,6 +24,10 @@ class ModelDao(ParentDao):
         cursor = self.modelCollection.insert_one(model)
         return self.insertOne(cursor)
 
+    def deleteModelByArea(self, areaid):
+        cursor = self.modelCollection.delete_many({"service_area":areaid})
+        return cursor.deleted_count
+
 # --------------------------- Predictions ------------------------------------------------
 
     def getPredictionForDate(self, areaid, predictionDate):
@@ -61,7 +65,11 @@ class ModelDao(ParentDao):
                                                                 "error_metric":errorMetric}})
         return cursor.modified_count
 
-    def deleteExperiment(self, predictionid):
+    def deletePrediction(self, predictionid):
         cursor = self.predictionsCollection.delete_one({"_id": ObjectId(predictionid)})
+        return cursor.deleted_count
+
+    def deletePredictionByArea(self, areaid):
+        cursor = self.predictionsCollection.delete_many({"service_area":areaid})
         return cursor.deleted_count
 

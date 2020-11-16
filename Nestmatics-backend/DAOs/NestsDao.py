@@ -46,12 +46,21 @@ class NestsDao(ParentDao):
 
     def findNestsByServiceAreaId(self, areaid, userid):
         """
-        Find all nests that belong to a specified area
+        Find all nests that belong to a specified area created by a specific user
         :param areaid: ID of area from which to retreive Nests
         :param userid: ID of user that created these Nests
         :return: dictionary holding all nests that belong to specified area
         """
         cursor = self.nestsCollection.find({"service_area": areaid, "user":userid})
+        return self.returnMany(cursor)
+
+    def getAllNestsForAnArea(self, areaid):
+        """
+        Find all nests that belong to a specified area regardless of user who created the nests
+        :param areaid: ID of area from which to retreive Nests
+        :return: dictionary holding all nests that belong to specified area
+        """
+        cursor = self.nestsCollection.find({"service_area": areaid})
         return self.returnMany(cursor)
 
     def getNestsNamesFromArea(self, areaid, userid):
@@ -65,6 +74,15 @@ class NestsDao(ParentDao):
                                            {"nest_name": 1})
         return self.returnMany(cursor)
 
+    def getAllNestsForUserID(self, userid):
+        """
+        Get all Nests identified by a specified userid
+        :param userid: ID of user that owns these nests
+        :return: dictionary of all Nest identified by the userid provided
+        """
+        cursor = self.nestsCollection.find({"user": userid})
+        return self.returnMany(cursor)
+
     def deleteNest(self, nestId):
         """
         Deletes a Nest identified by a nestID
@@ -72,6 +90,24 @@ class NestsDao(ParentDao):
         :return: number of nests deleted
         """
         cursor = self.nestsCollection.delete_one({"_id": ObjectId(nestId)})
+        return cursor.deleted_count
+
+    def deleteNestByArea(self, areaid):
+        """
+        Deletes all Nests identified by an area ID
+        :param areaid: ID of area from which to delete nests
+        :return: number of nests deleted
+        """
+        cursor = self.nestsCollection.delete_many({"service_area": areaid})
+        return cursor.deleted_count
+
+    def deleteNestByUserID(self, userid):
+        """
+        Deletes all Nests identified by a userID
+        :param userid: ID of user from which to delete nests
+        :return: number of nests deleted
+        """
+        cursor = self.nestsCollection.delete_many({"user": userid})
         return cursor.deleted_count
 
     def editNest(self, nestId, nestName):
@@ -143,7 +179,7 @@ class NestsDao(ParentDao):
         :param nestid: ID of nest that identifies nest configurations to delete
         :return: number of nest configurations deleted
         """
-        cursor = self.nestConfigCollection.delete_one({"nest": ObjectId(nestid)})
+        cursor = self.nestConfigCollection.delete_many({"nest": nestid})
         return cursor.deleted_count
 
     def editNestConfiguration(self, nestconfigid, vehicleqty):

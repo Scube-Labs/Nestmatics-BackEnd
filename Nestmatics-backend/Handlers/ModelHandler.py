@@ -1,12 +1,7 @@
 from flask import jsonify, make_response
-
 import json
-from datetime import datetime
-from random import random, uniform
-from pprint import pprint
 
 from Handlers.ParentHandler import ParentHandler
-
 from DAOs.ModelDao import ModelDao
 
 PREDICTIONKEYS = {"model_id":str, "prediction":list, "prediction_date":str, "creation_date":str,
@@ -154,6 +149,10 @@ class ModelHandler(ParentHandler):
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
 
+    def deleteModelByArea(self, areaid):
+        count = self.ModelDao.deleteModelByArea(areaid)
+        return count
+
     # --------------------------- Prediction methods -------------------------------------------
 
     def insertPrediction(self, predict_json):
@@ -293,6 +292,10 @@ class ModelHandler(ParentHandler):
             return response
         except Exception as e:
             return json.dumps({"Error":str(e)})
+
+    def deletePredictionByArea(self, areaid):
+        count = self.ModelDao.deletePredictionByArea(areaid)
+        return count
 
     def verifyPredictionExistsForArea(self, areaid):
         prediction = self.ModelDao.getPredictionByArea(areaid)

@@ -13,7 +13,7 @@ class MyTestCase(unittest.TestCase):
             "critical_val_error": round(uniform(10, 90), 4),
             "validation_error": round(uniform(70, 90), 4),
             "training_error": round(uniform(70, 90), 4),
-            "service_area": "5fa5df8ed2959eef671a4092",
+            "service_area": "5fb1a56ea9cc92ac9829096b",
             "creation_date": date,
             "model_file": "usr/repository/model"+str(round(uniform(70, 90)))
         }
@@ -105,7 +105,7 @@ class MyTestCase(unittest.TestCase):
                     [4, 1, 6, 3, 7]
                 ]
             ],
-            "service_area":  "5fa5df8ed2959eef671a4092",
+            "service_area":  "5fb1a56ea9cc92ac9829096b",
             "prediction_date": date,
             "creation_date": date,
             "features": {

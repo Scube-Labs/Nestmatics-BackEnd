@@ -20,11 +20,34 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 CORS(app)
 
 UsersHandler = UsersHandler()
-ServiceAreaHandler = ServiceAreaHandler()
 ModelHandler = ModelHandler()
-RidesHandler = RidesHandler(RideStatsHandler, ServiceAreaHandler, NestsHandler)
-RideStatsHandler = RideStatsHandler(ServiceAreaHandler)
-NestsHandler = NestsHandler(UsersHandler, ServiceAreaHandler, RidesHandler)
-DropStrategyHandler = DropStrategyHandler(ServiceAreaHandler)
-ExperimentsHandler = ExperimentsHandler(NestsHandler)
+RideStatsHandler = RideStatsHandler()
 
+NestsHandler = NestsHandler()
+DropStrategyHandler = DropStrategyHandler()
+ExperimentsHandler = ExperimentsHandler()
+
+RidesHandler = RidesHandler()
+ServiceAreaHandler = ServiceAreaHandler()
+
+ServiceAreaHandler.setNestHandler(NestsHandler)
+ServiceAreaHandler.setDropsHandler(DropStrategyHandler)
+ServiceAreaHandler.setRidesHandler(RidesHandler)
+ServiceAreaHandler.setModelHandler(ModelHandler)
+
+RidesHandler.setNestHandler(NestsHandler)
+RidesHandler.setServiceAreaHandler(ServiceAreaHandler)
+RidesHandler.setRideStatsHandler(RideStatsHandler)
+
+DropStrategyHandler.setSAHandler(ServiceAreaHandler)
+
+NestsHandler.setRidesHandler(RidesHandler)
+NestsHandler.setServiceAreaHandler(ServiceAreaHandler)
+NestsHandler.setExperimentsHandler(ExperimentsHandler)
+NestsHandler.setUsersHandler(UsersHandler)
+
+ExperimentsHandler.setNestHandler(NestsHandler)
+
+RideStatsHandler.setSAHandler(ServiceAreaHandler)
+
+UsersHandler.setNestHandler(NestsHandler)

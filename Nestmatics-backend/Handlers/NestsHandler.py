@@ -1,24 +1,35 @@
 from flask import jsonify, make_response
-from datetime import datetime
-from pprint import pprint
 
 from Handlers.ParentHandler import ParentHandler
-from Handlers.UsersHandler import UsersHandler
-from Handlers.ServiceAreaHandler import ServiceAreaHandler
+
 from DAOs.NestsDao import NestsDao
 
-NESTKEYS={"user":str, "service_area":str, "coords":dict, "nest_radius":int, "nest_name":str}
-NESTCONFIGKEYS={"start_date":str, "end_date":str, "nest":str, "vehicle_qty":int}
+NESTKEYS = {"user": str, "service_area": str, "coords": dict, "nest_radius": int, "nest_name": str}
+NESTCONFIGKEYS = {"start_date": str, "end_date": str, "nest": str, "vehicle_qty": int}
 RIDE_MINUTE_RATE = 0.10
+
 
 class NestsHandler(ParentHandler):
 
-    def __init__(self, usersHandler, saHandler, ridesHandler):
+    def __init__(self):
         super().__init__()
         self.NestsDao = NestsDao()
+        self.UsersHandler = None
+        self.ServiceAreaHandler = None
+        self.RidesHandler = None
+        self.ExperimentsHandler = None
+
+    def setUsersHandler(self, usersHandler):
         self.UsersHandler = usersHandler
+
+    def setServiceAreaHandler(self, saHandler):
         self.ServiceAreaHandler = saHandler
-        self.RidesHandler = ridesHandler
+
+    def setRidesHandler(self, rideshandler):
+        self.RidesHandler = rideshandler
+
+    def setExperimentsHandler(self, experimentsHandler):
+        self.ExperimentsHandler = experimentsHandler
 
     # This implied, No nests can have the same name or location
     def insertNests(self, nests_json):
@@ -42,7 +53,7 @@ class NestsHandler(ParentHandler):
         try:
             for key in NESTKEYS:
                 if key not in nests_json:
-                    return make_response(jsonify(Error='Missing credentials from submission: ' + key),400)
+                    return make_response(jsonify(Error='Missing credentials from submission: ' + key), 400)
                 keyType = NESTKEYS[key]
                 if type(nests_json[key]) is not keyType:
                     return make_response(jsonify(Error='Key ' + key + ' is not the expected type: ' + str(keyType)),
@@ -61,18 +72,18 @@ class NestsHandler(ParentHandler):
                     if not self.verifyIDString(nests_json["user"]):
                         return make_response(jsonify(Error="User ID must be a valid 24-character hex string"), 400)
 
-            user = UsersHandler().getUserExternal(nests_json["user"])
+            user = self.UsersHandler.getUserExternal(nests_json["user"])
             print(user)
             if user is None:
                 return make_response(jsonify(Error="There is no User with this user ID"), 404)
 
-            area = ServiceAreaHandler().getSArea(nests_json["service_area"])
+            area = self.ServiceAreaHandler.getSArea(nests_json["service_area"])
             if area is None:
                 return make_response(jsonify(Error="There is no Area with this area ID"), 404)
 
             # Look for a nest with the same Name
             findNest = self.NestsDao.findNestsByNestName(nests_json["service_area"], nests_json["nest_name"],
-                                                      nests_json["user"])
+                                                         nests_json["user"])
             if findNest is not None:
                 return make_response(jsonify(Error="There is already a nest with this name"), 403)
 
@@ -122,12 +133,12 @@ class NestsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getNestByArea(self, sa_id, user_id):
-        area = ServiceAreaHandler().getSArea(sa_id)
+        area = self.ServiceAreaHandler.getSArea(sa_id)
         if area is None:
-            return {"Error":"There is no Area with this area ID"}
-        user = UsersHandler().getUser(user_id)
+            return {"Error": "There is no Area with this area ID"}
+        user = self.UsersHandler.getUser(user_id)
         if user is None:
-            return {"Error":"There is no User with this user ID"}
+            return {"Error": "There is no User with this user ID"}
         nests = self.NestsDao.findNestsByServiceAreaId(sa_id, user_id)
         return nests
 
@@ -184,11 +195,11 @@ class NestsHandler(ParentHandler):
                 return make_response(jsonify(Error="Service area ID must be a valid 24-character hex string"), 400)
             if not self.verifyIDString(user_id):
                 return make_response(jsonify(Error="User ID must be a valid 24-character hex string"), 400)
-            user = UsersHandler().getUserExternal(user_id)
+            user = self.UsersHandler.getUserExternal(user_id)
             if user is None:
                 return make_response(jsonify(Error="There is no User with this user ID"), 404)
 
-            area = ServiceAreaHandler().getSArea(areaid)
+            area = self.ServiceAreaHandler.getSArea(areaid)
             if area is None:
                 return make_response(jsonify(Error="There is no Area with this area ID"), 404)
             nests = self.NestsDao.getNestsNamesFromArea(areaid, user_id)
@@ -200,7 +211,7 @@ class NestsHandler(ParentHandler):
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
 
-    def deleteNest(self, nestid):
+    def deleteNestByID(self, nestid):
         try:
             if not self.verifyIDString(nestid):
                 return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
@@ -209,11 +220,24 @@ class NestsHandler(ParentHandler):
             if nest is None:
                 return make_response(jsonify(Error="No Nest with that ID"), 404)
 
+            deletedConfigs = 0
+            deletedExperiments = 0
+
+            configs = self.NestsDao.getNestConfigurationsForNest(nest["_id"])
+            if len(configs) != 0:
+                for config in configs:
+                    experiments = self.ExperimentsHandler.deleteExperimentByNestConfig(config["_id"])
+                    deletedExperiments += experiments["deleted_experiments"]
+
+                deletedConfigs += self.NestsDao.deleteNestConfigurationByNestID(nest["_id"])
+
             result = self.NestsDao.deleteNest(nestid)
             if result is None or result == 0:
                 response = make_response(jsonify(Error="No Nests deleted"), 404)
             else:
-                response = make_response(jsonify(ok="deleted "+ str(result) +" entries"), 200)
+                response = make_response(jsonify(ok={"deleted_nest":result,
+                                                     "deleted_nest_configurations":deletedConfigs,
+                                                     "deletedExperiments":deletedExperiments}), 200)
             return response
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
@@ -250,7 +274,7 @@ class NestsHandler(ParentHandler):
                 print(result)
                 response = make_response(jsonify(Error="No Nest was modified, maybe no changes where found"), 404)
             else:
-                response = make_response(jsonify(ok="edited "+ str(result)+" nests"), 200)
+                response = make_response(jsonify(ok="edited " + str(result) + " nests"), 200)
             return response
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
@@ -302,7 +326,7 @@ class NestsHandler(ParentHandler):
             findNest = self.NestsDao.findNestById(nest_id)
 
             if findNest is None:
-                return make_response(jsonify(Error= "There is no Nest with name this id: " + nest_id), 404)
+                return make_response(jsonify(Error="There is no Nest with name this id: " + nest_id), 404)
 
             findNestConfig = self.NestsDao.getNestConfiguration(startDate=startDate, nestid=nest_id)
             if findNestConfig is not None:
@@ -313,7 +337,7 @@ class NestsHandler(ParentHandler):
             if id is None:
                 response = make_response(jsonify(Error="Error on insertion"), 500)
             else:
-                response = make_response(jsonify(ok={"_id":id}), 201)
+                response = make_response(jsonify(ok={"_id": id}), 201)
             return response
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
@@ -368,71 +392,100 @@ class NestsHandler(ParentHandler):
         config = self.NestsDao.getNestConfigurationFromID(nestconfigid)
         return config
 
-    def calculateNestConfigurationStats(self, nestconfigid):
-        from Handlers.RidesHandler import RidesHandler
+    def calculateNestConfigurationStats(self, rides, nest, nestConfig):
+        revenue = 0
+        nest_active_vehicles = {}
+        rides_started = []
+        rides_ended = []
+        total_rides = 0
 
-        if not self.verifyIDString(nestconfigid):
-            return {"Error":"Nest ID must be a valid 24-character hex string"}
+        if rides is not None or len(rides) != 0:
 
-        nestConfig = self.NestsDao.getNestConfigurationFromID(nestconfigid)
+            for i in rides:
+                ride_coords = {"lat": float(i["coords"]["start_lat"]), "lon": float(i["coords"]["start_lon"])}
+                if self.RidesHandler.areCoordsInsideNest(nest["coords"], 30, ride_coords):
+                    total_rides += 1
+                    revenue += float(i["ride_cost"])
+                    bird_id = str(i["bird_id"])
+                    if bird_id in nest_active_vehicles:
+                        nest_active_vehicles[bird_id] += 1
+                    else:
+                        nest_active_vehicles[bird_id] = 1
 
-        if nestConfig is not None:
-            config_start_date = nestConfig["start_date"]
-            config_end_date = nestConfig["end_date"]
+                    rides_started.append(i["_id"])
+                else:
+                    ride_coords = {"lat": float(i["coords"]["end_lat"]), "lon": float(i["coords"]["end_long"])}
+                    if self.RidesHandler.areCoordsInsideNest(nest["coords"], 30, ride_coords):
+                        rides_ended.append(i["_id"])
+
+            item = {
+                "vehicle_qty": nestConfig["vehicle_qty"],
+                "revenue": revenue,
+                "total_rides": total_rides,
+                "active_vehicles": nest_active_vehicles,
+                "rides_started_nest": rides_started,
+                "rides_end_nest": rides_ended
+            }
+            return item
+
+    def getNestStatsForTimeInterval(self, nestconfigid, date, start_time, end_time):
+        """
+        Gets Nest Configuration Statistics for a specific date and time interval. Used when it is desired to find
+        stats for a specified time interval, i.e. see how many vehicles started in that nest for that date and time.
+        :param nestconfigid: id of nestconfiguration from which to view rides that ocurred on that nest
+        :param date: date from which to get statistics
+        :param start_time: lower threshold of time interval to evaluate
+        :param end_time: upper thresold of time interval to evaluate
+        :return:
+            response with status code 200: if request was valid, will return response with stats of nest indicated
+            for time interval specified. It will have the format:
+            item = {
+                "vehicle_qty": quantity of nestconfig established,
+                "revenue": total revenue from all vehicles that started on that area,
+                "total_rides": total tides that happened on that area for that time,
+                "active_vehicles": active vehicles on that nest,
+                "rides_started_nest": ids of rides that started in that area,
+                "rides_end_nest": ids of rides that ended in that area
+            }
+            response with status code 400: if id does not follow correct format or date / times ara not in correct
+                format, will issue a json with a error information
+            response with status code 404: no nest configurations, no nests, no rides or no rides for area found
+            response with status code 500: if an error happened in the server
+        """
+        try:
+            if not self.verifyIDString(nestconfigid):
+                return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
+
+            newDate = self.toIsoFormat(date)
+            if newDate == -1:
+                return make_response(jsonify(Error='Date format should be YYYY-MM-DD'), 400)
+
+            start_time = self.toIsoFormat(start_time)
+            if start_time == -1:
+                return make_response(jsonify(Error='Start Time format should be YYYY-MM-DD HH:MM:SS'), 400)
+
+            end_time = self.toIsoFormat(end_time)
+            if end_time == -1:
+                return make_response(jsonify(Error='End Time format should be YYYY-MM-DD HH:MM:SS'), 400)
+
+            nestConfig = self.NestsDao.getNestConfigurationFromID(nestconfigid)
+
+            if nestConfig is None:
+                return make_response(jsonify(Error="No nest configuration with that id"), 404)
 
             nest = self.NestsDao.findNestById(nestConfig["nest"])
             if nest is None:
-                return {"Error":"No nest with this ID"}
+                return make_response(jsonify(Error="No nest with that id "), 404)
 
             print(nest["nest_name"])
             area_id = nest["service_area"]
             print(area_id)
 
-            rides = self.RidesHandler.getRidesForDateIntervalAndArea(config_start_date, config_end_date, area_id)
+            rides = self.RidesHandler.extern_getRidesForTimeInterval(newDate, start_time, end_time, area_id)
+            if rides is None:
+                return make_response(jsonify(Error="No rides for that area and/or date "), 404)
 
-            revenue = 0
-            nest_active_vehicles = {}
-            rides_started = []
-            rides_ended = []
-            total_rides = 0
-
-            if rides is not None or len(rides) != 0:
-                # from Handlers.RidesHandler import RidesHandler
-
-                for i in rides:
-                    ride_coords = {"lat": float(i["coords"]["start_lat"]), "lon": float(i["coords"]["start_lon"])}
-                    if self.RidesHandler.areCoordsInsideNest(nest["coords"], 30, ride_coords):
-                        total_rides += 1
-                        revenue += float(i["ride_cost"])
-                        bird_id = str(i["bird_id"])
-                        if bird_id in nest_active_vehicles:
-                            nest_active_vehicles[bird_id] += 1
-                        else:
-                            nest_active_vehicles[bird_id] = 1
-
-                        rides_started.append(i["_id"])
-                    else:
-                        ride_coords = {"lat": float(i["coords"]["end_lat"]), "lon": float(i["coords"]["end_long"])}
-                        if self.RidesHandler.areCoordsInsideNest(nest["coords"], 30, ride_coords):
-                            rides_ended.append(i["_id"])
-
-                item = {
-                    "vehicle_qty":nestConfig["vehicle_qty"],
-                    "revenue": revenue,
-                    "total_rides": total_rides,
-                    "active_vehicles": nest_active_vehicles,
-                    "rides_started_nest": rides_started,
-                    "rides_end_nest": rides_ended
-                }
-                return item
-        else:
-            return {"Error":"No nest config with this ID"}
-
-    def getNestConfigurationStats(self, nestconfigid):
-        try:
-            if not self.verifyIDString(nestconfigid):
-                return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
-            result = self.calculateNestConfigurationStats(nestconfigid)
+            result = self.calculateNestConfigurationStats(rides, nest, nestConfig)
             if result is None:
                 return make_response(jsonify(Error="No rides happened to include that nest configuration "), 404)
             if "Error" in result:
@@ -442,6 +495,84 @@ class NestsHandler(ParentHandler):
             return response
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
+
+    def getNestConfigurationStatsForADay(self, nestconfigid):
+        try:
+            if not self.verifyIDString(nestconfigid):
+                return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
+
+            nestConfig = self.NestsDao.getNestConfigurationFromID(nestconfigid)
+
+            if nestConfig is None:
+                return make_response(jsonify(Error="No nest configuration with that id"), 404)
+
+            config_start_date = nestConfig["start_date"]
+            config_end_date = nestConfig["end_date"]
+
+            nest = self.NestsDao.findNestById(nestConfig["nest"])
+            if nest is None:
+                return make_response(jsonify(Error="No nest with that id "), 404)
+
+            print(nest["nest_name"])
+            area_id = nest["service_area"]
+            print(area_id)
+
+            rides = self.RidesHandler.extern_getRidesForDateIntervalAndArea(config_start_date, config_end_date, area_id)
+            if rides is None:
+                return make_response(jsonify(Error="No rides for that area and/or date "), 404)
+
+            result = self.calculateNestConfigurationStats(rides, nest, nestConfig)
+            if result is None:
+                return make_response(jsonify(Error="No rides happened to include that nest configuration "), 404)
+            if "Error" in result:
+                return make_response(jsonify(result), 400)
+            else:
+                response = make_response(jsonify(ok=result), 200)
+            return response
+        except Exception as e:
+            return make_response(jsonify(Error=str(e)), 500)
+
+    def deleteNestsByUserID(self, userid):
+        deletedConfigs = 0
+        deletedNests = 0
+        deletedExperiments = 0
+
+        nests = self.NestsDao.getAllNestsForUserID(userid)
+
+        if len(nests) == 0:
+            return {"Error":"No nests for this user ID"}
+        for nest in nests:
+            configs = self.NestsDao.getNestConfigurationsForNest(nest["_id"])
+
+            for config in configs:
+                experiments = self.ExperimentsHandler.deleteExperimentByNestConfig(config["_id"])
+                deletedExperiments += experiments["deleted_experiments"]
+
+            deletedConfigs += self.NestsDao.deleteNestConfigurationByNestID(nest["_id"])
+
+        deletedNests = self.NestsDao.deleteNestByUserID(userid)
+        return {"deleted_nests":deletedNests,"deleted_configs":deletedConfigs, "deleted_Experiments":deletedExperiments}
+
+
+    def deleteNestByArea(self, areaid):
+        deletedConfigs = 0
+        deletedNests = 0
+        deletedExperiments = 0
+        nests = self.NestsDao.getAllNestsForAnArea(areaid)
+
+        if len(nests) == 0:
+            return {"Error":"No nests for this area"}
+        for nest in nests:
+            configs = self.NestsDao.getNestConfigurationsForNest(nest["_id"])
+
+            for config in configs:
+                experiments = self.ExperimentsHandler.deleteExperimentByNestConfig(config["_id"])
+                deletedExperiments += experiments["deleted_experiments"]
+
+            deletedConfigs += self.NestsDao.deleteNestConfigurationByNestID(nest["_id"])
+
+        deletedNests = self.NestsDao.deleteNestByArea(areaid)
+        return {"deleted_nests":deletedNests,"deleted_configs":deletedConfigs, "deleted_Experiments":deletedExperiments}
 
     def editNestConfiguration(self, nestconfigid, vehicleqty):
         """
@@ -502,12 +633,10 @@ class NestsHandler(ParentHandler):
             if result is None or result == 0:
                 response = make_response(jsonify(Error="No configurations deleted"), 404)
             else:
-                experiments = ExperimentsHandler().deleteExperimentByNestConfig(nestconfigid)
+                experiments = self.ExperimentsHandler.deleteExperimentByNestConfig(nestconfigid)
 
-                response = make_response(jsonify(ok={"configs":"deleted "+ str(result)+ " configurations",
-                                                     "experiments":experiments}), 200)
+                response = make_response(jsonify(ok={"configs": "deleted " + str(result) + " configurations",
+                                                     "experiments": experiments}), 200)
             return response
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
-
-

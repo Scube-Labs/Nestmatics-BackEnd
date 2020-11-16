@@ -35,4 +35,8 @@ class RideStatsDao(ParentDao):
         cursor = self.statsCollection.delete_many({"date":date})
         return cursor.deleted_count
 
+    def deleteStatsByArea(self, areaid):
+        cursor = self.statsCollection.delete_many({"service_area":areaid})
+        return cursor.deleted_count
+
 #print(RideStatsDao().getStatsForDateAndArea("2013-09-21","5f91c682bc71a04fda4b9dc7"))

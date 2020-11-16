@@ -2,7 +2,6 @@ from flask import jsonify, make_response
 from datetime import datetime
 
 from Handlers.ParentHandler import ParentHandler
-from Handlers.NestsHandler import NestsHandler
 
 from DAOs.ExperimentsDao import ExperimentsDao
 
@@ -10,10 +9,13 @@ EXPERIMENTSKEYS = {"nest_id":str, "name":str, "config1":str, "config2":str, "dat
 
 class ExperimentsHandler(ParentHandler):
 
-    def __init__(self, nestsHandler):
+    def __init__(self):
         super().__init__()
-        self.NestsHandler = nestsHandler
+        self.NestsHandler = None
         self.ExperimentsDao = ExperimentsDao()
+
+    def setNestHandler(self, nestHandler):
+        self.NestsHandler = nestHandler
 
     def insertExperiment(self, experiment_json):
         """
@@ -241,9 +243,7 @@ class ExperimentsHandler(ParentHandler):
         If there were no experiments that meet the criteria, return error dictionary with error information
         """
         result = self.ExperimentsDao.deleteExperimentByNestConfig(nestConfig)
-        if result is None or result == 0:
-            return {"Error":"No experiments deleted"}
-        return {"ok":"deleted "+ str(result)+" experiments"}
+        return {"deleted_experiments":result}
 
     def deleteExperimentByID(self, experimentid):
         """

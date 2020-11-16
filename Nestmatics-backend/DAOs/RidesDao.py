@@ -91,3 +91,12 @@ class RidesDAO(ParentDao):
         """
         cursor = self.ridesCollection.delete_many({"date":date})
         return cursor.deleted_count
+
+    def deleteRidesByArea(self, areaid):
+        """
+        Delete rides that belong to a provided date
+        :param date: date from which to delete rides
+        :return: number of rides deleted
+        """
+        cursor = self.ridesCollection.delete_many({"service_area._id": areaid})
+        return cursor.deleted_count

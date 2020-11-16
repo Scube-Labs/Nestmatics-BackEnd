@@ -5,12 +5,16 @@ from Handlers.ParentHandler import ParentHandler
 
 from DAOs.RideStatsDao import RideStatsDao
 
+
 class RideStatsHandler(ParentHandler):
 
-    def __init__(self, saHandler):
+    def __init__(self):
         super().__init__()
-        self.ServiceAreaHandler = saHandler
+        self.ServiceAreaHandler = None
         self.RideStatsDao = RideStatsDao()
+
+    def setSAHandler(self, saHandler):
+        self.ServiceAreaHandler = saHandler
 
     def getStatsForDate(self, date, areaid):
         try:
@@ -110,6 +114,10 @@ class RideStatsHandler(ParentHandler):
         return {"ok": _id}
 
     def deleteRideStatsByDate(self, date):
-        x = self.RideStatsDao.deleteStatsByDate(date)
-        return x
+        count = self.RideStatsDao.deleteStatsByDate(date)
+        return count
+
+    def deleteRideStatsByArea(self, areaid):
+        count = self.RideStatsDao.deleteStatsByArea(areaid)
+        return count
 

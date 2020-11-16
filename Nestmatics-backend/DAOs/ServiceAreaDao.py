@@ -40,7 +40,7 @@ class ServiceAreaDao(ParentDao):
         print("gt ", gt)
         print("lt ", lt)
         cursor = self.weatherCollection.find({"timestamp": {"$gte": gt, "$lte":lt},
-                                              "service_area._id": areaid})
+                                              "service_area": areaid})
         return self.returnMany(cursor)
 
     def getAmenitiesOfArea(self, areaid):
@@ -49,7 +49,7 @@ class ServiceAreaDao(ParentDao):
         :param areaid: ID of area from which to retireve ameninies information
         :return: information of amenities data
         """
-        cursor = self.amenitiesCollection.find_one({"service_area._id": areaid})
+        cursor = self.amenitiesCollection.find_one({"service_area": areaid})
         return self.returnOne(cursor)
 
     def getBuildingsOfArea(self, areaid):
@@ -59,7 +59,7 @@ class ServiceAreaDao(ParentDao):
         :return: information of buildings data
         """
         print(type(areaid))
-        cursor = self.buildingsCollection.find_one({"service_area._id": areaid})
+        cursor = self.buildingsCollection.find_one({"service_area": areaid})
         return self.returnOne(cursor)
 
     def getStreetsOfArea(self, areaid):
@@ -68,7 +68,7 @@ class ServiceAreaDao(ParentDao):
         :param areaid: ID of area from which to retireve streets information
         :return: information of streets data
         """
-        cursor = self.streetsCollection.find_one({"service_area._id": areaid})
+        cursor = self.streetsCollection.find_one({"service_area": areaid})
         return self.returnOne(cursor)
 
     def insertServiceArea(self, area):
@@ -123,6 +123,43 @@ class ServiceAreaDao(ParentDao):
         :return: number of entries deleted
         """
         cursor = self.serviceAreaCollection.delete_one({"_id": ObjectId(areaid)})
+
+        return self.deleteOne(cursor)
+
+    def deleteBuildingsData(self, areaid):
+        """
+        Function to delete a service area
+        :param areaid: ID of the area to delete
+        :return: number of entries deleted
+        """
+        cursor = self.buildingsCollection.delete_one({"service_area": areaid})
+        return self.deleteOne(cursor)
+
+    def deleteWeatherData(self, areaid):
+        """
+        Function to delete a service area
+        :param areaid: ID of the area to delete
+        :return: number of entries deleted
+        """
+        cursor = self.weatherCollection.delete_many({"service_area": areaid})
+        return cursor.deleted_count
+
+    def deleteAmentiesData(self, areaid):
+        """
+        Function to delete a service area
+        :param areaid: ID of the area to delete
+        :return: number of entries deleted
+        """
+        cursor = self.amenitiesCollection.delete_one({"service_area": areaid})
+        return self.deleteOne(cursor)
+
+    def deleteStreetsData(self, areaid):
+        """
+        Function to delete a service area
+        :param areaid: ID of the area to delete
+        :return: number of entries deleted
+        """
+        cursor = self.streetsCollection.delete_one({"service_area": areaid})
         return self.deleteOne(cursor)
 
     def editServiceAreaName(self, areaid, areaName):

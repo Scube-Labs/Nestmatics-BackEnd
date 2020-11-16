@@ -8,10 +8,13 @@ DROPSTRATEGYKEYS = {"days":list, "start_date":str, "end_date":str, "service_area
 
 class DropStrategyHandler(ParentHandler):
 
-    def __init__(self, saHandler):
+    def __init__(self):
         super().__init__()
-        self.ServiceAreaHandler = saHandler
+        self.ServiceAreaHandler = None
         self.DropStrategyDao = DropStrategyDao()
+
+    def setSAHandler(self, serviceAreaHandler):
+        self.ServiceAreaHandler = serviceAreaHandler
 
     def insertDropStrategy(self, drop_json):
         try:
@@ -183,3 +186,7 @@ class DropStrategyHandler(ParentHandler):
         except Exception as e:
             response = make_response(jsonify(Error=str(e)), 500)
             return response
+
+    def deleteDropStrategyByArea(self, areaid):
+        count = self.DropStrategyDao.deleteDropStrategyByArea(areaid)
+        return count

@@ -6,14 +6,31 @@ from Handlers.ParentHandler import ParentHandler
 from DAOs.ServiceAreaDao import ServiceAreaDao
 
 SERVICEAREAKEYS = {"area_name": str, "coords":dict}
-WEATHERKEYS= {"precipitation":float, "temperature":float, "service_area":dict, "timestamp":str}
-SAPROPERTIESKEYS = {"timestamp":str, "service_area":dict, "bitmap_file":str}
+WEATHERKEYS= {"precipitation":float, "temperature":float, "service_area":str, "timestamp":str}
+SAPROPERTIESKEYS = {"timestamp":str, "service_area":str, "bitmap_file":str}
+
 
 class ServiceAreaHandler(ParentHandler):
 
     def __init__(self):
         super().__init__()
         self.ServiceAreaDao = ServiceAreaDao()
+        self.NestHandler = None
+        self.ModelHandler = None
+        self.RidesHandler = None
+        self.DropsHandler = None
+
+    def setNestHandler(self, nestHandler):
+        self.NestHandler = nestHandler
+
+    def setModelHandler(self, modelHandler):
+        self.ModelHandler = modelHandler
+
+    def setRidesHandler(self, ridesHandler):
+        self.RidesHandler = ridesHandler
+
+    def setDropsHandler(self, dropHandler):
+        self.DropsHandler = dropHandler
 
     def getAllServiceAreas(self):
         """
@@ -110,28 +127,95 @@ class ServiceAreaHandler(ParentHandler):
         :param name: name to update area with
          :return:
         """
-       # try:
-        if not self.verifyIDString(areaid):
-            return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
+        try:
+            if not self.verifyIDString(areaid):
+                return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
 
-        area = self.getSArea(areaid)
-        if area is None:
-            return make_response(jsonify(Error="No area with that ID"), 404)
+            area = self.getSArea(areaid)
+            if area is None:
+                return make_response(jsonify(Error="No area with that ID"), 404)
 
-        if not type(name) == str:
-            name = str(name)
-        if len(name) == 0:
-            return make_response(jsonify(Error="empty area name"), 400)
+            if not type(name) == str:
+                name = str(name)
+            if len(name) == 0:
+                return make_response(jsonify(Error="empty area name"), 400)
 
-        result = self.ServiceAreaDao.editServiceAreaName(areaid, name)
-        print(result)
-        if result is None or result == 0:
-            response = make_response(jsonify(Error="No service area was modified, maybe no changes where found"), 403)
-        else:
-            response = make_response(jsonify(ok="edited "+ str(result)+" nests"), 200)
-        return response
-        # except Exception as e:
-        #     return make_response(jsonify(Error=str(e)), 500)
+            result = self.ServiceAreaDao.editServiceAreaName(areaid, name)
+            print(result)
+            if result is None or result == 0:
+                response = make_response(jsonify(Error="No service area was modified, maybe no changes where found"), 403)
+            else:
+                response = make_response(jsonify(ok="edited "+ str(result)+" nests"), 200)
+            return response
+        except Exception as e:
+            return make_response(jsonify(Error=str(e)), 500)
+
+    def deleteServiceArea(self, areaid):
+        """
+        Function To delete a Service area name
+        :param areaid: Id of area to edit
+         :return:
+            response object with status code 400: if area id does not follow the established format
+            response object with status code 404: if there is no area with established area id
+            response object with status code 500: if there was an error in the server
+
+            ** for any of the previously mentioned error codes, a json with error information will also be returned
+            with the format:
+                {
+                    "Error": "error information string"
+                }
+
+            response object with status code 200: if json is valid, response will be a doctionary holding the quantity
+            of documents deleted, of the format:
+                {
+                    "ok":{
+                        "deleted_weather": weather,
+                        "deleted_buildings": buildings,
+                        "deleted_street": street,
+                        "deleted_amenities": amenities,
+                        "deleted_rides": rides,
+                        "deleted_nests": nests,
+                        "deleted_drop": drop,
+                        "deleted_predictions": predictions,
+                        "deleted_area": area
+                    }
+                }
+        """
+        try:
+            if not self.verifyIDString(areaid):
+                return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
+
+            area = self.getSArea(areaid)
+            if area is None:
+                return make_response(jsonify(Error="No area with that ID"), 404)
+
+            weather = self.ServiceAreaDao.deleteWeatherData(areaid)
+            buildings = self.ServiceAreaDao.deleteBuildingsData(areaid)
+            street = self.ServiceAreaDao.deleteStreetsData(areaid)
+            amenities = self.ServiceAreaDao.deleteAmentiesData(areaid)
+
+            rides = self.RidesHandler.deleteRidesByServiceArea(areaid)
+            nests = self.NestHandler.deleteNestByArea(areaid)
+            drop = self.DropsHandler.deleteDropStrategyByArea(areaid)
+            predictions = self.ModelHandler.deletePredictionByArea(areaid)
+            area = self.ServiceAreaDao.deleteServiceArea(areaid)
+
+            item = {
+                "deleted_weather": weather,
+                "deleted_buildings": buildings,
+                "deleted_street": street,
+                "deleted_amenities": amenities,
+                "deleted_rides": rides,
+                "deleted_nests": nests,
+                "deleted_drop": drop,
+                "deleted_predictions": predictions,
+                "deleted_area": area
+            }
+
+            response = make_response(jsonify(ok=item), 200)
+            return response
+        except Exception as e:
+            return make_response(jsonify(Error=str(e)), 500)
 
     def getWeatherForDay(self, areaid, timestamp):
         """
@@ -321,6 +405,7 @@ class ServiceAreaHandler(ParentHandler):
         :param name: name of the area of interest
         :return: Service area information
         """
+        print("areaid, "+str(areaid))
         if areaid is None:
             return self.ServiceAreaDao.getServiceAreaByName(name)
         else:
@@ -418,8 +503,6 @@ class ServiceAreaHandler(ParentHandler):
             for key in WEATHERKEYS:
                 if key not in data:
                     return {"Error":'Missing fields from submission: ' + key}
-                if key == "service_area":
-                    self.verifyInnerDict(data["service_area"], self.SERVICEAREADICTKEYS)
                 keyType = WEATHERKEYS[key]
 
                 if type(data[key]) is not keyType:
@@ -430,7 +513,7 @@ class ServiceAreaHandler(ParentHandler):
                 return {"Error":'Date in wrong format. It should be YYYY-MM-DD'}
             data["timestamp"] = date
 
-            weather = self.getWeather(data["service_area"]["_id"], data["timestamp"])
+            weather = self.getWeather(data["service_area"], data["timestamp"])
             if weather:
                 return {"Error":{'There is already weather data for this day': weather}}
 
@@ -481,7 +564,7 @@ class ServiceAreaHandler(ParentHandler):
             if "Error" in validation:
                 return validation
 
-            amenities = self.getAmenities(data["service_area"]["_id"])
+            amenities = self.getAmenities(data["service_area"])
             if amenities:
                 return {"Error": {'There is already an amenities bitmap for this area': amenities}}
 
@@ -531,7 +614,7 @@ class ServiceAreaHandler(ParentHandler):
             if "Error" in validation:
                 return validation
 
-            buildings = self.getBuildings(data["service_area"]["_id"])
+            buildings = self.getBuildings(data["service_area"])
             if buildings:
                 return {"Error":{'There is already a buildings bitmap for this area': buildings}}
 
@@ -581,7 +664,7 @@ class ServiceAreaHandler(ParentHandler):
             if "Error" in validation:
                 return validation
 
-            street = self.getStreets(data["service_area"]["_id"])
+            street = self.getStreets(data["service_area"])
             if street:
                 return {"Error":{'There is already a streets bitmap for this area': street}}
 
@@ -599,8 +682,6 @@ class ServiceAreaHandler(ParentHandler):
         for key in SAPROPERTIESKEYS:
             if key not in data:
                 return {"Error": 'Missing fields from submission: ' + key}
-            if key == "service_area":
-                self.verifyInnerDict(data["service_area"], self.SERVICEAREADICTKEYS)
             keyType = SAPROPERTIESKEYS[key]
             print("key type: ", keyType)
             print("user[" + key + "]: ", type(data[key]))
@@ -610,6 +691,9 @@ class ServiceAreaHandler(ParentHandler):
             if key == "bitmap_file":
                 if len("bitmap_file") == 0:
                     return {"Error": 'bitmap file path should not be an empty string'}
+
+        if not self.verifyIDString(data["service_area"]):
+            return {"Error": "Nest ID must be a valid 24-character hex string"}
 
         date = self.toIsoFormat(data["timestamp"])
         if date == -1:

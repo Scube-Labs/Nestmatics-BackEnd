@@ -340,15 +340,30 @@ def findNestConfigurationsForNest(nestid=None):
 @app.route('/nestmatics/nests/nestconfig/<nestconfigid>/stats', methods=['GET'])
 def getNestConfigurationStats(nestconfigid=None):
     """
-    Finds Nest configurations for a specified nest
+    Gets Stats belonging to a nest configuration on a particular day
     :param nestconfigid: ID of nest from which to look for nest configurations
     :return:
-    if request was valid: response object with status code 200 containing the requested nest configurations
+    if request was valid: response object with status code 200 containing the requested nest configuration stats
     if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
         error message
     """
     if request.method == 'GET':
-        return NestsHandler.getNestConfigurationStats(nestconfigid)
+        return NestsHandler.getNestConfigurationStatsForADay(nestconfigid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/nests/nestconfig/<nestconfigid>/date/<date>/start/<starttime>/end/<endtime>/stats', methods=['GET'])
+def getNestStatsForATimeInterval(nestconfigid=None, date=None, starttime=None, endtime=None):
+    """
+    Gets Stats belonging to a nest configuration on a particular day
+    :param nestconfigid: ID of nest from which to look for nest configurations
+    :return:
+    if request was valid: response object with status code 200 containing the requested nest configuration stats
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
+    if request.method == 'GET':
+        return NestsHandler.getNestStatsForTimeInterval(nestconfigid, date, starttime, endtime)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -628,6 +643,23 @@ def editServiceArea(areaid=None):
         if "area_name" not in request.json:
             return jsonify(Error="BODY should have a area_name key"), 404
         return ServiceAreaHandler.editServiceAreaName(areaid, request.json["area_name"])
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/areas/<areaid>', methods=['DELETE'])
+def deleteServiceArea(areaid=None):
+    """
+    Edits a specified nest configuration's vehicle qty
+    :param areaid: ID of service area to update
+    :return:
+    if request was valid: response object with status code 200 containing the number of entries updated
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
+    if request.method == 'DELETE':
+        if areaid is None:
+            return jsonify(Error="Area ID is empty"), 404
+        return ServiceAreaHandler.deleteServiceArea(areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
 

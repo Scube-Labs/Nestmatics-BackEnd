@@ -63,6 +63,15 @@ class DropStrategyDao(ParentDao):
         cursor = self.dropStrategyCollection.delete_one({"_id": ObjectId(dropid)})
         return cursor.deleted_count
 
+    def deleteDropStrategyByArea(self, areaid):
+        """
+        Deletes a drop strategy identified by id provided
+        :param dropid: Id of drop strategy to delete
+        :return:
+        """
+        cursor = self.dropStrategyCollection.delete_many({"service_area": areaid})
+        return cursor.deleted_count
+
     def editDropStrategy(self, dropid, dayNum, config):
         cursor = self.dropStrategyCollection.update_one({"_id": ObjectId(dropid)},
                                                  { "$set":

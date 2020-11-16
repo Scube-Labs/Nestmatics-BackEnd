@@ -12,6 +12,10 @@ class UsersHandler(ParentHandler):
     def __init__(self):
         super().__init__()
         self.UsersDao = UsersDao()
+        self.NestsHandler = None
+
+    def setNestHandler(self, nestsHandler):
+        self.NestsHandler = nestsHandler
 
     def getAllUsers(self):
         """
@@ -77,9 +81,9 @@ class UsersHandler(ParentHandler):
             the request.
         """
         try:
-            if userid == None:
+            if userid is None:
                 return make_response(jsonify(Error="userid is incorrect format"), 400)
-            if self.verifyIDString(userid) == False:
+            if self.verifyIDString(userid) is False:
                 return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
 
             user = self.getUserExternal(userid)
@@ -141,7 +145,7 @@ class UsersHandler(ParentHandler):
                 if key not in user:
                     return make_response(jsonify(Error='Missing fields from submission: ' + key), 400)
                 keyType = USERKEYS[key]
-                print("key tye: ",keyType)
+                print("key tye: ", keyType)
                 print("user[key]: ", type(user[key]))
                 if type(user[key]) is not keyType:
                     return make_response(jsonify(Error='Key ' + key+' is not the expected type: '+str(keyType)), 400)
@@ -193,22 +197,23 @@ class UsersHandler(ParentHandler):
 
         """
         try:
-            if userid == None:
+            if userid is None:
                 return make_response(jsonify(Error="userid is incorrect format"), 400)
-            if self.verifyIDString(userid) == False:
+            if self.verifyIDString(userid) is False:
                 return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
 
             findUser = self.UsersDao.getUserByID(userid)
             if findUser is None:
-                response = make_response(jsonify(Error="No User with that ID"), 404)
-                return response
+                return make_response(jsonify(Error="No User with that ID"), 404)
+
+            nests = self.NestsHandler.deleteNestsByUserID(userid)
 
             result = self.UsersDao.deleteUser(str(userid))
             if result == 0 or result is None:
                 response = make_response(jsonify(Error="No User was deleted"), 404)
             else:
-                response = make_response(jsonify(ok={"deleted": str(result)}), 200)
+                response = make_response(jsonify(ok={"deleted_user": str(result),
+                                                     "deleted_nests":nests}), 200)
             return response
         except Exception as e:
-            response = make_response(jsonify(Error=str(e)), 500)
-            return response
+            return make_response(jsonify(Error=str(e)), 500)
