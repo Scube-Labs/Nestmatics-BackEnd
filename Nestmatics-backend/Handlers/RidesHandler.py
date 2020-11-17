@@ -190,6 +190,73 @@ class RidesHandler(ParentHandler):
             response = make_response(jsonify(Error=str(e)), 500)
             return response
 
+    def getDistinctRideDatesForArea(self, areaid):
+        """
+        Function to get distinct ride dates for an area
+        :param areaid: ID of area from which to get ride dates
+        :return:
+        response with status code 200: if request was valid, will return response with dates for the area specified
+        response with status code 400: if area id does not follow correct format, will issue a json with a error
+            information
+        response with status code 404: no rides for area provided
+        response with status code 500: if an error happened in the server
+        """
+        try:
+            if areaid == None:
+                return make_response(jsonify(Error="No areaid passed as parameter"), 400)
+            if self.verifyIDString(areaid) is False:
+                return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
+            if self.ServiceAreaHandler.getSArea(areaid) is None:
+                return make_response(jsonify(Error="No Area with this ID"), 404)
+
+            dates = self.RidesDao.getDatesOfRides(areaid)
+            if dates is None or len(dates) == 0:
+                response = make_response(jsonify(Error="No rides for this date or area"), 404)
+            else:
+                response = make_response(jsonify(ok=dates), 200)
+            return response
+        except Exception as e:
+            response = make_response(jsonify(Error=str(e)), 500)
+            return response
+
+    def getDistinctRideDatesForAreaAndInterval(self, areaid, startDate, endDate):
+        """
+        Function to get distinct ride dates for an area on a specified interval
+        :param areaid: ID of area from which to get ride dates
+        :return:
+        response with status code 200: if request was valid, will return response with dates for the date
+            interval specified
+        response with status code 400: if id or dates do not follow correct format, will issue a json with a error
+            information
+        response with status code 404: no rides for area or dates provided
+        response with status code 500: if an error happened in the server
+        """
+        try:
+            if areaid is None:
+                return make_response(jsonify(Error="No areaid passed as parameter"), 400)
+            if self.verifyIDString(areaid) is False:
+                return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
+            if self.ServiceAreaHandler.getSArea(areaid) is None:
+                return make_response(jsonify(Error="No Area with this ID"), 404)
+
+            start = self.toIsoFormat(startDate)
+            if start == -1:
+                return make_response(jsonify(Error='Date format should be YYYY-MM-DD'), 400)
+
+            end = self.toIsoFormat(endDate)
+            if end == -1:
+                return make_response(jsonify(Error='Date format should be YYYY-MM-DD'), 400)
+
+            dates = self.RidesDao.getDatesOfRidesForInterval(areaid, start, end)
+            if dates is None or len(dates) == 0:
+                response = make_response(jsonify(Error="No rides for this date or area"), 404)
+            else:
+                response = make_response(jsonify(ok=dates), 200)
+            return response
+        except Exception as e:
+            response = make_response(jsonify(Error=str(e)), 500)
+            return response
+
     def testCSV(self, file):
         """
         Test function for csv files
@@ -258,151 +325,151 @@ class RidesHandler(ParentHandler):
                 }
             }
         """
-        #try:
-        if self.verifyIDString(area) == False:
-            return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
-        print("areaid, "+area)
-        findArea = self.ServiceAreaHandler.getSArea(areaid=area)
-        if findArea is None:
-            return make_response(jsonify(Error="No area with this ID"), 404)
+        try:
+            if self.verifyIDString(area) == False:
+                return make_response(jsonify(Error="ID must be a valid 24-character hex string"), 400)
+            print("areaid, "+area)
+            findArea = self.ServiceAreaHandler.getSArea(areaid=area)
+            if findArea is None:
+                return make_response(jsonify(Error="No area with this ID"), 404)
 
-        line_count = 0
-        file_data = file.read().decode('utf-8').split("\n")
-        csv_reader = csv.reader(file_data)
+            line_count = 0
+            file_data = file.read().decode('utf-8').split("\n")
+            csv_reader = csv.reader(file_data)
 
-        ack = []
-        nack = []
-        stats_ids = []
-        total_rides = 0
-        revenue = 0
-        total_active_vehicles = {}
+            ack = []
+            nack = []
+            stats_ids = []
+            total_rides = 0
+            revenue = 0
+            total_active_vehicles = {}
 
-        service_area = str(area)
+            service_area = str(area)
 
-        repeatedRides = 0
-        currentDate = None
-        prevDate = None
-        keys = {}
+            repeatedRides = 0
+            currentDate = None
+            prevDate = None
+            keys = {}
 
-        for row in csv_reader:
-            if len(row) == 0:
-                break
+            for row in csv_reader:
+                if len(row) == 0:
+                    break
 
-            if line_count == 0:
-                for key in RIDESKEYS:
-                    if key not in row:
-                        return make_response(jsonify(Error='Missing fields from submission: ' + key), 400)
-                    index = row.index(key)
-                    keys[key] = index
-                print(keys)
-                line_count += 1
-                continue
+                if line_count == 0:
+                    for key in RIDESKEYS:
+                        if key not in row:
+                            return make_response(jsonify(Error='Missing fields from submission: ' + key), 400)
+                        index = row.index(key)
+                        keys[key] = index
+                    print(keys)
+                    line_count += 1
+                    continue
 
-            # if prevDate is none, its the second iteration, after getting the column headers
-            if prevDate is None:
-                prevDate = self.toIsoFormat(row[keys['dt']])
+                # if prevDate is none, its the second iteration, after getting the column headers
+                if prevDate is None:
+                    prevDate = self.toIsoFormat(row[keys['dt']])
 
-                if prevDate == -1:
-                    return make_response(jsonify(Error='Date format should be YYYY-MM-DD'), 400)
+                    if prevDate == -1:
+                        return make_response(jsonify(Error='Date format should be YYYY-MM-DD'), 400)
+
+                    startTime = self.toIsoFormat(row[keys["start_time"]])
+                    endTime = self.toIsoFormat(row[keys["end_time"]])
+
+                    if startTime == -1 or endTime == -1:
+                        return make_response(jsonify(Error='Time stamp format should be YYYY-MM-DD HH:MM:SS'), 400)
+
+                currentDate = self.toIsoFormat(row[keys['dt']])
+
+                # verify if the date is the same as the entry before, in which case insert the stats for the last day
+                if currentDate != prevDate:
+                    item = {
+                        "total_rides": total_rides,
+                        "service_area": service_area,
+                        "total_revenue": revenue,
+                        "date": prevDate,
+                        "total_active_vehicles": total_active_vehicles
+                    }
+                    total_rides = 0
+                    revenue = 0
+                    total_active_vehicles = {}
+
+                    # insert stats for this date
+                    id = self.RideStatsHandler.insertStats(item)
+
+                    if "ok" in id:
+                        stats_ids.append(id["ok"])
+
+                prevDate = currentDate
 
                 startTime = self.toIsoFormat(row[keys["start_time"]])
                 endTime = self.toIsoFormat(row[keys["end_time"]])
 
-                if startTime == -1 or endTime == -1:
-                    return make_response(jsonify(Error='Time stamp format should be YYYY-MM-DD HH:MM:SS'), 400)
+                bird_id = str(row[keys["bird_id"]])
 
-            currentDate = self.toIsoFormat(row[keys['dt']])
-
-            # verify if the date is the same as the entry before, in which case insert the stats for the last day
-            if currentDate != prevDate:
-                item = {
-                    "total_rides": total_rides,
-                    "service_area": service_area,
-                    "total_revenue": revenue,
-                    "date": prevDate,
-                    "total_active_vehicles": total_active_vehicles
-                }
-                total_rides = 0
-                revenue = 0
-                total_active_vehicles = {}
-
-                # insert stats for this date
-                id = self.RideStatsHandler.insertStats(item)
-
-                if "ok" in id:
-                    stats_ids.append(id["ok"])
-
-            prevDate = currentDate
-
-            startTime = self.toIsoFormat(row[keys["start_time"]])
-            endTime = self.toIsoFormat(row[keys["end_time"]])
-
-            bird_id = str(row[keys["bird_id"]])
-
-            findRides = self.RidesDao.getRidesForTimeAndVechicleId(startTime,
-                                                                currentDate,
-                                                                service_area,
-                                                                bird_id)
-            if findRides is not None:
-                repeatedRides += 1
-                total_rides += 1
-                line_count += 1
-                continue
-            else:
-                # bird_id = bird_id
-                if bird_id in total_active_vehicles:
-                    total_active_vehicles[bird_id] += 1
-
+                findRides = self.RidesDao.getRidesForTimeAndVechicleId(startTime,
+                                                                    currentDate,
+                                                                    service_area,
+                                                                    bird_id)
+                if findRides is not None:
+                    repeatedRides += 1
+                    total_rides += 1
+                    line_count += 1
+                    continue
                 else:
-                    total_active_vehicles[bird_id] = 1
+                    # bird_id = bird_id
+                    if bird_id in total_active_vehicles:
+                        total_active_vehicles[bird_id] += 1
 
-                cost = row[keys["ride_cost"]]
-                if len(cost) != 0:
-                    cost = float(cost)
-                    revenue += cost
+                    else:
+                        total_active_vehicles[bird_id] = 1
 
-                total_rides += 1
+                    cost = row[keys["ride_cost"]]
+                    if len(cost) != 0:
+                        cost = float(cost)
+                        revenue += cost
 
-                ride = {
-                    "date": currentDate,
-                    "bird_id": bird_id,
-                    "start_time": startTime,
-                    "end_time": endTime,
-                    "service_area": {"_id": service_area},
-                    "ride_cost": cost,
-                    "coords": {
-                        "start_lat": row[keys["start_lat"]],
-                        "start_lon": row[keys["start_long"]],
-                        "end_lat": row[keys["end_lat"]],
-                        "end_lon": row[keys["end_long"]]
+                    total_rides += 1
+
+                    ride = {
+                        "date": currentDate,
+                        "bird_id": bird_id,
+                        "start_time": startTime,
+                        "end_time": endTime,
+                        "service_area": {"_id": service_area},
+                        "ride_cost": cost,
+                        "coords": {
+                            "start_lat": row[keys["start_lat"]],
+                            "start_lon": row[keys["start_long"]],
+                            "end_lat": row[keys["end_lat"]],
+                            "end_lon": row[keys["end_long"]]
+                        }
                     }
-                }
-                id = self.RidesDao.insertRide(ride)
+                    id = self.RidesDao.insertRide(ride)
 
-                ack.append(id)
+                    ack.append(id)
 
-                line_count += 1
+                    line_count += 1
 
-        if total_rides == 0 or line_count == 1:
-            return make_response(jsonify(Error='Document is empty. No rides'), 400)
+            if total_rides == 0 or line_count == 1:
+                return make_response(jsonify(Error='Document is empty. No rides'), 400)
 
-        item = {
-            "total_rides": total_rides,
-            "service_area": service_area,
-            "total_revenue": revenue,
-            "date": prevDate,
-            "total_active_vehicles": total_active_vehicles
-        }
+            item = {
+                "total_rides": total_rides,
+                "service_area": service_area,
+                "total_revenue": revenue,
+                "date": prevDate,
+                "total_active_vehicles": total_active_vehicles
+            }
 
-        # insert stats for this date
-        id = self.RideStatsHandler.insertStats(item)
+            # insert stats for this date
+            id = self.RideStatsHandler.insertStats(item)
 
-        if "ok" in id:
-            stats_ids.append(id["ok"])
+            if "ok" in id:
+                stats_ids.append(id["ok"])
 
-        return make_response(jsonify(ok={"inserted": ack,"stats_ids":stats_ids, "rejected": repeatedRides}),201)
-        # except Exception as e:
-        #     return make_response(jsonify(Error=str(e)), 500)
+            return make_response(jsonify(ok={"inserted": ack,"stats_ids":stats_ids, "rejected": repeatedRides}),201)
+        except Exception as e:
+            return make_response(jsonify(Error=str(e)), 500)
 
     def deleteRidesByDate(self, date):
         """
@@ -440,7 +507,6 @@ class RidesHandler(ParentHandler):
         if nest is None:
             return "No nest on with this id"
 
-       # print(nest)
         nest_radius = nest["nest_radius"]
         nest_coords = nest["coords"]
 
@@ -451,7 +517,7 @@ class RidesHandler(ParentHandler):
                 rides_coords = {"lat":float(item["coords"]["start_lat"]), "lon": float(item["coords"]["start_lon"])}
             else:
                 rides_coords = {"lat": item["coords"]["end_lat"], "lon": item["coords"]["end_lon"]}
-            #print(rides_lat)
+
             if self.areCoordsInsideNest(nest_coords, 30, rides_coords):
                 rides_at_nest.append(item)
                 ridesinnest += 1
@@ -478,11 +544,12 @@ class RidesHandler(ParentHandler):
         c = 2 * atan2(sqrt(a), sqrt(1-a))
 
         distance = earthRadiusM * c
-       # print(distance)
         return distance <= radius
+
 
     def degreesToRadians(self, degrees):
         return degrees * pi /180
+
 
     def calculateRideCost(self, ride_cost, minute_rate, ride_duration):
         if ride_cost is None:
@@ -491,8 +558,3 @@ class RidesHandler(ParentHandler):
             calc = ride_cost
         return calc
 
-# nest_coords = {
-#     "lat": 18.20516,
-#     "lon": -67.14222}
-# rides = RidesDAO().getRidesForDateAndArea("2020-03-03T00:00:00", "5fa5df52d2959eef671a408f")
-# print(RidesHandler().startAtNest("5faf54b0ece87a6df7fed08b", rides, True ))

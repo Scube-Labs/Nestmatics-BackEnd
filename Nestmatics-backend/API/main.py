@@ -30,6 +30,37 @@ def getRidesForDateAndArea(areaid=None, date=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
+@app.route('/nestmatics/rides/area/<areaid>/alldates', methods=['GET'])
+def getrideDatesForArea(areaid=None):
+    """
+    Route to get coordinates of rides for a specified area on a specified day
+    :param areaid: ID of area to get rides from
+    :param date: date on which rides happened
+    :return:
+    """
+    if request.method == 'GET':
+        if areaid is None:
+            return jsonify(Error="URI does not have all parameters needed"), 400
+        rides = RidesHandler.getDistinctRideDatesForArea(areaid=areaid)
+        return rides
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/rides/area/<areaid>/start/<startdate>/end/<enddate>/alldates', methods=['GET'])
+def getrideDatesForAreaAndInterval(areaid=None, startdate=None, enddate=None):
+    """
+    Route to get coordinates of rides for a specified area on a specified day
+    :param areaid: ID of area to get rides from
+    :param date: date on which rides happened
+    :return:
+    """
+    if request.method == 'GET':
+        if areaid is None or startdate is None or enddate is None:
+            return jsonify(Error="URI does not have all parameters needed"), 400
+        rides = RidesHandler.getDistinctRideDatesForAreaAndInterval(areaid,startdate,enddate)
+        return rides
+    else:
+        return jsonify(Error="Method not allowed."), 405
 
 @app.route('/nestmatics/rides/interval/area/<areaid>/date/<date>/start/<starttime>/end/<endtime>', methods=['GET'])
 def getRidesForTimeInterval(areaid=None, date=None, starttime=None, endtime=None):
