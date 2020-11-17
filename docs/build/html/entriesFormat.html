@@ -1,0 +1,423 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Database Documents Format &mdash; Nestmatics-Backend 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Nestmatics-Backend
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Nestmatics-backend</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Nestmatics-Backend</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Database Documents Format</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/entriesFormat.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="database-documents-format">
+<span id="my-reference-label"></span><h1>Database Documents Format<a class="headerlink" href="#database-documents-format" title="Permalink to this headline">¶</a></h1>
+<p>In this section, the format for the documents inside each collection in the database will be
+explained and defined for easier access when making CRUD requests to the database through the API.</p>
+<div class="section" id="order-to-insert-into-database">
+<h2>Order To Insert Into Database<a class="headerlink" href="#order-to-insert-into-database" title="Permalink to this headline">¶</a></h2>
+<p>When using the API, and/or there is need to insert documents (entries) for the first time, the recommended
+order to insert entries is the following:</p>
+<ol class="arabic simple">
+<li><p>Users</p></li>
+<li><p>Service Area</p></li>
+<li><p>Nests</p></li>
+<li><p>Nest Configuration</p></li>
+<li><p>Drop Strategies</p></li>
+<li><p>Experiments</p></li>
+<li><p>Rides</p></li>
+</ol>
+<p>This order is recommended due to the fact that the lower items on the list rely on the upper items on the list.
+For example, a Nest needs an id of a valid service area that is already inserted on the system
+to complete all the fields necessary for the nest insertion into the database.</p>
+</div>
+<div class="section" id="users-collection">
+<h2>Users Collection<a class="headerlink" href="#users-collection" title="Permalink to this headline">¶</a></h2>
+<p>The Users Collection holds information about Users registered in the system. The documents in this
+collection will have the following format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+    &quot;_id&quot;: id of document,
+    &quot;email&quot;: email of user. This email will act as an identifier for the authentication process and the
+                overall system,
+    &quot;type&quot;: type of the user in the system. This field dictates user permissions, therefore, allowed
+                values for this field is &quot;user&quot; or &quot;admin&quot;
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="service-area-collection">
+<h2>Service Area Collection<a class="headerlink" href="#service-area-collection" title="Permalink to this headline">¶</a></h2>
+<p>The Service Area Collection holds information such as coordinates and the service area name of service areas
+in the system. The documents in this collection will have the following format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+    &quot;_id&quot;: id of document,
+    &quot;area_name&quot;: Name of the Service Area. Must be a string with at least one character,
+    &quot;coords&quot;: {
+                &quot;coordinates&quot;: 2D array containing lat and lon coordinates the comprises the service area polygon,
+                &quot;type&quot;: (optional) type of the polygon in case the service area should be used in KML format
+              }
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="nests-collection">
+<h2>Nests Collection<a class="headerlink" href="#nests-collection" title="Permalink to this headline">¶</a></h2>
+<p>The Nests Collection holds information such as coordinates and the name of Nests
+in the system. The documents in this collection will have the following format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+    &quot;_id&quot;: id of document,
+    &quot;user&quot;: id (document id) of the user who created the Nest,
+    &quot;service_area&quot;: id (document id) of the service area this Nest belongs to,
+    &quot;nest_radius&quot;: radius of nest. Radius will dictate area that Nest encompasses,
+    &quot;nest_name&quot;: name of the nest. Must be a string and contain at least one character,
+    &quot;coords&quot;: {
+                &quot;lat&quot;: coordinate latitude of the Nest
+                &quot;lon&quot;: coordinate longitude of the Nest
+              }
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="nests-configuration-collection">
+<h2>Nests Configuration Collection<a class="headerlink" href="#nests-configuration-collection" title="Permalink to this headline">¶</a></h2>
+<p>The Nests Configuration Collection holds information about Nest Configurations such as nest id (nest that the
+configuration belongs to) and vehicle quantity deployed on the nest for the specified day. The documents in this
+collection will have the following format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+    &quot;_id&quot;: id of document,
+    &quot;nest&quot;: id (document id) of the Nest this configuration belongs to,
+    &quot;start_date&quot;: date that nest configuration started (ISO 8601 format),
+    &quot;end_date&quot;: date that the nest configuration ended (ISO 8601 format),
+    &quot;vehicle_qty&quot;: Quantity of vehicles deployed on that Nest for specified start and end dates
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="drop-strategy-collection">
+<h2>Drop Strategy Collection<a class="headerlink" href="#drop-strategy-collection" title="Permalink to this headline">¶</a></h2>
+<p>The Drop Strategy Collection in the database will have documents of the format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+    &quot;_id&quot;: id of document,
+    &quot;start_date&quot;: date when drop strategy started (ISO 8601 format),
+    &quot;end_date&quot;: date when drop strategy ended (ISO 8601 format),
+    &quot;service_area&quot;: id of service area the drop strategy was implemented in,
+    &quot;days&quot;: array containing json objects for each day the drop strategy was implemented.
+}
+</pre></div>
+</div>
+<p>The Days field in the drop strategy will have the following format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+    &quot;date&quot;:(optional) date of the day being described (ISO 8601 format),
+    &quot;configurations&quot;: array of configuration ids for the nest configurations deployed that day
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="experiments-collection">
+<h2>Experiments Collection<a class="headerlink" href="#experiments-collection" title="Permalink to this headline">¶</a></h2>
+<p>The Experiments Collection holds information about Experiments such as the ids of the configurations to compare
+and an experiment name. The documents in this collection will have the following format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+    &quot;_id&quot;: id of document,
+    &quot;nest&quot;: id (document id) of the Nest this experiment belongs to,
+    &quot;name&quot;: name of the experiment,
+    &quot;config1&quot;: Nest configuration ID of 1 configuration to compare,
+    &quot;config2&quot;: Nest configuration ID of 2 configuration to compare,
+    &quot;date&quot;: date that the experiment was created (ISO 8601 format)
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="rides-collection">
+<h2>Rides Collection<a class="headerlink" href="#rides-collection" title="Permalink to this headline">¶</a></h2>
+<p>The Rides Collection holds information about Rides such as the time a ride started and ended, the coordinates of
+where the ride started and ended, the service area where it took place, etc. The documents in this collection will
+have the following format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+    &quot;_id&quot;: id of document,
+    &quot;date&quot;: date that the ride took place (ISO 8601 format),
+    &quot;bird_id&quot;: id (from bird) of the vehicle that performed this ride,
+    &quot;start_time&quot;: time stamp of when the ride started (ISO 8601 format),
+    &quot;end_time&quot;: time stamp of when the ride ended (ISO 8601 format),
+    &quot;service_area&quot;: {
+                        &quot;_id&quot;: id of service area where this ride happened
+                    },
+    &quot;ride_cost&quot;: cost of the ride,
+    &quot;coords&quot;: {
+                &quot;start_lat&quot;: latitude of ride&#39;s start location,
+                &quot;start_lon&quot;: longitude of ride&#39;s start location,
+                &quot;end_lat&quot;: latitude of ride&#39;s end location,
+                &quot;end_lon&quot;: longitude of ride&#39;s end location
+              }
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="models-collection">
+<h2>Models Collection<a class="headerlink" href="#models-collection" title="Permalink to this headline">¶</a></h2>
+<p>The Models collection will hold information about the Machine Learning models used to create predictions.
+The documents in this collection will have the following format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+    &quot;_id&quot;: id of document,
+    &quot;critical_val_error&quot;: critical validation error of the model,
+    &quot;validation_error&quot;: validation Error of the model,
+    &quot;training_error&quot;: training error of the model,
+    &quot;service_area&quot;: id of service area this model was created for,
+    &quot;creation_date&quot;: date in which this model was created (ISO 8601 format),
+    &quot;model_file&quot;: path of model files
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="predictions-collection">
+<h2>Predictions Collection<a class="headerlink" href="#predictions-collection" title="Permalink to this headline">¶</a></h2>
+<p>The Models collection will hold information about the Machine Learning models used to create predictions.
+The documents in this collection will have the following format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+    &quot;_id&quot;: id of document,
+    &quot;model_id&quot;: id of model that this prediction was made with,
+    &quot;service_area&quot;: id of service area for this prediction,
+    &quot;prediction_date&quot;: date of day that is being predicted (ISO 8601 format),
+    &quot;creation_date&quot;: date of when the prediction was created (ISO 8601 format),
+    &quot;error_metric&quot;: error metric resulting from the comparison of the prediction output and the real output
+                    for the specified day,
+    &quot;prediction&quot;: 3D array holding the prediction data
+    &quot;features&quot;: dictionary holding information of each feature&#39;s impact on the prediction
+}
+</pre></div>
+</div>
+<p>The features field holds numerical information of the impact a specific feature had on the prediction. The higher
+the number, the higher the impact of the feature on the prediction. This field will have the format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+    &quot;weather&quot;: {
+        &quot;precipitation&quot;: precipitation relevance on prediction value,
+        &quot;temperature&quot;: precipitation relevance on prediction value
+    },
+    &quot;rides&quot;: rides relevance on prediction value,
+    &quot;buildings&quot;: buildings relevance on prediction value,
+    &quot;streets&quot;: streets relevance on prediction value,
+    &quot;amenities&quot;: amenities relevance on prediction value
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="other-collections">
+<h2>Other Collections<a class="headerlink" href="#other-collections" title="Permalink to this headline">¶</a></h2>
+<p>Other collections in the system.</p>
+<div class="section" id="weather">
+<h3>Weather<a class="headerlink" href="#weather" title="Permalink to this headline">¶</a></h3>
+<p>The weather collection holds weather information (precipitation and temperature) of a specific day on a service area.
+Documents in this collection will have the following format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+    &quot;_id&quot;: id of document,
+    &quot;precipitation&quot;: precipitation of the area for the specified day,
+    &quot;temperature&quot;: temperature of the area for the specified day,
+    &quot;service_area&quot;: id of service area for this weather information,
+    &quot;timestamp&quot;: time stamp of this weather information (ISO 8601 format)
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="buildings-streets-amenities">
+<h3>Buildings/Streets/Amenities<a class="headerlink" href="#buildings-streets-amenities" title="Permalink to this headline">¶</a></h3>
+<p>The Buildings, Street, and Amenities collection holds the buildings, street or amenities bitmap path, respectively,
+of a particular service area. These three collection share a common structure. Documents in these collections will
+have the format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span>{
+    &quot;_id&quot;: id of document,
+    &quot;bitmap_file&quot;: file path to the buildings/streets/amenities bitmap file,
+    &quot;service_area&quot;: id of service area for this information,
+    &quot;timestamp&quot;: time stamp of when this information was inserted into the system (ISO 8601 format)
+}
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Sofia Saavedra
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

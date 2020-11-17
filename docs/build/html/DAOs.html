@@ -1,0 +1,992 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>DAOs package &mdash; Nestmatics-Backend 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Nestmatics-Backend
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">DAOs package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-DAOs.DropStrategyDao">DAOs.DropStrategyDao module</a></li>
+<li><a class="reference internal" href="#module-DAOs.ExperimentsDao">DAOs.ExperimentsDao module</a></li>
+<li><a class="reference internal" href="#module-DAOs.ModelDao">DAOs.ModelDao module</a></li>
+<li><a class="reference internal" href="#module-DAOs.NestsDao">DAOs.NestsDao module</a></li>
+<li><a class="reference internal" href="#module-DAOs.ParentDao">DAOs.ParentDao module</a></li>
+<li><a class="reference internal" href="#module-DAOs.RideStatsDao">DAOs.RideStatsDao module</a></li>
+<li><a class="reference internal" href="#module-DAOs.RidesDao">DAOs.RidesDao module</a></li>
+<li><a class="reference internal" href="#module-DAOs.ServiceAreaDao">DAOs.ServiceAreaDao module</a></li>
+<li><a class="reference internal" href="#module-DAOs.UsersDao">DAOs.UsersDao module</a></li>
+<li><a class="reference internal" href="#module-DAOs">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Nestmatics-Backend</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>DAOs package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/DAOs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="daos-package">
+<h1>DAOs package<a class="headerlink" href="#daos-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-DAOs.DropStrategyDao">
+<span id="daos-dropstrategydao-module"></span><h2>DAOs.DropStrategyDao module<a class="headerlink" href="#module-DAOs.DropStrategyDao" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="DAOs.DropStrategyDao.DropStrategyDao">
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.DropStrategyDao.</code><code class="sig-name descname">DropStrategyDao</code><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
+<dl class="py method">
+<dt id="DAOs.DropStrategyDao.DropStrategyDao.deleteDropStrategy">
+<code class="sig-name descname">deleteDropStrategy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dropid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao.deleteDropStrategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a drop strategy identified by id provided
+:param dropid: Id of drop strategy to delete
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.DropStrategyDao.DropStrategyDao.deleteDropStrategyByArea">
+<code class="sig-name descname">deleteDropStrategyByArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao.deleteDropStrategyByArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a drop strategy identified by id provided
+:param dropid: Id of drop strategy to delete
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.DropStrategyDao.DropStrategyDao.editDropStrategy">
+<code class="sig-name descname">editDropStrategy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dropid</span></em>, <em class="sig-param"><span class="n">dayNum</span></em>, <em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao.editDropStrategy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.DropStrategyDao.DropStrategyDao.getDropStrategiesForArea">
+<code class="sig-name descname">getDropStrategiesForArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao.getDropStrategiesForArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets drop strategy for a specified area
+:param areaid: ID of area from which to find drop strategies
+:return: drop strategies that area in specified area</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.DropStrategyDao.DropStrategyDao.getDropStrategyForDate">
+<code class="sig-name descname">getDropStrategyForDate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">start_date</span></em>, <em class="sig-param"><span class="n">end_date</span></em>, <em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao.getDropStrategyForDate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get drop strategy for date specified on are specified
+:param start_date: start date of drop stretegy to find
+:param end_date: end date of drop strategy to find
+:param areaid: ID of area from which to get drop strategy
+:return: drop strategies that meet specified criteria</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.DropStrategyDao.DropStrategyDao.getDropStrategyFromId">
+<code class="sig-name descname">getDropStrategyFromId</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dropid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao.getDropStrategyFromId" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a drop strategy identified by provided id
+:param dropid: d of drop strategy to retrieve
+:return: drop strategy identified by provided id</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.DropStrategyDao.DropStrategyDao.getMostRecentDropStrategy">
+<code class="sig-name descname">getMostRecentDropStrategy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao.getMostRecentDropStrategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets most recently made drop strategy
+:param areaid:
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.DropStrategyDao.DropStrategyDao.insertDropStrategy">
+<code class="sig-name descname">insertDropStrategy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao.insertDropStrategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>insert a drop strategy in the database
+:param data: data of drop strategy to insert
+:return: if of newly inserted document</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-DAOs.ExperimentsDao">
+<span id="daos-experimentsdao-module"></span><h2>DAOs.ExperimentsDao module<a class="headerlink" href="#module-DAOs.ExperimentsDao" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="DAOs.ExperimentsDao.ExperimentsDao">
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.ExperimentsDao.</code><code class="sig-name descname">ExperimentsDao</code><a class="headerlink" href="#DAOs.ExperimentsDao.ExperimentsDao" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
+<dl class="py method">
+<dt id="DAOs.ExperimentsDao.ExperimentsDao.deleteExperiment">
+<code class="sig-name descname">deleteExperiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experimentid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ExperimentsDao.ExperimentsDao.deleteExperiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a specific experiment
+:param experimentid: ID of experiment to delete
+:return: number of experiments deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ExperimentsDao.ExperimentsDao.deleteExperimentByNestConfig">
+<code class="sig-name descname">deleteExperimentByNestConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestconfig</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ExperimentsDao.ExperimentsDao.deleteExperimentByNestConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete nest experiment that had the provided nest configuration
+:param nestconfig: nest configuration that identifies the experiments to delete
+:return: number of experiments deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ExperimentsDao.ExperimentsDao.editExperiment">
+<code class="sig-name descname">editExperiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experimentid</span></em>, <em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ExperimentsDao.ExperimentsDao.editExperiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edits the name of an experiment
+:param experimentid: ID of experiment to edit
+:param name: name to update experiment with
+:return: number of experiments edited</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ExperimentsDao.ExperimentsDao.getExperimentForConfigurations">
+<code class="sig-name descname">getExperimentForConfigurations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config1</span></em>, <em class="sig-param"><span class="n">config2</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ExperimentsDao.ExperimentsDao.getExperimentForConfigurations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets experiments that has the provided nest configurations
+:param config1: nest configuration 1
+:param config2: nest configuration 2
+:return: experiment that contains the nest configuration 1 and 2 provided</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ExperimentsDao.ExperimentsDao.getExperimentFromID">
+<code class="sig-name descname">getExperimentFromID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experimentid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ExperimentsDao.ExperimentsDao.getExperimentFromID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a specific experiment from ID
+:param experimentid: ID of experiment to retreive
+:return: Experiment that has the provided id</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ExperimentsDao.ExperimentsDao.getExperimentsForNest">
+<code class="sig-name descname">getExperimentsForNest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ExperimentsDao.ExperimentsDao.getExperimentsForNest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all experiments that meet the provided nest id
+:param nestid: ID of nest from which to identify requested experiemnts
+:return: experiments that belong to the provided nest</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ExperimentsDao.ExperimentsDao.insertExperiment">
+<code class="sig-name descname">insertExperiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ExperimentsDao.ExperimentsDao.insertExperiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts an experiment into the database
+:param data: data of experiment to insert into the database
+:return: id of newly inserted document</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-DAOs.ModelDao">
+<span id="daos-modeldao-module"></span><h2>DAOs.ModelDao module<a class="headerlink" href="#module-DAOs.ModelDao" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="DAOs.ModelDao.ModelDao">
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.ModelDao.</code><code class="sig-name descname">ModelDao</code><a class="headerlink" href="#DAOs.ModelDao.ModelDao" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.deleteModelByArea">
+<code class="sig-name descname">deleteModelByArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.deleteModelByArea" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.deletePrediction">
+<code class="sig-name descname">deletePrediction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">predictionid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.deletePrediction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.deletePredictionByArea">
+<code class="sig-name descname">deletePredictionByArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.deletePredictionByArea" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.editPrediction">
+<code class="sig-name descname">editPrediction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">predictionid</span></em>, <em class="sig-param"><span class="n">prediction</span></em>, <em class="sig-param"><span class="n">featureImp</span></em>, <em class="sig-param"><span class="n">errorMetric</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.editPrediction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.getAllModels">
+<code class="sig-name descname">getAllModels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.getAllModels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.getErrorMetricForPredictions">
+<code class="sig-name descname">getErrorMetricForPredictions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.getErrorMetricForPredictions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.getModelByArea">
+<code class="sig-name descname">getModelByArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.getModelByArea" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.getModelByID">
+<code class="sig-name descname">getModelByID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">modelid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.getModelByID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.getMostRecentModelForArea">
+<code class="sig-name descname">getMostRecentModelForArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.getMostRecentModelForArea" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.getPredictionByArea">
+<code class="sig-name descname">getPredictionByArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.getPredictionByArea" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.getPredictionByID">
+<code class="sig-name descname">getPredictionByID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">predictionid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.getPredictionByID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.getPredictionFeatures">
+<code class="sig-name descname">getPredictionFeatures</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">predictionDate</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.getPredictionFeatures" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.getPredictionForDate">
+<code class="sig-name descname">getPredictionForDate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">predictionDate</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.getPredictionForDate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.insertModel">
+<code class="sig-name descname">insertModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.insertModel" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ModelDao.ModelDao.insertPrediction">
+<code class="sig-name descname">insertPrediction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prediction</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao.insertPrediction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-DAOs.NestsDao">
+<span id="daos-nestsdao-module"></span><h2>DAOs.NestsDao module<a class="headerlink" href="#module-DAOs.NestsDao" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="DAOs.NestsDao.NestsDao">
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.NestsDao.</code><code class="sig-name descname">NestsDao</code><a class="headerlink" href="#DAOs.NestsDao.NestsDao" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.deleteNest">
+<code class="sig-name descname">deleteNest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestId</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.deleteNest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a Nest identified by a nestID
+:param nestId: ID of Nest to delete
+:return: number of nests deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.deleteNestByArea">
+<code class="sig-name descname">deleteNestByArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.deleteNestByArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes all Nests identified by an area ID
+:param areaid: ID of area from which to delete nests
+:return: number of nests deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.deleteNestByUserID">
+<code class="sig-name descname">deleteNestByUserID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">userid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.deleteNestByUserID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes all Nests identified by a userID
+:param userid: ID of user from which to delete nests
+:return: number of nests deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.deleteNestConfigurationByID">
+<code class="sig-name descname">deleteNestConfigurationByID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestconfigid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.deleteNestConfigurationByID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete nest configuration by a provided id
+:param nestconfigid: ID of nest configuration to delete
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.deleteNestConfigurationByNestID">
+<code class="sig-name descname">deleteNestConfigurationByNestID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.deleteNestConfigurationByNestID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete all nest configurations identified by provided nestid
+:param nestid: ID of nest that identifies nest configurations to delete
+:return: number of nest configurations deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.deleteNestConfigurationsByDate">
+<code class="sig-name descname">deleteNestConfigurationsByDate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.deleteNestConfigurationsByDate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete nest configurations identified by provided date
+:param date: date from which to delete nest configurations
+:return: number of configurations deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.editNest">
+<code class="sig-name descname">editNest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestId</span></em>, <em class="sig-param"><span class="n">nestName</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.editNest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edit a Nest’s name
+:param nestId: ID of the Nest to modify
+:param nestName: Name to update Nest
+:return: Number of Nests edited</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.editNestConfiguration">
+<code class="sig-name descname">editNestConfiguration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestconfigid</span></em>, <em class="sig-param"><span class="n">vehicleqty</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.editNestConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edit the number of vehicles on a specified nest configuration
+:param nestconfigid: ID of nest configuration to modify
+:param vehicleqty: quantity of vehicles to update
+:return: number of nest configurations modified</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.findNestByCoords">
+<code class="sig-name descname">findNestByCoords</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">coords</span></em>, <em class="sig-param"><span class="n">userid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.findNestByCoords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find a nest identified by provided coordinates
+:param coords: Coordinates by which to find a nest
+:param userid: ID of user that created that nest
+:return: dictionary holding all requested Nest information</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.findNestById">
+<code class="sig-name descname">findNestById</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.findNestById" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retreives a Nest identified by the provided nest id
+:param nestid: ID of nest to find
+:return: dictionary holding requested Nest information</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.findNestsByNestName">
+<code class="sig-name descname">findNestsByNestName</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">nest_name</span></em>, <em class="sig-param"><span class="n">userid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.findNestsByNestName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a Nest with the specified name from the database
+:param areaid: ID where desired nest belongs to
+:param nest_name: name of nest to find
+:param userid: ID of user that created that nest
+:return: dictionary holding requested Nest information</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.findNestsByServiceAreaId">
+<code class="sig-name descname">findNestsByServiceAreaId</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">userid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.findNestsByServiceAreaId" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find all nests that belong to a specified area created by a specific user
+:param areaid: ID of area from which to retreive Nests
+:param userid: ID of user that created these Nests
+:return: dictionary holding all nests that belong to specified area</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.getAllNestsForAnArea">
+<code class="sig-name descname">getAllNestsForAnArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.getAllNestsForAnArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find all nests that belong to a specified area regardless of user who created the nests
+:param areaid: ID of area from which to retreive Nests
+:return: dictionary holding all nests that belong to specified area</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.getAllNestsForUserID">
+<code class="sig-name descname">getAllNestsForUserID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">userid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.getAllNestsForUserID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all Nests identified by a specified userid
+:param userid: ID of user that owns these nests
+:return: dictionary of all Nest identified by the userid provided</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.getNestConfiguration">
+<code class="sig-name descname">getNestConfiguration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">startDate</span></em>, <em class="sig-param"><span class="n">nestid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.getNestConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a nest configuration from the start and nest id provided
+:param startDate: date the nest configuration looking for started
+:param nestid: ID of the nest that has the nest configuration in question
+:return: dictionary holding nest configuration that meets the specified criteria</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.getNestConfigurationFromID">
+<code class="sig-name descname">getNestConfigurationFromID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestConfig_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.getNestConfigurationFromID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.getNestConfigurationsForNest">
+<code class="sig-name descname">getNestConfigurationsForNest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.getNestConfigurationsForNest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all Nest configurations for a specified nest
+:param nestid: ID of the nest that holds the desired nest configurations
+:return: Array holding all nests with that nest id</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.getNestsNamesFromArea">
+<code class="sig-name descname">getNestsNamesFromArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">userid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.getNestsNamesFromArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all Nests Names from nests in a specified area
+:param areaid: ID of area from which to retreive Nest names
+:param userid: ID of user that owns these nests
+:return: dictionary of all Nest names of the specified area</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.insertNest">
+<code class="sig-name descname">insertNest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nest</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.insertNest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert Nest in the database
+:param nest: JSON with nest information
+:return: ID of newly inserted document</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.insertNestConfiguration">
+<code class="sig-name descname">insertNestConfiguration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestconfig</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.insertNestConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert Nest Configuration
+:param nestconfig: JSON containing information of the nest configuration to insert
+:return: id of newly inserted document</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-DAOs.ParentDao">
+<span id="daos-parentdao-module"></span><h2>DAOs.ParentDao module<a class="headerlink" href="#module-DAOs.ParentDao" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="DAOs.ParentDao.ParentDao">
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.ParentDao.</code><code class="sig-name descname">ParentDao</code><a class="headerlink" href="#DAOs.ParentDao.ParentDao" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="DAOs.ParentDao.ParentDao.deleteOne">
+<code class="sig-name descname">deleteOne</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cursor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ParentDao.ParentDao.deleteOne" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ParentDao.ParentDao.insertOne">
+<code class="sig-name descname">insertOne</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cursor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ParentDao.ParentDao.insertOne" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ParentDao.ParentDao.returnMany">
+<code class="sig-name descname">returnMany</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cursor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ParentDao.ParentDao.returnMany" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ParentDao.ParentDao.returnOne">
+<code class="sig-name descname">returnOne</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cursor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ParentDao.ParentDao.returnOne" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ParentDao.ParentDao.toIsoFormat">
+<code class="sig-name descname">toIsoFormat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ParentDao.ParentDao.toIsoFormat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-DAOs.RideStatsDao">
+<span id="daos-ridestatsdao-module"></span><h2>DAOs.RideStatsDao module<a class="headerlink" href="#module-DAOs.RideStatsDao" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="DAOs.RideStatsDao.RideStatsDao">
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.RideStatsDao.</code><code class="sig-name descname">RideStatsDao</code><a class="headerlink" href="#DAOs.RideStatsDao.RideStatsDao" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
+<dl class="py method">
+<dt id="DAOs.RideStatsDao.RideStatsDao.deleteStatsByArea">
+<code class="sig-name descname">deleteStatsByArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RideStatsDao.RideStatsDao.deleteStatsByArea" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RideStatsDao.RideStatsDao.deleteStatsByDate">
+<code class="sig-name descname">deleteStatsByDate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RideStatsDao.RideStatsDao.deleteStatsByDate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RideStatsDao.RideStatsDao.getStatsForDateAndArea">
+<code class="sig-name descname">getStatsForDateAndArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RideStatsDao.RideStatsDao.getStatsForDateAndArea" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RideStatsDao.RideStatsDao.getTotalActiveVehicles">
+<code class="sig-name descname">getTotalActiveVehicles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">until_time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RideStatsDao.RideStatsDao.getTotalActiveVehicles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RideStatsDao.RideStatsDao.getTotalNumberOfRides">
+<code class="sig-name descname">getTotalNumberOfRides</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">until_time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RideStatsDao.RideStatsDao.getTotalNumberOfRides" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RideStatsDao.RideStatsDao.getTotalRevenue">
+<code class="sig-name descname">getTotalRevenue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">until_time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RideStatsDao.RideStatsDao.getTotalRevenue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RideStatsDao.RideStatsDao.getTotalRideTime">
+<code class="sig-name descname">getTotalRideTime</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">until_time</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RideStatsDao.RideStatsDao.getTotalRideTime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RideStatsDao.RideStatsDao.insertStats">
+<code class="sig-name descname">insertStats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RideStatsDao.RideStatsDao.insertStats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-DAOs.RidesDao">
+<span id="daos-ridesdao-module"></span><h2>DAOs.RidesDao module<a class="headerlink" href="#module-DAOs.RidesDao" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="DAOs.RidesDao.RidesDAO">
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.RidesDao.</code><code class="sig-name descname">RidesDAO</code><a class="headerlink" href="#DAOs.RidesDao.RidesDAO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
+<dl class="py method">
+<dt id="DAOs.RidesDao.RidesDAO.deleteRidesByArea">
+<code class="sig-name descname">deleteRidesByArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RidesDao.RidesDAO.deleteRidesByArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete rides that belong to a provided date
+:param date: date from which to delete rides
+:return: number of rides deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RidesDao.RidesDAO.deleteRidesByDate">
+<code class="sig-name descname">deleteRidesByDate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RidesDao.RidesDAO.deleteRidesByDate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete rides that belong to a provided date
+:param date: date from which to delete rides
+:return: number of rides deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RidesDao.RidesDAO.getRidesCoordsForDateAndArea">
+<code class="sig-name descname">getRidesCoordsForDateAndArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RidesDao.RidesDAO.getRidesCoordsForDateAndArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get rides for the specified coordinates for a specified date and area
+:param date: date from which to get rides
+:param areaid: ID of area from which to get rides
+:return: array with all rides that meet the date and area id provided</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RidesDao.RidesDAO.getRidesForDateAndArea">
+<code class="sig-name descname">getRidesForDateAndArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RidesDao.RidesDAO.getRidesForDateAndArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Rides for a certain date and area
+:param date: date from which to get rides
+:param areaid: ID of area from which to get rides
+:return: array with all rides that meet the date and area id provided</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RidesDao.RidesDAO.getRidesForDateIntervalAndArea">
+<code class="sig-name descname">getRidesForDateIntervalAndArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date_gt</span></em>, <em class="sig-param"><span class="n">date_lt</span></em>, <em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RidesDao.RidesDAO.getRidesForDateIntervalAndArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get rides for a date interval on a specified area
+:param date_gt: lower threshold for the date interval
+:param date_lt: upper threshold for the date interval
+:param areaid: ID of area rides belong to
+:return: array of rides that meet the provided criteria</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RidesDao.RidesDAO.getRidesForTimeAndVechicleId">
+<code class="sig-name descname">getRidesForTimeAndVechicleId</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">started_at</span></em>, <em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">bird_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RidesDao.RidesDAO.getRidesForTimeAndVechicleId" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get rides for a specified time and vehicle id. Intended to verify duplicates
+:param started_at: time ride started at
+:param date: date when ride took place
+:param areaid: ID of area ride belongs to
+:param bird_id: id of vehicle of ride
+:return: dictionary containing iride that meets the provided criteria</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RidesDao.RidesDAO.getRidesForTimeIntervalAndArea">
+<code class="sig-name descname">getRidesForTimeIntervalAndArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">time_gt</span></em>, <em class="sig-param"><span class="n">time_lt</span></em>, <em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RidesDao.RidesDAO.getRidesForTimeIntervalAndArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get rides between a provided time interval and an area
+:param time_gt: lower threshold for the time interval
+:param time_lt: upper threshold for the time interval
+:param areaid: ID of area rides belong to
+:return: array of rides that meet the provided criteria</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RidesDao.RidesDAO.getRidesWithCoordinates">
+<code class="sig-name descname">getRidesWithCoordinates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">start_lat</span></em>, <em class="sig-param"><span class="n">start_lon</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RidesDao.RidesDAO.getRidesWithCoordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get rides that meet the provided coordinates
+:param start_lat: starting latitude
+:param start_lon: start longitude
+:return: all rides that meet the starting coordinates provided</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RidesDao.RidesDAO.insertRide">
+<code class="sig-name descname">insertRide</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ride</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RidesDao.RidesDAO.insertRide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert ride into the system
+:param ride: ride information
+:return: id of inserted ride</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-DAOs.ServiceAreaDao">
+<span id="daos-serviceareadao-module"></span><h2>DAOs.ServiceAreaDao module<a class="headerlink" href="#module-DAOs.ServiceAreaDao" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao">
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.ServiceAreaDao.</code><code class="sig-name descname">ServiceAreaDao</code><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.deleteAmentiesData">
+<code class="sig-name descname">deleteAmentiesData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.deleteAmentiesData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to delete a service area
+:param areaid: ID of the area to delete
+:return: number of entries deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.deleteBuildingsData">
+<code class="sig-name descname">deleteBuildingsData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.deleteBuildingsData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to delete a service area
+:param areaid: ID of the area to delete
+:return: number of entries deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.deleteServiceArea">
+<code class="sig-name descname">deleteServiceArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.deleteServiceArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to delete a service area
+:param areaid: ID of the area to delete
+:return: number of entries deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.deleteStreetsData">
+<code class="sig-name descname">deleteStreetsData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.deleteStreetsData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to delete a service area
+:param areaid: ID of the area to delete
+:return: number of entries deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.deleteWeatherData">
+<code class="sig-name descname">deleteWeatherData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.deleteWeatherData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to delete a service area
+:param areaid: ID of the area to delete
+:return: number of entries deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.editServiceAreaName">
+<code class="sig-name descname">editServiceAreaName</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">areaName</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.editServiceAreaName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edit name of a service area
+:param areaid: ID of the service area to modify
+:param areaName: name to update
+:return: number of edited entries</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.getAllServiceAreas">
+<code class="sig-name descname">getAllServiceAreas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.getAllServiceAreas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.getAmenitiesOfArea">
+<code class="sig-name descname">getAmenitiesOfArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.getAmenitiesOfArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to get information of the amenities of a specified area
+:param areaid: ID of area from which to retireve ameninies information
+:return: information of amenities data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.getBuildingsOfArea">
+<code class="sig-name descname">getBuildingsOfArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.getBuildingsOfArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to get information of the buildings of a specified area
+:param areaid: ID of area from which to retireve buildings information
+:return: information of buildings data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.getServiceAreaById">
+<code class="sig-name descname">getServiceAreaById</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.getServiceAreaById" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to get a service area information from the database using the area id
+:param areaid: ID of area to retreive
+:return: Service area information</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.getServiceAreaByName">
+<code class="sig-name descname">getServiceAreaByName</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaname</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.getServiceAreaByName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to get a service area information from the database using the area name
+:param areaid: name of area to retreive
+:return: Service area information</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.getStreetsOfArea">
+<code class="sig-name descname">getStreetsOfArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.getStreetsOfArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to get information of the streets of a specified area
+:param areaid: ID of area from which to retireve streets information
+:return: information of streets data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.getWeatherData">
+<code class="sig-name descname">getWeatherData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">timestamp</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.getWeatherData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to retrieve weather data from a service area on a specific day
+:param areaid: ID of area to retreive weather from
+:param timestamp: date from which to retrieve weather data
+:return: Weather data from parameters indicated, incorporating weather from date indicated and the day after.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.insertAmenitiesData">
+<code class="sig-name descname">insertAmenitiesData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.insertAmenitiesData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a amenities data into the database
+:param area: json object containing amenities information to insert in the database
+:return: id of inserted document</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.insertBuildingsData">
+<code class="sig-name descname">insertBuildingsData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.insertBuildingsData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert buildings data into the database
+:param area: json object containing buildings information to insert in the database
+:return: id of inserted document</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.insertServiceArea">
+<code class="sig-name descname">insertServiceArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">area</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.insertServiceArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a service area into the database
+:param area: json object containing area information to insert in the database
+:return: id of inserted area</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.insertStreetData">
+<code class="sig-name descname">insertStreetData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.insertStreetData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert street data into the database
+:param area: json object containing street information to insert in the database
+:return: id of inserted document</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.ServiceAreaDao.ServiceAreaDao.insertWeatherData">
+<code class="sig-name descname">insertWeatherData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao.insertWeatherData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert weather data into the database
+:param area: json object containing weather information to insert in the database
+:return: id of inserted document</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-DAOs.UsersDao">
+<span id="daos-usersdao-module"></span><h2>DAOs.UsersDao module<a class="headerlink" href="#module-DAOs.UsersDao" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="DAOs.UsersDao.UsersDao">
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.UsersDao.</code><code class="sig-name descname">UsersDao</code><a class="headerlink" href="#DAOs.UsersDao.UsersDao" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
+<dl class="py method">
+<dt id="DAOs.UsersDao.UsersDao.deleteUser">
+<code class="sig-name descname">deleteUser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">userid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.UsersDao.UsersDao.deleteUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a specified user from the database
+:param userid: ID identifying the user to delete
+:return: number of documents deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.UsersDao.UsersDao.getAllUsers">
+<code class="sig-name descname">getAllUsers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.UsersDao.UsersDao.getAllUsers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all users from database
+:return: dictionary with all users of system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.UsersDao.UsersDao.getUserByEmail">
+<code class="sig-name descname">getUserByEmail</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">email</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.UsersDao.UsersDao.getUserByEmail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a specific user from the database identified by a provided email
+:param email: email of the user to get from the database
+:return: dictionary with user data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.UsersDao.UsersDao.getUserByID">
+<code class="sig-name descname">getUserByID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">userid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.UsersDao.UsersDao.getUserByID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a specific user from the database identified by a provided userid
+:param userid: ID of the user to get from the database
+:return: dictionary with user data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.UsersDao.UsersDao.insertUser">
+<code class="sig-name descname">insertUser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">user</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.UsersDao.UsersDao.insertUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a user into the database
+:param user: new user information
+:return: id of inserted user</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-DAOs">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-DAOs" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Sofia Saavedra
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,995 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API package &mdash; Nestmatics-Backend 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Nestmatics-Backend
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">API package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-API.main">API.main module</a></li>
+<li><a class="reference internal" href="#module-API">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Nestmatics-Backend</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>API package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/API.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="api-package">
+<h1>API package<a class="headerlink" href="#api-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-API.main">
+<span id="api-main-module"></span><h2>API.main module<a class="headerlink" href="#module-API.main" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="API.main.allowed_file">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">allowed_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.allowed_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method ro verify if file is of a csv format
+:param filename: name of provided file
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.deleteDropStrategy">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">deleteDropStrategy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dropid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.deleteDropStrategy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="API.main.deleteExperiment">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">deleteExperiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experimentid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.deleteExperiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to delete an experiment
+:param experimentid:
+:return:
+if request was valid: response object with status code 200 containing the number of experiments deleted
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.deleteNest">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">deleteNest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.deleteNest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="API.main.deleteNestConfiguration">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">deleteNestConfiguration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestconfigid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.deleteNestConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a Nest Configuration
+:param nestconfigid: ID of nest config to delete
+:return:
+if request was valid: response object with status code 200 containing the number of entries deleted
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.deleteServiceArea">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">deleteServiceArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.deleteServiceArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edits a specified nest configuration’s vehicle qty
+:param areaid: ID of service area to update
+:return:
+if request was valid: response object with status code 200 containing the number of entries updated
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.deleteUser">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">deleteUser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">userid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.deleteUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to delete users from the database. User will be identified with the userid in the URI route.
+:param userid: ID of the user to delete
+:return:</p>
+<blockquote>
+<div><dl>
+<dt>if request is successful, will return a response object with the number of deleted documents with format:</dt><dd><dl class="simple">
+<dt>{ “ok”:</dt><dd><p>{ “deleted”: number_of_documents_deleted  }</p>
+</dd>
+</dl>
+<p>}</p>
+</dd>
+</dl>
+<p>if error in request, will return a 400, 404, 500 or 405 error with corresponding information, following the
+format:
+{</p>
+<blockquote>
+<div><p>“Error”: “error information string”</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.editDropStrategy">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">editDropStrategy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dropid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">daynum</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.editDropStrategy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="API.main.editExperiment">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">editExperiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experimentid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.editExperiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to edit experiments name
+:param experimentid:
+:return:
+if request was valid: response object with status code 200 containing the number of edited experimetns
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.editNest">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">editNest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.editNest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edit Nest name of specified nest id
+:param nestid: ID of nest to modify
+:return:
+if request was valid: response object with status code 200 containing number of Nest modified
+if request was invalid: response object with status code 400, 404,304, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.editNestConfiguration">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">editNestConfiguration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestconfigid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.editNestConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edits a specified nest configuration’s vehicle qty
+:param nestconfigid: ID of nest configuration to update
+:return:
+if request was valid: response object with status code 200 containing the number of entries updated
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.editServiceArea">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">editServiceArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.editServiceArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edits a specified nest configuration’s vehicle qty
+:param areaid: ID of service area to update
+:return:
+if request was valid: response object with status code 200 containing the number of entries updated
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.findNestConfiguration">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">findNestConfiguration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestconfigid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.findNestConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds Nest configurations identified by provided nest vonfiguration id
+:param nestconfigid: ID of nest configuration to find
+:return:
+if request was valid: response object with status code 200 containing the requested nest configuration
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.findNestConfigurationsForNest">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">findNestConfigurationsForNest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.findNestConfigurationsForNest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds Nest configurations for a specified nest
+:param nestid: ID of nest from which to look for nest configurations
+:return:
+if request was valid: response object with status code 200 containing the requested nest configurations
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getAllServiceAreas">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getAllServiceAreas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getAllServiceAreas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to get all Service areas in the database.
+:return:</p>
+<blockquote>
+<div><p>if request is successful, will return a response object with the id of the inserted object with format:
+{ “ok”:[</p>
+<blockquote>
+<div><blockquote>
+<div><dl>
+<dt>{</dt><dd><p>“_id”: id of service area,
+“area_name”: name of service area,
+“coords”: {</p>
+<blockquote>
+<div><dl>
+<dt>“coordinates”: [</dt><dd><dl class="simple">
+<dt>[</dt><dd><p>-67.152729,
+18.2176116</p>
+</dd>
+</dl>
+<p>.</p>
+</dd>
+</dl>
+<p>],
+“type”: “LineString”</p>
+</div></blockquote>
+<p>}</p>
+</dd>
+<dt>},</dt><dd><p>.  ]</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>}
+if error in request, will return a 400, 404, 500 or 405 ststus code with corresponding information,
+following the format:</p>
+</div></blockquote>
+<dl class="simple">
+<dt>{</dt><dd><p>“Error”: “error information string”</p>
+</dd>
+</dl>
+<p>}</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getAllUsers">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getAllUsers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getAllUsers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to get all users registered in the system
+:return:</p>
+<blockquote>
+<div><p>if request is successful (status code 200), will return a response object with the information of all Users
+in the database. Response will have the format:
+[</p>
+<blockquote>
+<div><dl class="simple">
+<dt>{</dt><dd><p>“_id”: document_id,
+“email”: user_email,
+“type”: user_type</p>
+</dd>
+</dl>
+<p>},
+.
+.</p>
+</div></blockquote>
+<p>]
+if error in request, will return a 400, 404, 500 or 405 status code with corresponding information,
+following the format:
+{</p>
+<blockquote>
+<div><p>“Error”: “error information string”</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getDropStrategiesForArea">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getDropStrategiesForArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getDropStrategiesForArea" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getDropStrategyForDate">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getDropStrategyForDate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sdate</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">edate</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getDropStrategyForDate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a drop strategy between two dates. Intended so the request will receive all drop strategies
+between the specified start and end date
+:param areaid: ID of area that drop strategy belongs to
+:param sdate: start date of drop strategy to find
+:param edate: end date of drop strategy to find
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getDropStrategyFromID">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getDropStrategyFromID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dropid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getDropStrategyFromID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getExperimentFromID">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getExperimentFromID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experimentid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getExperimentFromID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to get an experiment from a provided ID
+:param experimentid: ID of experiment to retreive
+:return:
+if request was valid: response object with status code 200 containing the experiment requested
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getExperimentsForAreaID">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getExperimentsForAreaID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">userid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getExperimentsForAreaID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets experiments related to an area ID
+:param areaid: ID of service area
+:param userid: ID of user. Needed to retrieve Nests that belong to that user
+:return:
+if request was valid: response object with status code 200 containing the experiments requested
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getExperimentsForNestID">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getExperimentsForNestID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getExperimentsForNestID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all experiments belonging to a specified nest id
+:param nestid: ID of nest from which to get experiments
+:return:
+if request was valid: response object with status code 200 containing the experiments requested
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getModelFromID">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getModelFromID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">modelid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getModelFromID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to get a model from a specified ID
+:param modelid: ID of model to retrieve
+:return:
+if request was valid: response object with status code 200 containing model information
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getModelsForArea">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getModelsForArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getModelsForArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all models in a specific area
+:param areaid: ID of area to retrieve model information from
+:return:
+if request was valid: response object with status code 200 containing model information
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getMostRecentDropStrategy">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getMostRecentDropStrategy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getMostRecentDropStrategy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getMostRecentModel">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getMostRecentModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getMostRecentModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets most recent model (last made model for area)
+:param areaid: ID of area from which to look for model
+:return:
+if request was valid: response object with status code 200 containing model information
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getNest">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getNest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getNest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a specific Nest
+:param nestid: ID of Nest to find
+:return:
+if request was valid: response object with status code 200 containing Nest identified by provided id
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getNestConfigurationStats">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getNestConfigurationStats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestconfigid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getNestConfigurationStats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets Stats belonging to a nest configuration on a particular day
+:param nestconfigid: ID of nest from which to look for nest configurations
+:return:
+if request was valid: response object with status code 200 containing the requested nest configuration stats
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getNestStatsForATimeInterval">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getNestStatsForATimeInterval</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestconfigid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">date</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">starttime</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">endtime</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getNestStatsForATimeInterval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets Stats belonging to a nest configuration on a particular day
+:param nestconfigid: ID of nest from which to look for nest configurations
+:return:
+if request was valid: response object with status code 200 containing the requested nest configuration stats
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getNestsName">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getNestsName</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">userid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getNestsName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Nest Names of Service Area specified
+:param userid: ID of user that created said Nests
+:param areaid: ID of area to get Nests from
+:return:
+if request was valid: response object with status code 200 containing Nest names on area specified
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getNestsOnArea">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getNestsOnArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">userid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getNestsOnArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Nests on Service Area specified
+:param userid: ID of user that created said Nests
+:param areaid: ID of area to get Nests from
+:return:
+if request was valid: response object with status code 200 containing Nests on area specified
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getPredictionFeatures">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getPredictionFeatures</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">date</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getPredictionFeatures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get predictions features for a specified area and date
+:param areaid: Id of area from which to get predictions
+:param date: date of prediction to retreive
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getPredictionForDate">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getPredictionForDate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">date</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getPredictionForDate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to get Predictions for a specified area and date
+:param areaid: Id of area from which to get predictions
+:param date: date of prediction to retreive
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getReportForExperiment">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getReportForExperiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experimentid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getReportForExperiment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getRidesCoordinates">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getRidesCoordinates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">date</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getRidesCoordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to get coordinates of rides for a specified area on a specified day
+:param areaid: ID of area to get rides from
+:param date: date on which rides happened
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getRidesEndingAtNest">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getRidesEndingAtNest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">date</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getRidesEndingAtNest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getRidesForDateAndArea">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getRidesForDateAndArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">date</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getRidesForDateAndArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to get coordinates of rides for a specified area on a specified day
+:param areaid: ID of area to get rides from
+:param date: date on which rides happened
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getRidesForTimeInterval">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getRidesForTimeInterval</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">date</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">starttime</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">endtime</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getRidesForTimeInterval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to get coordinates of rides for a specified area on a specified day
+:param endtime:
+:param starttime:
+:param areaid: ID of area to get rides from
+:param date: date on which rides happened
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getRidesStartingAtNest">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getRidesStartingAtNest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">date</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getRidesStartingAtNest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getRidesStats">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getRidesStats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">date</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getRidesStats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to get ride stats for a specified date and area
+:param areaid: ID of area to get stats from
+:param date: date of stats
+:return:</p>
+<blockquote>
+<div><p>if request was valid: response object with status code 201 containing JSON with rides stats
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getServiceArea">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getServiceArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getServiceArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to retrieve service area information identified by the areaid used as parameter
+:param areaid: ID of the service area to request
+:return:</p>
+<blockquote>
+<div><p>if request is successful (status code 200), will return a response object with the information of requested
+user. Response will have the format:</p>
+<blockquote>
+<div><dl>
+<dt>{</dt><dd><p>“_id”: id of service area,
+“area_name”: name of service area,
+“coords”: {</p>
+<blockquote>
+<div><dl class="simple">
+<dt>“coordinates”: [</dt><dd><p>coordinates of service area</p>
+</dd>
+</dl>
+<p>],
+“type”: (optional) type of polygon coordinates</p>
+</div></blockquote>
+<p>}</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>if error in request, will return a 400, 404, 500 or 405 status code with corresponding information, following
+the format:
+{</p>
+<blockquote>
+<div><p>“Error”: “error information string”</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getTotalActiveVehicles">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getTotalActiveVehicles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">date</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getTotalActiveVehicles" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Route to only get the total active vehicles according to rides stats stored for an area on a</dt><dd><p>specific date</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>areaid</strong> – ID of area from which to obtain the total active vehicles</p></li>
+<li><p><strong>date</strong> – date from which to retreive the total active vehicles</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>if request was valid: response object with status code 201 containing JSON with the total</dt><dd><p>active vehicles</p>
+</dd>
+<dt>if request was invalid: response object with status code 400, 404, 500 or 405 along with json</dt><dd><p>with error message</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getTotalNumberOfRides">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getTotalNumberOfRides</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">date</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getTotalNumberOfRides" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to only get the number of rides according to rides stats stored for an area on a specific date
+:param areaid: ID of area from which to obtain number of rides
+:param date: date from which to retreive the total number of rides
+:return:
+if request was valid: response object with status code 201 containing JSON with number of rides
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with err</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getTotalRevenue">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getTotalRevenue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">date</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getTotalRevenue" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Route to only get the total revenue according to rides stats stored for an area on a</dt><dd><p>specific date</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>areaid</strong> – ID of area from which to obtain the total revenue</p></li>
+<li><p><strong>date</strong> – date from which to retreive the total revenue</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>if request was valid: response object with status code 201 containing JSON with the total</dt><dd><p>revenue for provided area and date</p>
+</dd>
+<dt>if request was invalid: response object with status code 400, 404, 500 or 405 along with json</dt><dd><p>with error message</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getUser">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getUser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">userid</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to get a specific user’s information from the database
+:param userid: User ID of a specific user
+:return:</p>
+<blockquote>
+<div><p>if request is successful (status code 200), will return a response object with the information of requested
+user. Response will have the format:
+{</p>
+<blockquote>
+<div><p>“_id”: document_id,
+“email”: user_email,
+“type”: user_type</p>
+</div></blockquote>
+<p>}</p>
+<p>if error in request, will return a 400, 404, 500 or 405 ststus code with corresponding information,
+following the format:
+{</p>
+<blockquote>
+<div><p>“Error”: “error information string”</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.getWeatherData">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">getWeatherData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">date</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#API.main.getWeatherData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to get weather data from a specified location on a specified date
+:param areaid: ID of area requested weather belongs to
+:param date: date of requested weather information
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.home">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">home</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#API.main.home" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="API.main.insertUser">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">insertUser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#API.main.insertUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to insert a user in the system
+:return:</p>
+<blockquote>
+<div><p>if request is successful, will return a response object with the id of the inserted object with format:
+{ “ok”:</p>
+<blockquote>
+<div><p>{ “_id”: id_Number  }</p>
+</div></blockquote>
+<p>}
+** id_Number refers to the db id for the newly inserted field</p>
+<p>if error in request, will return a 400, 404, 500 or 405 error with corresponding information, following the
+format:
+{</p>
+<blockquote>
+<div><p>“Error”: “error information string”</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.postDropStrategy">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">postDropStrategy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#API.main.postDropStrategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to insert a drop strategy in the system
+:return:</p>
+<blockquote>
+<div><p>if request is successful, will return a response object with the id of the inserted object with
+format:
+{ “ok”:</p>
+<blockquote>
+<div><p>{ “_id”: id_Number  }</p>
+</div></blockquote>
+<p>}
+** id_Number refers to the db id for the newly inserted field</p>
+<p>if error in request, will return a 400, 403, 404, 500 or 405 error with corresponding information,
+following the format:
+{</p>
+<blockquote>
+<div><p>“Error”: “error information string”</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.postExperiment">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">postExperiment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#API.main.postExperiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to insert a user in the system
+:return:</p>
+<blockquote>
+<div><p>if request is successful, will return a response object with the id of the inserted object with format:
+{ “ok”:</p>
+<blockquote>
+<div><p>{ “_id”: id_Number  }</p>
+</div></blockquote>
+<p>}
+** id_Number refers to the db id for the newly inserted field</p>
+<p>if error in request, will return a 400, 404, 500 or 405 error with corresponding information, following the
+format:
+{</p>
+<blockquote>
+<div><p>“Error”: “error information string”</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.postNestConfigurations">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">postNestConfigurations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#API.main.postNestConfigurations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to insert a new Nest Configuration into the database
+:return:
+if request was valid: response object with status code 201 containing the id of newly entered document
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.postNests">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">postNests</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#API.main.postNests" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Route to insert Nests into the database</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>if request was valid: response object with status code 201 containing JSON with id of new nest
+if request was invalid: response object with status code 400, 404, 500 or 405 along with json with</p>
+<blockquote>
+<div><p>error message</p>
+</div></blockquote>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.postRides">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">postRides</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#API.main.postRides" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to insert Rides from a provided csv file in the request.
+:return:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>if request was valid: response object with status code 201 containing JSON with inserted rides IDs, skipped</dt><dd><p>rides and the ids of stats entry for the uploaded days</p>
+</dd>
+</dl>
+<p>if request was invalid: response object with status code 400, 500 or 405 along with json with error message</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt id="API.main.postServiceArea">
+<code class="sig-prename descclassname">API.main.</code><code class="sig-name descname">postServiceArea</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#API.main.postServiceArea" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to insert a Service Area in the database. Service Area to be inserted should have the following structure:
+{</p>
+<blockquote>
+<div><p>“_id”: id of service area,
+“area_name”: name of service area,
+“coords”: {</p>
+<blockquote>
+<div><dl class="simple">
+<dt>“coordinates”: [</dt><dd><p>coordinates of service area</p>
+</dd>
+</dl>
+<p>],
+“type”: (optional) type of polygon coordinates</p>
+</div></blockquote>
+</div></blockquote>
+<p>}
+:return:</p>
+<blockquote>
+<div><p>if request is successful, will return a response object with the id of the inserted object with format:
+{ “ok”:</p>
+<blockquote>
+<div><p>{ “_id”: id_Number  }</p>
+</div></blockquote>
+<p>}
+** id_Number refers to the db id for the newly inserted field</p>
+<p>if error in request, will return a 400, 404, 500 or 405 error with corresponding information, following the
+format:
+{</p>
+<blockquote>
+<div><p>“Error”: “error information string”</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="module-API">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-API" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Sofia Saavedra
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
