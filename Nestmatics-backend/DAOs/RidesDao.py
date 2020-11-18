@@ -74,26 +74,26 @@ class RidesDAO(ParentDao):
     def getRidesForTimeIntervalAndArea(self, date, time_gt, time_lt, areaid):
         """
         Get rides between a provided time interval and an area
-        :param time_gt: lower threshold for the time interval
-        :param time_lt: upper threshold for the time interval
+        :param time_gt: time greater than or equal
+        :param time_lt: time lower than or equal
         :param areaid: ID of area rides belong to
         :return: array of rides that meet the provided criteria
         """
         cursor = self.ridesCollection.find({"start_time": {"$gte": time_gt, "$lte": time_lt},
                                             "date": date,
-                                            "service_area._id": areaid})
+                                            "service_area._id": areaid}).sort('start_time', 1)
         return self.returnMany(cursor)
 
     def getRidesForDateIntervalAndArea(self, date_gt, date_lt, areaid):
         """
         Get rides for a date interval on a specified area
-        :param date_gt: lower threshold for the date interval
-        :param date_lt: upper threshold for the date interval
+        :param date_gt: date greater than or equal
+        :param date_lt: date lower than or equal
         :param areaid: ID of area rides belong to
         :return: array of rides that meet the provided criteria
         """
         cursor = self.ridesCollection.find({"date": {"$gte": date_gt, "$lte": date_lt},
-                                            "service_area._id": areaid})
+                                            "service_area._id": areaid}).sort('start_time', 1)
         return self.returnMany(cursor)
 
     def insertRide(self, ride):
@@ -123,6 +123,10 @@ class RidesDAO(ParentDao):
         cursor = self.ridesCollection.delete_many({"service_area._id": areaid})
         return cursor.deleted_count
 
-# print(RidesDAO().getDatesOfRidesForInterval("5fa5df52d2959eef671a408f",
-#                                             "2019-06-05T00:00:00",
-#                                             "2019-08-05T00:00:00"))
+
+# rides = RidesDAO().getRidesForDateIntervalAndArea("2020-03-03T00:00:00",
+#                                                 "2020-03-03T00:00:00",
+#                                                 "5fa5df52d2959eef671a408f")
+#
+# for i in rides:
+#     print(i["start_time"])

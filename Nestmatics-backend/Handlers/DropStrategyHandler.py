@@ -11,10 +11,14 @@ class DropStrategyHandler(ParentHandler):
     def __init__(self):
         super().__init__()
         self.ServiceAreaHandler = None
+        self.NestHandler = None
         self.DropStrategyDao = DropStrategyDao()
 
     def setSAHandler(self, serviceAreaHandler):
         self.ServiceAreaHandler = serviceAreaHandler
+
+    def setNestHandler(self, nestHandler):
+        self.NestHandler = nestHandler
 
     def insertDropStrategy(self, drop_json):
         try:

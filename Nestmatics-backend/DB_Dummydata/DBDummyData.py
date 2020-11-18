@@ -567,7 +567,6 @@ def getActiveVehicles(list):
     return freq
 
 
-    # Build and return a list
 def random_value(n, l_l, u_l, decimals):
     """
     Produce random values

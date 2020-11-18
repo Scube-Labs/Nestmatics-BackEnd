@@ -399,6 +399,31 @@ def getNestStatsForATimeInterval(nestconfigid=None, date=None, starttime=None, e
         return jsonify(Error="Method not allowed."), 405
 
 
+@app.route('/nestmatics/nests/area/<areaid>/date/<date>/empty', methods=['GET'])
+def getEmptyNestsForDate(areaid=None, date=None):
+    """
+
+    """
+    if request.method == 'GET':
+        if areaid is None or date is None:
+            return make_response(jsonify(Error="Parameters missing"), 400)
+        return NestsHandler.getEmptyNestTimesForDate(areaid, date)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/nestmatics/nests/area/<areaid>/date/<date>/unused', methods=['GET'])
+def getUnusedVehiclesForNest(areaid=None, date=None):
+    """
+
+    """
+    if request.method == 'GET':
+        if areaid is None or date is None:
+            return make_response(jsonify(Error="Parameters missing"), 400)
+        return NestsHandler.getUnusuedVehiclesForDate(areaid, date)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
 @app.route('/nestmatics/nests/nestconfig/<nestconfigid>', methods=['GET'])
 def findNestConfiguration(nestconfigid=None):
     """
@@ -948,7 +973,6 @@ def getModelsForArea(areaid=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
-
 @app.route('/nestmatics/ml/recent/area/<areaid>', methods=['GET'])
 def getMostRecentModel(areaid=None):
     """
@@ -964,6 +988,19 @@ def getMostRecentModel(areaid=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
+@app.route('/nestmatics/ml/area/<areaid>/trainModel', methods=['POST'])
+def trainModel(areaid=None):
+    """
+    Route to trigger the training of a new ML model
+    :param areaid: ID of area from which to create a model
+    :return:
+    TODO: what does it return?
+    """
+    if request.method == 'POST':
+        print("placeholder")
+        #TODO: Add function to train model here
+    else:
+        return jsonify(Error="Method not allowed."), 405
 
 # -------------------------- Predictions API routes ----------------------
 
@@ -992,6 +1029,21 @@ def getPredictionFeatures(areaid=None, date=None):
     """
     if request.method == 'GET':
         return ModelHandler.getPredictionFeatures(areaid, date)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/ml/prediction/area/<areaid>/date/<date>', methods=['POST'])
+def createPrediction(areaid=None, date=None):
+    """
+    Trigger the creation of a new prediction
+    :param areaid: Id of area from which to create a prediction
+    :param date: date of prediction to create
+    :return: TODO what does it return?
+    """
+    if request.method == 'GET':
+        if request.method == 'POST':
+            print("placeholder")
+            # TODO: Add function to create prediction here
     else:
         return jsonify(Error="Method not allowed."), 405
 

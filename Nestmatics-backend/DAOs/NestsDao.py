@@ -1,5 +1,6 @@
 from bson import ObjectId
 from DAOs.ParentDao import ParentDao
+from random import uniform
 
 class NestsDao(ParentDao):
 
@@ -21,7 +22,7 @@ class NestsDao(ParentDao):
         :return: dictionary holding requested Nest information
         """
         cursor = self.nestsCollection.find_one({"service_area": areaid, "nest_name": nest_name,
-                                                "user":userid})
+                                                "user": userid})
         return self.returnOne(cursor)
 
     def findNestById(self, nestid):
@@ -41,7 +42,7 @@ class NestsDao(ParentDao):
         :param userid: ID of user that created that nest
         :return: dictionary holding all requested Nest information
         """
-        cursor = self.nestsCollection.find_one({"coords": coords, "user":userid})
+        cursor = self.nestsCollection.find_one({"coords": coords, "user": userid})
         return self.returnOne(cursor)
 
     def findNestsByServiceAreaId(self, areaid, userid):
@@ -51,7 +52,7 @@ class NestsDao(ParentDao):
         :param userid: ID of user that created these Nests
         :return: dictionary holding all nests that belong to specified area
         """
-        cursor = self.nestsCollection.find({"service_area": areaid, "user":userid})
+        cursor = self.nestsCollection.find({"service_area": areaid, "user": userid})
         return self.returnMany(cursor)
 
     def getAllNestsForAnArea(self, areaid):
@@ -118,10 +119,10 @@ class NestsDao(ParentDao):
         :return: Number of Nests edited
         """
         cursor = self.nestsCollection.update_one({"_id": ObjectId(nestId)},
-                                                {"$set": {"nest_name": nestName}})
+                                                 {"$set": {"nest_name": nestName}})
         return cursor.modified_count
 
-    #----------------- Nest Configurations methods ------------------------ #
+    # ----------------- Nest Configurations methods ------------------------ #
 
     def insertNestConfiguration(self, nestconfig):
         """
@@ -139,11 +140,22 @@ class NestsDao(ParentDao):
         :param nestid: ID of the nest that has the nest configuration in question
         :return: dictionary holding nest configuration that meets the specified criteria
         """
-        cursor = self.nestConfigCollection.find_one({"start_date":startDate, "nest": nestid})
+        cursor = self.nestConfigCollection.find_one({"start_date": startDate, "nest": nestid})
         return self.returnOne(cursor)
 
     def getNestConfigurationFromID(self, nestConfig_id):
         cursor = self.nestConfigCollection.find_one({"_id": ObjectId(nestConfig_id)})
+        return self.returnOne(cursor)
+
+    def getNestConfigurationFromDateInterval(self, date, nestid):
+        cursor = self.nestConfigCollection.find({"end_date": {"$gte": date},
+                                                 "start_date": {"$lte": date}})
+        return self.returnMany(cursor)
+
+    def getNestConfigurationForDate(self, date, nestid):
+        cursor = self.nestConfigCollection.find_one({"end_date": date,
+                                                 "start_date":  date,
+                                                 "nest": nestid})
         return self.returnOne(cursor)
 
     def getNestConfigurationsForNest(self, nestid):
@@ -182,6 +194,15 @@ class NestsDao(ParentDao):
         cursor = self.nestConfigCollection.delete_many({"nest": nestid})
         return cursor.deleted_count
 
+    def deleteNestConfigurationByDate(self, date):
+        """
+        Delete all nest configurations identified by provided nestid
+        :param nestid: ID of nest that identifies nest configurations to delete
+        :return: number of nest configurations deleted
+        """
+        cursor = self.nestConfigCollection.delete_many({"start_date": date})
+        return cursor.deleted_count
+
     def editNestConfiguration(self, nestconfigid, vehicleqty):
         """
         Edit the number of vehicles on a specified nest configuration
@@ -190,5 +211,35 @@ class NestsDao(ParentDao):
         :return: number of nest configurations modified
         """
         cursor = self.nestConfigCollection.update_one({"_id": ObjectId(nestconfigid)},
-                                                      { "$set": { "vehicle_qty": vehicleqty}})
+                                                      {"$set": {"vehicle_qty": vehicleqty}})
         return cursor.modified_count
+
+    def insertTests(self, n, nests):
+        qty = [x for x in self.random_value(n, 2, 6, 0)]
+        date = "2020-03-03T00:00:00"
+        for i in range(n):
+            item ={
+                "start_date":date,
+                "end_date": date,
+                "nest": nests[i]["_id"],
+                "vehicle_qty": qty[i]
+            }
+            self.insertNestConfiguration(item)
+
+    def random_value(self, n, l_l, u_l, decimals):
+        """
+        Produce random values
+        :param n: number of random values to create
+        :param l_l: lower threshold
+        :param u_l: upper threshold
+        :param decimals: how many decimals for the random number
+        :return:
+        """
+        while n > 0:
+            cost = round(uniform(l_l, u_l), decimals)
+            yield cost
+            n -= 1
+
+# dao = NestsDao()
+# nests = dao.getAllNestsForAnArea("5fa5df52d2959eef671a408f")
+# dao.insertTests(len(nests), nests)
