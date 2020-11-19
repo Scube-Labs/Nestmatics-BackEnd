@@ -240,6 +240,3 @@ class NestsDao(ParentDao):
             yield cost
             n -= 1
 
-# dao = NestsDao()
-# nests = dao.getAllNestsForAnArea("5fa5df52d2959eef671a408f")
-# dao.insertTests(len(nests), nests)

@@ -796,9 +796,3 @@ class NestsHandler(ParentHandler):
             return response
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
-
-handler = NestsHandler()
-rides = RidesHandler()
-handler.setRidesHandler(rides)
-
-handler.getUnusedVehicles("5fa5df52d2959eef671a408f", "2020-03-03T00:00:00")

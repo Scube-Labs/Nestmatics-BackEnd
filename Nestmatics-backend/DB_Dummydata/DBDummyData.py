@@ -17,42 +17,42 @@ nest_list = []
 nest_config_list = []
 model_list = []
 
-def main():
-    try:
-        DB_USERNAME = os.environ['DB_USERNAME']
-        DB_PASSWD = os.environ['DB_PASWD']
-        DB_HOST = "mongoContainer"
-        PORT = 27017
-    except KeyError:
-        DB_USERNAME = "root"
-        DB_PASSWD = "example"
-        DB_HOST = "localhost"
-        PORT = 2717
+#def main():
+    # try:
+    #     DB_USERNAME = os.environ['DB_USERNAME']
+    #     DB_PASSWD = os.environ['DB_PASWD']
+    #     DB_HOST = "mongoContainer"
+    #     PORT = 27017
+    # except KeyError:
+    #     DB_USERNAME = "root"
+    #     DB_PASSWD = "example"
+    #     DB_HOST = "localhost"
+    #     PORT = 2717
+    #
+    # client = MongoClient(host=DB_HOST, port=PORT, username=DB_USERNAME,
+    #                           password=DB_PASSWD)
+    #
+    # db = client["Nestmatics"]
 
-    client = MongoClient(host=DB_HOST, port=PORT, username=DB_USERNAME,
-                              password=DB_PASSWD)
-
-    db = client["Nestmatics"]
-
-    createUsersTable(db)
-    createServiceAreaTable(db)
-    createNestsTable(db)
-    createNestConfigTable(db)
-    createDropStrategyTable(db)
-    createExperimentsTable(db)
-
-    # insert path of csv file here
-    csv_path = "/home/hydro/Downloads/mayaguez_rides_all_030320.csv"
-    f = open(csv_path, 'r')
-    print(type(f))
-    insertRides(f, db)
-
-    createModelTable(db)
-    createPredictionTable(db)
-    createStreetsTable(db)
-    createAmenitiesTable(db)
-    createWeatherTable(db)
-    createBuildingsTable(db)
+    # createUsersTable(db)
+    # createServiceAreaTable(db)
+    # createNestsTable(db)
+    # createNestConfigTable(db)
+    # createDropStrategyTable(db)
+    # createExperimentsTable(db)
+    #
+    # # insert path of csv file here
+    # csv_path = "/home/hydro/Downloads/mayaguez_rides_all_030320.csv"
+    # f = open(csv_path, 'r')
+    # print(type(f))
+    # insertRides(f, db)
+    #
+    # createModelTable(db)
+    # createPredictionTable(db)
+    # createStreetsTable(db)
+    # createAmenitiesTable(db)
+    # createWeatherTable(db)
+    # createBuildingsTable(db)
 
 
 def insertOne(cursor):
@@ -595,5 +595,5 @@ def random_hour(timestamp,l):
        yield current
        l-=1
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
