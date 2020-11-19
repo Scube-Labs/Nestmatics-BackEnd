@@ -5,11 +5,18 @@ from API import app, RidesHandler, NestsHandler, \
 
 from werkzeug.utils import secure_filename
 
-
 @app.route('/', methods=['GET'])
 def home():
     return "This is the Nestmatics API"
 
+@app.route('/nestmatics/db/insertDummydata', methods=['POST'])
+def insertDummyData():
+    import DB_Dummydata.DBDummyData
+    if request.method == 'POST':
+        response = DB_Dummydata.DBDummyData.main()
+        return make_response(jsonify(response), 200)
+    else:
+        return jsonify(Error="Method not allowed."), 405
 
 # ------------------------ Rides API routes -----------------------------------------#
 
