@@ -55,13 +55,13 @@ class NestsDao(ParentDao):
         cursor = self.nestsCollection.find({"service_area": areaid, "user": userid})
         return self.returnMany(cursor)
 
-    def getAllNestsForAnArea(self, areaid):
+    def getAllNestsForAnArea(self, areaid, userid):
         """
         Find all nests that belong to a specified area regardless of user who created the nests
         :param areaid: ID of area from which to retreive Nests
         :return: dictionary holding all nests that belong to specified area
         """
-        cursor = self.nestsCollection.find({"service_area": areaid})
+        cursor = self.nestsCollection.find({"service_area": areaid, "user": userid})
         return self.returnMany(cursor)
 
     def getNestsNamesFromArea(self, areaid, userid):
@@ -147,7 +147,7 @@ class NestsDao(ParentDao):
         cursor = self.nestConfigCollection.find_one({"_id": ObjectId(nestConfig_id)})
         return self.returnOne(cursor)
 
-    def getNestConfigurationFromDateInterval(self, date, nestid):
+    def getNestConfigurationFromDateInterval(self, date):
         cursor = self.nestConfigCollection.find({"end_date": {"$gte": date},
                                                  "start_date": {"$lte": date}})
         return self.returnMany(cursor)

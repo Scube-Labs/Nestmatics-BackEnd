@@ -135,7 +135,7 @@ def createUsersTable(db):
     for x in range(2):
         item = {
             "email": email[x],
-            "prviledges": priviledges[x]
+            "type": priviledges[x]
         }
         cursor = collection.insert_one(item)
         user = insertOne(cursor)
@@ -219,7 +219,7 @@ def createNestConfigTable(db):
         item = {
             "start_date": startDate[i],
             "end_date": endDate[i],
-            "nest_id": nest_list[0],
+            "nest": nest_list[0],
             "vehicle_qty": vehicleqty[i]
         }
         cursor = collection.insert_one(item)
@@ -236,7 +236,7 @@ def createNestConfigTable(db):
         item = {
             "start_date": startDate[i],
             "end_date": endDate[i],
-            "nest_id": nest_list[1],
+            "nest": nest_list[1],
             "vehicle_qty": vehicleqty[i]
         }
         cursor = collection.insert_one(item)

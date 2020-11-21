@@ -47,6 +47,16 @@ class UsersHandler(ParentHandler):
             the request.
         """
         try:
+            # user = self.UsersDao.getAllUsers()
+            # usersCollection = db["users"]
+            # cursor = usersCollection.find()
+            #
+            # user = []
+            # if cursor is not None:
+            #     for i in cursor:
+            #         i["_id"] = str(i["_id"])
+            #         user.append(i)
+
             user = self.UsersDao.getAllUsers()
             if user is None or len(user) == 0:
                 response = make_response(jsonify(Error="No users on system"), 404)
