@@ -4,6 +4,11 @@ from DAOs.ParentDao import ParentDao
 
 class ModelDao(ParentDao):
 
+    def __init__(self, db):
+       # super().__init__()
+        self.modelCollection = db["models"]
+        self.predictionsCollection = db["predictions"]
+
     def getModelByID(self, modelid):
         cursor = self.modelCollection.find_one({"_id": ObjectId(modelid)})
         return self.returnOne(cursor)

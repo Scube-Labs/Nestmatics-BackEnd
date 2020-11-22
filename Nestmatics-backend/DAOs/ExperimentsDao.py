@@ -4,6 +4,10 @@ from DAOs.ParentDao import ParentDao
 
 class ExperimentsDao(ParentDao):
 
+    def __init__(self, db):
+       # super().__init__()
+        self.experimentCollection = db["experiments"]
+
     def insertExperiment(self, data):
         """
         Inserts an experiment into the database

@@ -2,7 +2,13 @@ from bson import ObjectId
 from DAOs.ParentDao import ParentDao
 from random import uniform
 
+
 class NestsDao(ParentDao):
+
+    def __init__(self, db):
+        super().__init__()
+        self.nestsCollection = db["nests"]
+        self.nestConfigCollection = db["nest_configuration"]
 
     def insertNest(self, nest):
         """
@@ -197,7 +203,7 @@ class NestsDao(ParentDao):
     def deleteNestConfigurationByDate(self, date):
         """
         Delete all nest configurations identified by provided nestid
-        :param nestid: ID of nest that identifies nest configurations to delete
+        :param date: ID of nest that identifies nest configurations to delete
         :return: number of nest configurations deleted
         """
         cursor = self.nestConfigCollection.delete_many({"start_date": date})
@@ -219,7 +225,7 @@ class NestsDao(ParentDao):
         date = "2020-03-03T00:00:00"
         for i in range(n):
             item ={
-                "start_date":date,
+                "start_date": date,
                 "end_date": date,
                 "nest": nests[i]["_id"],
                 "vehicle_qty": qty[i]

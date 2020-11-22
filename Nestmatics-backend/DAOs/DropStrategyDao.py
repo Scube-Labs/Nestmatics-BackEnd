@@ -4,6 +4,10 @@ from DAOs.ParentDao import ParentDao
 
 class DropStrategyDao(ParentDao):
 
+    def __init__(self, db):
+        #super().__init__()
+        self.dropStrategyCollection = db["drop_strategies"]
+
     def insertDropStrategy(self, data):
         """
         insert a drop strategy in the database

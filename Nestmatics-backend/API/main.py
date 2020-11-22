@@ -17,12 +17,16 @@ def home():
     return "This is the Nestmatics API"
 
 
-@app.route('/nestmatics/db/insertDummydata', methods=['POST'])
+@app.route('/nestmatics/db/insertDummydata', methods=['GET', 'OPTIONS'])
 def insertDummyData():
     import DB_Dummydata.DBDummyData
-    if request.method == 'POST':
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
+
+    if request.method == 'GET':
         response = DB_Dummydata.DBDummyData.main()
-        return make_response(jsonify(response), 200)
+        responseToCOORS = make_response(jsonify(response), 200)
+        return _corsify_actual_response(responseToCOORS)
     else:
         return jsonify(Error="Method not allowed."), 405
 

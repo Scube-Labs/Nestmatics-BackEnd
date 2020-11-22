@@ -1,7 +1,12 @@
 from bson import ObjectId
 from DAOs.ParentDao import ParentDao
 
+
 class UsersDao(ParentDao):
+
+    def __init__(self, db):
+        #super().__init__()
+        self.usersCollection = db["users"]
 
     def getAllUsers(self):
         """

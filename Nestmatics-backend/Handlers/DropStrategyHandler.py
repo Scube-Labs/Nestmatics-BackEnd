@@ -6,13 +6,14 @@ from DAOs.DropStrategyDao import DropStrategyDao
 
 DROPSTRATEGYKEYS = {"days":list, "start_date":str, "end_date":str, "service_area":str}
 
+
 class DropStrategyHandler(ParentHandler):
 
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
         self.ServiceAreaHandler = None
         self.NestHandler = None
-        self.DropStrategyDao = DropStrategyDao()
+        self.DropStrategyDao = DropStrategyDao(db)
 
     def setSAHandler(self, serviceAreaHandler):
         self.ServiceAreaHandler = serviceAreaHandler

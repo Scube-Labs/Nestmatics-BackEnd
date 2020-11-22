@@ -9,10 +9,10 @@ EXPERIMENTSKEYS = {"nest_id":str, "name":str, "config1":str, "config2":str, "dat
 
 class ExperimentsHandler(ParentHandler):
 
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
         self.NestsHandler = None
-        self.ExperimentsDao = ExperimentsDao()
+        self.ExperimentsDao = ExperimentsDao(db)
 
     def setNestHandler(self, nestHandler):
         self.NestsHandler = nestHandler

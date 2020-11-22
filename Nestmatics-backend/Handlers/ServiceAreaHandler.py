@@ -12,9 +12,9 @@ SAPROPERTIESKEYS = {"timestamp":str, "service_area":str, "bitmap_file":str}
 
 class ServiceAreaHandler(ParentHandler):
 
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
-        self.ServiceAreaDao = ServiceAreaDao()
+        self.ServiceAreaDao = ServiceAreaDao(db)
         self.NestHandler = None
         self.ModelHandler = None
         self.RidesHandler = None

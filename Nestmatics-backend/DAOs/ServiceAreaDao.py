@@ -4,6 +4,14 @@ from DAOs.ParentDao import ParentDao
 
 class ServiceAreaDao(ParentDao):
 
+    def __init__(self, db):
+        #super().__init__()
+        self.serviceAreaCollection = db["service_area"]
+        self.weatherCollection = db["weather"]
+        self.streetsCollection = db["streets"]
+        self.amenitiesCollection = db["amenities"]
+        self.buildingsCollection = db["buildings"]
+
     def getServiceAreaById(self, areaid):
         """
         Function to get a service area information from the database using the area id

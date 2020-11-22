@@ -5,6 +5,10 @@ from DAOs.ParentDao import ParentDao
 
 class RidesDAO(ParentDao):
 
+    def __init__(self, db):
+       # super().__init__()
+        self.ridesCollection = db["rides"]
+
     def getRidesForDateAndArea(self, date, areaid):
         """
         Get Rides for a certain date and area

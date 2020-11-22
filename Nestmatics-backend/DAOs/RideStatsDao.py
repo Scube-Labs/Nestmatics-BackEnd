@@ -1,7 +1,12 @@
 from bson import ObjectId
 from DAOs.ParentDao import ParentDao
 
+
 class RideStatsDao(ParentDao):
+
+    def __init__(self, db):
+        #super().__init__()
+        self.statsCollection = db["ride_stats"]
 
     def getStatsForDateAndArea(self, date, areaid):
         cursor = self.statsCollection.find_one({"date": date, "service_area": areaid})

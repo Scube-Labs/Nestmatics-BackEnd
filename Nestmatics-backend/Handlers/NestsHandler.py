@@ -13,9 +13,9 @@ RIDE_MINUTE_RATE = 0.10
 
 class NestsHandler(ParentHandler):
 
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
-        self.NestsDao = NestsDao()
+        self.NestsDao = NestsDao(db)
         self.UsersHandler = None
         self.ServiceAreaHandler = None
         self.RidesHandler = None
