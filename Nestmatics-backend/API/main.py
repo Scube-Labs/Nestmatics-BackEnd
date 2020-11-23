@@ -9,8 +9,10 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
+
 # Apply CORS to this app
 CORS(app)
+
 
 @app.route('/', methods=['GET'])
 def home():
@@ -277,7 +279,7 @@ def postNests():
 
 
 @app.route('/nestmatics/nests/area/<areaid>/user/<userid>', methods=['GET'])
-def getNestsOnArea(userid=None, areaid=None):
+def getNestsOnAreaByUser(userid=None, areaid=None):
     """
     Get Nests on Service Area specified
     :param userid: ID of user that created said Nests

@@ -60,14 +60,14 @@ class NestsDao(ParentDao):
         """
         cursor = self.nestsCollection.find({"service_area": areaid, "user": userid})
         return self.returnMany(cursor)
-
-    def getAllNestsForAnArea(self, areaid, userid):
+    
+    def getAllNestsForAnArea(self, areaid):
         """
         Find all nests that belong to a specified area regardless of user who created the nests
         :param areaid: ID of area from which to retreive Nests
         :return: dictionary holding all nests that belong to specified area
         """
-        cursor = self.nestsCollection.find({"service_area": areaid, "user": userid})
+        cursor = self.nestsCollection.find({"service_area": areaid})
         return self.returnMany(cursor)
 
     def getNestsNamesFromArea(self, areaid, userid):

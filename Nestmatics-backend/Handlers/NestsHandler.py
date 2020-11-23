@@ -614,9 +614,9 @@ class NestsHandler(ParentHandler):
             if not self.verifyIDString(areaid):
                 return make_response(jsonify(Error="area ID must be a valid 24-character hex string"), 400)
 
-            nests = self.NestsDao.getAllNestsForAnArea(areaid, userid)
-            if len(nests) == 0:
-                return make_response(jsonify(Error="No nest for the area"), 404)
+            nests = self.getNestByArea(areaid, userid)
+            if 'Error' in nests:
+                return make_response(jsonify(Error=nests), 404)
 
             newdate = self.toIsoFormat(date)
             if newdate == -1:
@@ -697,14 +697,14 @@ class NestsHandler(ParentHandler):
         print(result_list)
         return result_list
 
-    def getEmptyNestTimesForDate(self, areaid, date):
+    def getEmptyNestTimesForDate(self, areaid, userid, date):
         try:
             if not self.verifyIDString(areaid):
                 return make_response(jsonify(Error="area ID must be a valid 24-character hex string"), 400)
 
-            nests = self.NestsDao.getAllNestsForAnArea(areaid)
-            if nests is None:
-                return make_response(jsonify(Error="No nests for the area"), 404)
+            nests = self.getNestByArea(areaid, userid)
+            if 'Error' in nests:
+                return make_response(jsonify(Error=nests), 404)
 
             newdate = self.toIsoFormat(date)
             if newdate == -1:
@@ -741,7 +741,7 @@ class NestsHandler(ParentHandler):
         return {"deleted_nests":deletedNests,"deleted_configs":deletedConfigs, "deleted_Experiments":deletedExperiments}
 
 
-    def deleteNestByArea(self, areaid):
+    def extern_deleteNestByArea(self, areaid):
         deletedConfigs = 0
         deletedNests = 0
         deletedExperiments = 0
