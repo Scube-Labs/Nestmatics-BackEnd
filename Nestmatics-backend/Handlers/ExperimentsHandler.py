@@ -127,7 +127,7 @@ class ExperimentsHandler(ParentHandler):
         """
         try:
             if not self.verifyIDString(experimentid):
-                return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
+                return make_response(jsonify(Error="Experiment ID must be a valid 24-character hex string"), 400)
 
             result = self.ExperimentsDao.getExperimentFromID(experimentid)
             if result is None:
@@ -140,26 +140,28 @@ class ExperimentsHandler(ParentHandler):
             return response
 
     def getConfigCalculationsForReport(self, experimentid):
-        experiment = self.ExperimentsDao.getExperimentFromID(experimentid)
-        if experiment is None:
-            return make_response(jsonify(Error='No experiment with this id'), 404)
-
-        report = {"config1": self.NestsHandler.calculateNestConfigurationStats(experiment["config1"]),
-                  "config2": self.NestsHandler.calculateNestConfigurationStats(experiment["config2"])}
-
-        return report
-
-    def getReportForExperiment(self, experimentid):
         try:
-            result = self.getConfigCalculationsForReport(experimentid)
-            if result is None:
-                response = make_response(jsonify(Error="Error in getting configuration stats"), 404)
-            else:
-                response = make_response(jsonify(Ok=result), 200)
-            return response
+            if not self.verifyIDString(experimentid):
+                return make_response(jsonify(Error="Experiment ID must be a valid 24-character hex string"), 400)
+
+            experiment = self.ExperimentsDao.getExperimentFromID(experimentid)
+            if experiment is None:
+                return make_response(jsonify(Error='No experiment with this id'), 404)
+
+            config1 = self.NestsHandler.getInfoForNestConfigStats(experiment["config1"])
+            if config1 is None or "Error" in config1:
+                config1 = {"No rides happened to include that nest configuration "+str(experiment["config1"])}
+
+            config2 = self.NestsHandler.getInfoForNestConfigStats(experiment["config2"])
+            if config2 is None or "Error" in config2:
+                config2 = {"No rides happened to include nest configuration "+str(experiment["config2"])}
+
+            report = {"config1": config1,
+                      "config2": config2}
+
+            return make_response(jsonify(ok=report), 200)
         except Exception as e:
-            response = make_response(jsonify(Error=str(e)), 500)
-            return response
+            return make_response(jsonify(Error=str(e)), 500)
 
     def getExperimentsForArea(self, areaid, user_id):
         """

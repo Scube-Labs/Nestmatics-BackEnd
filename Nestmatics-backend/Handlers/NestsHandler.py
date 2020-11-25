@@ -448,7 +448,7 @@ class NestsHandler(ParentHandler):
 
                     rides_started.append(i["_id"])
                 else:
-                    ride_coords = {"lat": float(i["coords"]["end_lat"]), "lon": float(i["coords"]["end_long"])}
+                    ride_coords = {"lat": float(i["coords"]["end_lat"]), "lon": float(i["coords"]["end_lon"])}
                     if self.RidesHandler.areCoordsInsideNest(nest["coords"], 30, ride_coords):
                         rides_ended.append(i["_id"])
 
@@ -529,6 +529,24 @@ class NestsHandler(ParentHandler):
             return response
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
+
+    def getInfoForNestConfigStats(self, configid):
+        nestConfig = self.NestsDao.getNestConfigurationFromID(configid)
+        config_start_date = nestConfig["start_date"]
+        config_end_date = nestConfig["end_date"]
+
+        nest = self.NestsDao.findNestById(nestConfig["nest"])
+        if nest is None:
+            return {"Error":"No nest with that id "}
+
+        area_id = nest["service_area"]
+
+        rides = self.RidesHandler.extern_getRidesForDateIntervalAndArea(config_start_date, config_end_date, area_id)
+        if rides is None:
+            return {"Error":"No rides for that area and/or date "}
+        result = self.calculateNestConfigurationStats(rides, nest, nestConfig)
+        return result
+
 
     def getNestConfigurationStatsForADay(self, nestconfigid):
         try:

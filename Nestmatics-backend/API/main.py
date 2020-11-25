@@ -1004,7 +1004,7 @@ def editExperiment(experimentid=None):
 @app.route('/nestmatics/experiment/<experimentid>/report', methods=['GET'])
 def getReportForExperiment(experimentid=None):
     if request.method == 'GET':
-        return ExperimentsHandler.getReportForExperiment(experimentid)
+        return ExperimentsHandler.getConfigCalculationsForReport(experimentid)
     else:
         return make_response(jsonify(Error="Method not allowed."), 405)
 
