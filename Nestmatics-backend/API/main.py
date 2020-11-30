@@ -1,13 +1,20 @@
 from flask import jsonify, request, make_response
+from threading import *
+import sys
+
+sys.path.append('../')
 
 from API import app, RidesHandler, NestsHandler, \
     ServiceAreaHandler, UsersHandler, RideStatsHandler, ModelHandler, ExperimentsHandler, DropStrategyHandler
 
 from werkzeug.utils import secure_filename
 
+import ML
+
 @app.route('/', methods=['GET'])
 def home():
     return "This is the Nestmatics API"
+    
 
 @app.route('/nestmatics/db/insertDummydata', methods=['POST'])
 def insertDummyData():
@@ -687,7 +694,13 @@ def postServiceArea():
     if request.method == 'POST':
         if request.json is None:
             return make_response(jsonify(Error="No JSON body was included in request"), 400)
-        return ServiceAreaHandler.insertServiceArea(request.json)
+        response = ServiceAreaHandler.insertServiceArea(request.json)
+        if 'Error' in response.json:
+            return response
+        else:
+            ML.get_terrain_data(response.json['ok']['_id'])# Downloading terrain data in a thread 
+            return response
+        #TODO here to fetch bitmaps
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -723,6 +736,7 @@ def deleteServiceArea(areaid=None):
         if areaid is None:
             return jsonify(Error="Area ID is empty"), 404
         return ServiceAreaHandler.deleteServiceArea(areaid)
+        #TODO delete bitmaps
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -1047,12 +1061,16 @@ def createPrediction(areaid=None, date=None):
     :param date: date of prediction to create
     :return: TODO what does it return?
     """
-    if request.method == 'GET':
-        if request.method == 'POST':
-            print("placeholder")
-            # TODO: Add function to create prediction here
+    #TODO check parameters are valid
+
+    if request.method == 'POST':
+        return ML.predict(areaid, date) #TODO check error code
     else:
         return jsonify(Error="Method not allowed."), 405
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+@app.route('/nestmatics/test', methods=['GET'])
+def test():
+    ML.validate('5fc3e51af3d58c5308a1d878', '2019-10-14')
+
+if __name__ == '__main__':
+    app.run(debug=True)

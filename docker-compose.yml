@@ -17,6 +17,8 @@ services:
       - mongo
     expose:
       - 8080
+    volumes:
+    - ./ml_data:/data/ml
 
   nginx:
     build: ./nginx
@@ -29,12 +31,14 @@ services:
     image: mongo
     container_name: mongo
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      -MONGO_INITDB_ROOT_USERNAME: root
+      -MONGO_INITDB_ROOT_PASSWORD: example
     expose:
       - 27017
     volumes:
       - ./mongo_data:/data/db
+    # ports: #Eliminate(this is for fast testing purposes)
+    #   - "2717:27017"
 
   mongo-express:
     image: mongo-express
@@ -50,5 +54,4 @@ services:
       - mongo
     ports:
       - "8081:8081"
-
 
