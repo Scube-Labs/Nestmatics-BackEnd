@@ -103,7 +103,7 @@ def fetch_terrain_data(north_lat, south_lat, east_lon, west_lon):
         [int]: request response code
     """
 
-    if (abs(north_lat - south_lat) * abs(east_lon - west_lon)) > MAX_REQUEST_AREA: # OpenStreeMap API square degree limit per request.
+    if (abs(abs(north_lat) - abs(south_lat)) * abs(abs(east_lon) -abs(west_lon))) > MAX_REQUEST_AREA: # OpenStreeMap API square degree limit per request.
         raise ValueError("Requested area is too big.")
     
     request_link = "https://api.openstreetmap.org/api/0.6/map.json?bbox=" + str(west_lon) + "," + str(south_lat) + "," + str(east_lon) + "," + str(north_lat)
