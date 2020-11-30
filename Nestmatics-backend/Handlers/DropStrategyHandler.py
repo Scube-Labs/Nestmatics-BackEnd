@@ -4,7 +4,7 @@ from datetime import datetime
 from Handlers.ParentHandler import ParentHandler
 from DAOs.DropStrategyDao import DropStrategyDao
 
-DROPSTRATEGYKEYS = {"days":list, "start_date":str, "end_date":str, "service_area":str}
+DROPSTRATEGYKEYS = {"user":str, "days":list, "start_date":str, "end_date":str, "service_area":str}
 
 
 class DropStrategyHandler(ParentHandler):
@@ -139,13 +139,29 @@ class DropStrategyHandler(ParentHandler):
             response = make_response(jsonify(Error=str(e)), 500)
             return response
 
-    def getMostRecentDropStrategy(self, areaid):
+    def getMostRecentDropStrategy(self, areaid, userid):
         try:
             if not self.verifyIDString(areaid):
                 return make_response(jsonify(Error="area ID must be a valid 24-character hex string"),
                                      400)
 
-            drop = self.DropStrategyDao.getMostRecentDropStrategy(areaid)
+            drop = self.DropStrategyDao.getMostRecentDropStrategy(areaid,userid)
+            if drop is None or len(drop) == 0:
+                return make_response(jsonify(Error="No drop strategies for area"), 404)
+            else:
+                response = make_response(jsonify(ok=drop[0]), 200)
+            return response
+        except Exception as e:
+            response = make_response(jsonify(Error=str(e)), 500)
+            return response
+
+    def getLatestDropStrategyFromDate(self, areaid, userid, date):
+        try:
+            if not self.verifyIDString(areaid):
+                return make_response(jsonify(Error="area ID must be a valid 24-character hex string"),
+                                     400)
+
+            drop = self.DropStrategyDao.getMostRecentDropStrategyFromDate(areaid,userid, date)
             if drop is None or len(drop) == 0:
                 return make_response(jsonify(Error="No drop strategies for area"), 404)
             else:

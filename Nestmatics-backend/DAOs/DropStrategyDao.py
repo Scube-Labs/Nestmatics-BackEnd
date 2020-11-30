@@ -48,14 +48,24 @@ class DropStrategyDao(ParentDao):
         cursor = self.dropStrategyCollection.find_one({"_id": ObjectId(dropid)})
         return self.returnOne(cursor)
 
-    def getMostRecentDropStrategy(self, areaid):
+    def getMostRecentDropStrategy(self, areaid, userid):
         """
         Gets most recently made drop strategy
         :param areaid:
         :return:
         """
-        cursor = self.dropStrategyCollection.find({"service_area":areaid}).\
+        cursor = self.dropStrategyCollection.find({"service_area":areaid, "user":userid}).\
             sort([("start_date", -1)]).limit(1)
+        return self.returnMany(cursor)
+
+    def getMostRecentDropStrategyFromDate(self, areaid, userid, date_lt):
+        """
+        Gets most recently made drop strategy
+        :param areaid:
+        :return:
+        """
+        cursor = self.dropStrategyCollection.find({"start_date": {"$lte": date_lt}, "service_area":areaid,
+                                                   "user":userid}).sort([("start_date", -1)]).limit(1)
         return self.returnMany(cursor)
 
     def deleteDropStrategy(self, dropid):

@@ -387,6 +387,7 @@ class NestsHandler(ParentHandler):
                 qty = config["vehicle_qty"]
                 nest = self.NestsDao.findNestById(config["nest"])
                 nest["vehicle_qty"] = qty
+                nest["configid"] = config["_id"]
                 result.append(nest)
 
             if result is None:

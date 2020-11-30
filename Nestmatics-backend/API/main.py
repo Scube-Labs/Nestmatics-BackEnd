@@ -831,10 +831,17 @@ def getDropStrategyFromID(dropid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/drop/area/<areaid>/recent', methods=['GET'])
-def getMostRecentDropStrategy(areaid=None):
+@app.route('/nestmatics/drop/area/<areaid>/user/<userid>/recent', methods=['GET'])
+def getMostRecentDropStrategy(areaid=None, userid=None):
     if request.method == 'GET':
-        return DropStrategyHandler.getMostRecentDropStrategy(areaid)
+        return DropStrategyHandler.getMostRecentDropStrategy(areaid, userid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/drop/area/<areaid>/user/<userid>/date/<date>/recent', methods=['GET'])
+def getLatestDropStrategyFromDate(areaid=None, userid=None, date=None):
+    if request.method == 'GET':
+        return DropStrategyHandler.getLatestDropStrategyFromDate(areaid, userid, date)
     else:
         return jsonify(Error="Method not allowed."), 405
 
