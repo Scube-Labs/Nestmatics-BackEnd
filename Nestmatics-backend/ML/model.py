@@ -10,7 +10,7 @@ from tensorflow.keras.layers import UpSampling2D
 from tensorflow.keras.layers import LeakyReLU
 import tensorflow as tf
 import csv
-from data_sequencer import DataSequencer
+from .data_sequencer import DataSequencer
 
 class NestmaticModel(tf.keras.Model):
 

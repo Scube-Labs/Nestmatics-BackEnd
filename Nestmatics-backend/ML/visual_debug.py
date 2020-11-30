@@ -1,5 +1,5 @@
 import numpy as np
-from model import NestmaticModel, custom_loss_function
+from .model import NestmaticModel, custom_loss_function
 import tensorflow as tf
 from PIL import Image
 import imageio
