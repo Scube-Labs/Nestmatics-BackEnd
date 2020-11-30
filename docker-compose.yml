@@ -24,12 +24,17 @@ services:
     build: ./nginx
     container_name: nginx
     restart: always
+    depends_on:
+      - mongo
+      - flask
+      - mongo-express
     ports:
       - "80:80"
 
   mongo:
     image: mongo
     container_name: mongo
+    restart: always
     environment:
       -MONGO_INITDB_ROOT_USERNAME: root
       -MONGO_INITDB_ROOT_PASSWORD: example
@@ -52,6 +57,7 @@ services:
       ME_CONFIG_SITE_BASEURL: /mongoadmin
     depends_on:
       - mongo
+      - flask
     ports:
       - "8081:8081"
 

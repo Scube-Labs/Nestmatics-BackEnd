@@ -7,11 +7,12 @@ import re
 USERKEYS = {"email":str, "type":str}
 TYPES = ["admin", "user"]
 
+
 class UsersHandler(ParentHandler):
 
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
-        self.UsersDao = UsersDao()
+        self.UsersDao = UsersDao(db)
         self.NestsHandler = None
 
     def setNestHandler(self, nestsHandler):
@@ -47,12 +48,14 @@ class UsersHandler(ParentHandler):
             the request.
         """
         try:
+
             user = self.UsersDao.getAllUsers()
             if user is None or len(user) == 0:
                 response = make_response(jsonify(Error="No users on system"), 404)
             else:
                 response = make_response(jsonify(user), 200)
             return response
+
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
 

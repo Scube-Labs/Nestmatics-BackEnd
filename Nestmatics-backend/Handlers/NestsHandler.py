@@ -13,9 +13,9 @@ RIDE_MINUTE_RATE = 0.10
 
 class NestsHandler(ParentHandler):
 
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
-        self.NestsDao = NestsDao()
+        self.NestsDao = NestsDao(db)
         self.UsersHandler = None
         self.ServiceAreaHandler = None
         self.RidesHandler = None
@@ -367,6 +367,39 @@ class NestsHandler(ParentHandler):
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
 
+    def getNestConfigurationInfoForDay(self, areaid, userid, date):
+        try:
+            if not self.verifyIDString(areaid):
+                return make_response(jsonify(Error="area ID must be a valid 24-character hex string"), 400)
+            if not self.verifyIDString(userid):
+                return make_response(jsonify(Error="user ID must be a valid 24-character hex string"), 400)
+
+            newdate = self.toIsoFormat(date)
+            if newdate == -1:
+                return make_response(jsonify(Error='Date format should be YYYY-MM-DD or ISO'), 400)
+
+            configs = self.NestsDao.getNestConfigurationFromDateInterval(newdate)
+            if len(configs) == 0:
+                return make_response(jsonify(Error="No nest configurations for this date"), 404)
+
+            result = []
+            for config in configs:
+                qty = config["vehicle_qty"]
+                nest = self.NestsDao.findNestById(config["nest"])
+                nest["vehicle_qty"] = qty
+                nest["configid"] = config["_id"]
+                result.append(nest)
+
+            if result is None:
+                return make_response(jsonify(Error="No nest config for nests"), 404)
+            else:
+                response = make_response(jsonify(ok=result), 200)
+            return response
+        except Exception as e:
+            return make_response(jsonify(Error=str(e)), 500)
+
+
+
     def getNestConfigurationFromId(self, nestconfigid):
         """
         Gets Nest congifuration that belong to a specified ID
@@ -401,7 +434,7 @@ class NestsHandler(ParentHandler):
         rides_ended = []
         total_rides = 0
 
-        if rides is not None or len(rides) != 0:
+        if len(rides) != 0:
 
             for i in rides:
                 ride_coords = {"lat": float(i["coords"]["start_lat"]), "lon": float(i["coords"]["start_lon"])}
@@ -416,7 +449,7 @@ class NestsHandler(ParentHandler):
 
                     rides_started.append(i["_id"])
                 else:
-                    ride_coords = {"lat": float(i["coords"]["end_lat"]), "lon": float(i["coords"]["end_long"])}
+                    ride_coords = {"lat": float(i["coords"]["end_lat"]), "lon": float(i["coords"]["end_lon"])}
                     if self.RidesHandler.areCoordsInsideNest(nest["coords"], 30, ride_coords):
                         rides_ended.append(i["_id"])
 
@@ -498,6 +531,24 @@ class NestsHandler(ParentHandler):
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
 
+    def getInfoForNestConfigStats(self, configid):
+        nestConfig = self.NestsDao.getNestConfigurationFromID(configid)
+        config_start_date = nestConfig["start_date"]
+        config_end_date = nestConfig["end_date"]
+
+        nest = self.NestsDao.findNestById(nestConfig["nest"])
+        if nest is None:
+            return {"Error":"No nest with that id "}
+
+        area_id = nest["service_area"]
+
+        rides = self.RidesHandler.extern_getRidesForDateIntervalAndArea(config_start_date, config_end_date, area_id)
+        if rides is None:
+            return {"Error":"No rides for that area and/or date "}
+        result = self.calculateNestConfigurationStats(rides, nest, nestConfig)
+        return result
+
+
     def getNestConfigurationStatsForADay(self, nestconfigid):
         try:
             if not self.verifyIDString(nestconfigid):
@@ -577,15 +628,14 @@ class NestsHandler(ParentHandler):
         return result_list
 
 
-    def getUnusuedVehiclesForDate(self, areaid, date):
+    def getUnusuedVehiclesForDate(self, areaid, userid, date):
         try:
             if not self.verifyIDString(areaid):
                 return make_response(jsonify(Error="area ID must be a valid 24-character hex string"), 400)
 
-            nests = self.NestsDao.getAllNestsForAnArea(areaid)
-
-            if nests is None:
-                return make_response(jsonify(Error="No nest for the area"), 404)
+            nests = self.getNestByArea(areaid, userid)
+            if 'Error' in nests:
+                return make_response(jsonify(Error=nests), 404)
 
             newdate = self.toIsoFormat(date)
             if newdate == -1:
@@ -666,14 +716,14 @@ class NestsHandler(ParentHandler):
         print(result_list)
         return result_list
 
-    def getEmptyNestTimesForDate(self, areaid, date):
+    def getEmptyNestTimesForDate(self, areaid, userid, date):
         try:
             if not self.verifyIDString(areaid):
                 return make_response(jsonify(Error="area ID must be a valid 24-character hex string"), 400)
 
-            nests = self.NestsDao.getAllNestsForAnArea(areaid)
-            if nests is None:
-                return make_response(jsonify(Error="No nests for the area"), 404)
+            nests = self.getNestByArea(areaid, userid)
+            if 'Error' in nests:
+                return make_response(jsonify(Error=nests), 404)
 
             newdate = self.toIsoFormat(date)
             if newdate == -1:
@@ -710,7 +760,7 @@ class NestsHandler(ParentHandler):
         return {"deleted_nests":deletedNests,"deleted_configs":deletedConfigs, "deleted_Experiments":deletedExperiments}
 
 
-    def deleteNestByArea(self, areaid):
+    def extern_deleteNestByArea(self, areaid):
         deletedConfigs = 0
         deletedNests = 0
         deletedExperiments = 0

@@ -1,27 +1,36 @@
-from flask import jsonify, request, make_response
-from threading import *
+from flask import jsonify, request, make_response, Flask
+from flask_cors import CORS
 import sys
-
 sys.path.append('../')
-
-from API import app, RidesHandler, NestsHandler, \
+from API import RidesHandler, NestsHandler, \
     ServiceAreaHandler, UsersHandler, RideStatsHandler, ModelHandler, ExperimentsHandler, DropStrategyHandler
-
 from werkzeug.utils import secure_filename
-
 import ML
+
+app = Flask(__name__)
+app.config["DEBUG"] = True
+
+
+# Apply CORS to this app
+CORS(app)
+
 
 @app.route('/', methods=['GET'])
 def home():
     return "This is the Nestmatics API"
     
 
-@app.route('/nestmatics/db/insertDummydata', methods=['POST'])
+
+@app.route('/nestmatics/db/insertDummydata', methods=['GET', 'OPTIONS'])
 def insertDummyData():
     import DB_Dummydata.DBDummyData
-    if request.method == 'POST':
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
+
+    if request.method == 'GET':
         response = DB_Dummydata.DBDummyData.main()
-        return make_response(jsonify(response), 200)
+        responseToCOORS = make_response(jsonify(response), 200)
+        return _corsify_actual_response(responseToCOORS)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -44,6 +53,7 @@ def getRidesForDateAndArea(areaid=None, date=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
+
 @app.route('/nestmatics/rides/area/<areaid>/alldates', methods=['GET'])
 def getrideDatesForArea(areaid=None):
     """
@@ -60,6 +70,7 @@ def getrideDatesForArea(areaid=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
+
 @app.route('/nestmatics/rides/area/<areaid>/start/<startdate>/end/<enddate>/alldates', methods=['GET'])
 def getrideDatesForAreaAndInterval(areaid=None, startdate=None, enddate=None):
     """
@@ -75,6 +86,7 @@ def getrideDatesForAreaAndInterval(areaid=None, startdate=None, enddate=None):
         return rides
     else:
         return jsonify(Error="Method not allowed."), 405
+
 
 @app.route('/nestmatics/rides/interval/area/<areaid>/date/<date>/start/<starttime>/end/<endtime>', methods=['GET'])
 def getRidesForTimeInterval(areaid=None, date=None, starttime=None, endtime=None):
@@ -269,7 +281,7 @@ def postNests():
 
 
 @app.route('/nestmatics/nests/area/<areaid>/user/<userid>', methods=['GET'])
-def getNestsOnArea(userid=None, areaid=None):
+def getNestsOnAreaByUser(userid=None, areaid=None):
     """
     Get Nests on Service Area specified
     :param userid: ID of user that created said Nests
@@ -318,12 +330,30 @@ def getNest(nestid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/nests/nest/<nestid>', methods=['DELETE'])
-def deleteNest(nestid=None):
-    if request.method == 'DELETE':
-        return NestsHandler.deleteNest(nestid)
+@app.route('/nestmatics/nests/area/<areaid>/user/<userid>/date/<date>', methods=['GET'])
+def getNestsForDate(areaid=None, userid=None, date=None):
+    """
+    Finds Nest configurations for a specified nest
+    :param nestid: ID of nest from which to look for nest configurations
+    :return:
+    if request was valid: response object with status code 200 containing the requested nest configurations
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+    """
+    if request.method == 'GET':
+        return NestsHandler.getNestConfigurationInfoForDay(areaid,userid,date)
     else:
-        return jsonify(Error="Method not allowed."), 405
+        return make_response(jsonify(Error="Method not allowed."), 405)
+
+@app.route('/nestmatics/nests/nest/<nestid>', methods=['DELETE', 'OPTIONS'])
+def deleteNest(nestid=None):
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
+    if request.method == 'DELETE':
+        response = NestsHandler.deleteNestByID(nestid)
+        return _corsify_actual_response(response)
+    else:
+        return make_response(jsonify(Error="Method not allowed."), 405)
 
 
 @app.route('/nestmatics/nests/nest/<nestid>', methods=['PUT'])
@@ -397,6 +427,7 @@ def getNestConfigurationStats(nestconfigid=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
+
 @app.route('/nestmatics/nests/nestconfig/<nestconfigid>/date/<date>/start/<starttime>/end/<endtime>/stats', methods=['GET'])
 def getNestStatsForATimeInterval(nestconfigid=None, date=None, starttime=None, endtime=None):
     """
@@ -438,6 +469,7 @@ def getUnusedVehiclesForNest(areaid=None, date=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
+
 @app.route('/nestmatics/nests/nestconfig/<nestconfigid>', methods=['GET'])
 def findNestConfiguration(nestconfigid=None):
     """
@@ -454,7 +486,7 @@ def findNestConfiguration(nestconfigid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/nests/nestconfig/<nestconfigid>', methods=['DELETE'])
+@app.route('/nestmatics/nests/nestconfig/<nestconfigid>', methods=['DELETE', 'OPTIONS'])
 def deleteNestConfiguration(nestconfigid=None):
     """
     Deletes a Nest Configuration
@@ -464,8 +496,11 @@ def deleteNestConfiguration(nestconfigid=None):
     if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
         error message
     """
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
     if request.method == 'DELETE':
-        return NestsHandler.deleteNestConfiguration(nestconfigid)
+        response = NestsHandler.deleteNestConfiguration(nestconfigid)
+        return _corsify_actual_response(response)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -480,18 +515,21 @@ def editNestConfiguration(nestconfigid=None):
     if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
         error message
     """
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
     if request.method == 'PUT':
         if "vehicle_qty" not in request.json:
-            return jsonify(Error="BODY should have a vehicle_qty key"), 404
-        return NestsHandler.editNestConfiguration(nestconfigid, request.json["vehicle_qty"])
+            return make_response(jsonify(Error="BODY should have a vehicle_qty key"), 404)
+        response = NestsHandler.editNestConfiguration(nestconfigid, request.json["vehicle_qty"])
+        return _corsify_actual_response(response)
     else:
-        return jsonify(Error="Method not allowed."), 405
+        return make_response(jsonify(Error="Method not allowed."), 405)
 
 
 # ---------------------- Users API routes -------------------------------------
 
 
-@app.route('/nestmatics/users', methods=['GET'])
+@app.route('/nestmatics/users', methods=['GET', 'OPTIONS'])
 def getAllUsers():
     """
     Route to get all users registered in the system
@@ -506,7 +544,6 @@ def getAllUsers():
             },
             .
             .
-
         ]
         if error in request, will return a 400, 404, 500 or 405 status code with corresponding information,
         following the format:
@@ -514,7 +551,10 @@ def getAllUsers():
             "Error": "error information string"
         }
     """
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
     if request.method == 'GET':
+        print("get all students")
         return UsersHandler.getAllUsers()
     else:
         return jsonify(Error="Method not allowed."), 405
@@ -571,7 +611,7 @@ def insertUser():
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/users/<userid>', methods=['DELETE'])
+@app.route('/nestmatics/users/<userid>', methods=['DELETE', 'OPTIONS'])
 def deleteUser(userid=None):
     """
     Route to delete users from the database. User will be identified with the userid in the URI route.
@@ -588,10 +628,13 @@ def deleteUser(userid=None):
             "Error": "error information string"
         }
     """
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
     if request.method == 'DELETE':
-        return UsersHandler.deleteUser(userid)
+        response = UsersHandler.deleteUser(userid)
+        return _corsify_actual_response(response)
     else:
-        return jsonify(Error="Method not allowed."), 405
+        return make_response(jsonify(Error="Method not allowed."), 405)
 
 
 # ----------------------- Service Area API routes -----------------
@@ -698,9 +741,8 @@ def postServiceArea():
         if 'Error' in response.json:
             return response
         else:
-            ML.get_terrain_data(response.json['ok']['_id'])# Downloading terrain data in a thread 
+            ML.get_terrain_data(response.json['ok']['_id'])# Downloading terrain data in a thread #TODO error messages
             return response
-        #TODO here to fetch bitmaps
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -715,14 +757,18 @@ def editServiceArea(areaid=None):
     if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
         error message
     """
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
     if request.method == 'PUT':
         if "area_name" not in request.json:
             return jsonify(Error="BODY should have a area_name key"), 404
-        return ServiceAreaHandler.editServiceAreaName(areaid, request.json["area_name"])
+        response = ServiceAreaHandler.editServiceAreaName(areaid, request.json["area_name"])
+        return _corsify_actual_response(response)
     else:
-        return jsonify(Error="Method not allowed."), 405
+        return make_response(jsonify(Error="Method not allowed."), 405)
 
-@app.route('/nestmatics/areas/<areaid>', methods=['DELETE'])
+
+@app.route('/nestmatics/areas/<areaid>', methods=['DELETE','OPTIONS' ])
 def deleteServiceArea(areaid=None):
     """
     Edits a specified nest configuration's vehicle qty
@@ -732,11 +778,13 @@ def deleteServiceArea(areaid=None):
     if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
         error message
     """
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
     if request.method == 'DELETE':
         if areaid is None:
-            return jsonify(Error="Area ID is empty"), 404
-        return ServiceAreaHandler.deleteServiceArea(areaid)
-        #TODO delete bitmaps
+            return make_response(jsonify(Error="Area ID is empty"), 404)
+        response = ServiceAreaHandler.deleteServiceArea(areaid)
+        return _corsify_actual_response(response)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -790,10 +838,17 @@ def getDropStrategyFromID(dropid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/drop/area/<areaid>/recent', methods=['GET'])
-def getMostRecentDropStrategy(areaid=None):
+@app.route('/nestmatics/drop/area/<areaid>/user/<userid>/recent', methods=['GET'])
+def getMostRecentDropStrategy(areaid=None, userid=None):
     if request.method == 'GET':
-        return DropStrategyHandler.getMostRecentDropStrategy(areaid)
+        return DropStrategyHandler.getMostRecentDropStrategy(areaid, userid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/nestmatics/drop/area/<areaid>/user/<userid>/date/<date>/recent', methods=['GET'])
+def getLatestDropStrategyFromDate(areaid=None, userid=None, date=None):
+    if request.method == 'GET':
+        return DropStrategyHandler.getLatestDropStrategyFromDate(areaid, userid, date)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -824,10 +879,13 @@ def postDropStrategy():
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/drop/<dropid>', methods=['DELETE'])
+@app.route('/nestmatics/drop/<dropid>', methods=['DELETE', 'OPTIONS'])
 def deleteDropStrategy(dropid=None):
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
     if request.method == 'DELETE':
-        return DropStrategyHandler.deleteDropStrategy(dropid)
+        response = DropStrategyHandler.deleteDropStrategy(dropid)
+        return _corsify_actual_response(response)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -917,7 +975,7 @@ def getExperimentsForNestID(nestid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/experiment/<experimentid>', methods=['DELETE'])
+@app.route('/nestmatics/experiment/<experimentid>', methods=['DELETE','OPTIONS'])
 def deleteExperiment(experimentid=None):
     """
     Route to delete an experiment
@@ -927,11 +985,13 @@ def deleteExperiment(experimentid=None):
     if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
         error message
     """
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
     if request.method == 'DELETE':
-        print("delete experiment")
-        return ExperimentsHandler.deleteExperimentByID(experimentid)
+        response = ExperimentsHandler.deleteExperimentByID(experimentid)
+        return _corsify_actual_response(response)
     else:
-        return jsonify(Error="Method not allowed."), 405
+        return make_response(jsonify(Error="Method not allowed."), 405)
 
 
 @app.route('/nestmatics/experiment/<experimentid>', methods=['PUT'])
@@ -944,20 +1004,23 @@ def editExperiment(experimentid=None):
     if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
         error message
     """
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
     if request.method == 'PUT':
         if "name" not in request.json:
-            return jsonify(Error="BODY should have a name key"), 404
-        return ExperimentsHandler.editExperiment(experimentid, request.json["name"])
+            return make_response(jsonify(Error="BODY should have a name key"), 404)
+        response = ExperimentsHandler.editExperiment(experimentid, request.json["name"])
+        return _corsify_actual_response(response)
     else:
-        return jsonify(Error="Method not allowed."), 405
+        return make_response(jsonify(Error="Method not allowed."), 405)
 
 
 @app.route('/nestmatics/experiment/<experimentid>/report', methods=['GET'])
 def getReportForExperiment(experimentid=None):
     if request.method == 'GET':
-        return ExperimentsHandler.getReportForExperiment(experimentid)
+        return ExperimentsHandler.getConfigCalculationsForReport(experimentid)
     else:
-        return jsonify(Error="Method not allowed."), 405
+        return make_response(jsonify(Error="Method not allowed."), 405)
 
 
 # ------------------------------ Models API routes ---------------------------------
@@ -1053,6 +1116,7 @@ def getPredictionFeatures(areaid=None, date=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
+
 @app.route('/nestmatics/ml/prediction/area/<areaid>/date/<date>', methods=['POST'])
 def createPrediction(areaid=None, date=None):
     """
@@ -1067,6 +1131,19 @@ def createPrediction(areaid=None, date=None):
         return ML.predict(areaid, date) #TODO check error code
     else:
         return jsonify(Error="Method not allowed."), 405
+
+def _build_cors_prelight_response():
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add('Access-Control-Allow-Headers', "*")
+    response.headers.add('Access-Control-Allow-Methods', "*")
+    return response
+
+
+def _corsify_actual_response(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
 
 @app.route('/nestmatics/test', methods=['GET'])
 def test():

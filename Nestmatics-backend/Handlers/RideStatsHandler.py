@@ -8,10 +8,10 @@ from DAOs.RideStatsDao import RideStatsDao
 
 class RideStatsHandler(ParentHandler):
 
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
         self.ServiceAreaHandler = None
-        self.RideStatsDao = RideStatsDao()
+        self.RideStatsDao = RideStatsDao(db)
 
     def setSAHandler(self, saHandler):
         self.ServiceAreaHandler = saHandler

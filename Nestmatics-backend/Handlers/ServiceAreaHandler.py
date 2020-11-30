@@ -12,9 +12,9 @@ SAPROPERTIESKEYS = {"timestamp":str, "service_area":str, "bitmap_file":str}
 
 class ServiceAreaHandler(ParentHandler):
 
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
-        self.ServiceAreaDao = ServiceAreaDao()
+        self.ServiceAreaDao = ServiceAreaDao(db)
         self.NestHandler = None
         self.ModelHandler = None
         self.RidesHandler = None
@@ -129,7 +129,7 @@ class ServiceAreaHandler(ParentHandler):
         """
         try:
             if not self.verifyIDString(areaid):
-                return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
+                return make_response(jsonify(Error="area ID must be a valid 24-character hex string"), 400)
 
             area = self.getSArea(areaid)
             if area is None:
@@ -195,7 +195,7 @@ class ServiceAreaHandler(ParentHandler):
             amenities = self.ServiceAreaDao.deleteAmentiesData(areaid)
 
             rides = self.RidesHandler.deleteRidesByServiceArea(areaid)
-            nests = self.NestHandler.deleteNestByArea(areaid)
+            nests = self.NestHandler.extern_deleteNestByArea(areaid)
             drop = self.DropsHandler.deleteDropStrategyByArea(areaid)
             predictions = self.ModelHandler.deletePredictionByArea(areaid)
             area = self.ServiceAreaDao.deleteServiceArea(areaid)

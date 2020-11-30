@@ -11,9 +11,9 @@ RIDESKEYS=["bird_id", "dt", "start_time", "end_time", "ride_cost", "start_long",
 
 class RidesHandler(ParentHandler):
 
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
-        self.RidesDao = RidesDAO()
+        self.RidesDao = RidesDAO(db)
         self.ServiceAreaHandler = None
         self.NestsHandler = None
         self.RideStatsHandler = None

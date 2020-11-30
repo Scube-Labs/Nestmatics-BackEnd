@@ -17,9 +17,9 @@ MODELKEYS = {"model_file":str, "creation_date":str, "service_area":str, "trainin
 
 class ModelHandler(ParentHandler):
 
-    def __init__(self):
+    def __init__(self, db):
         super().__init__()
-        self.ModelDao = ModelDao()
+        self.ModelDao = ModelDao(db)
 
     def insertModel(self, model_json):
         """
