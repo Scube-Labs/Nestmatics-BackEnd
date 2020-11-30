@@ -1145,9 +1145,9 @@ def _corsify_actual_response(response):
     return response
 
 
-@app.route('/nestmatics/test', methods=['GET'])
-def test():
-    ML.validate('5fc3e51af3d58c5308a1d878', '2019-10-14')
+# @app.route('/nestmatics/test', methods=['GET'])
+# def test():
+#     ML.validate('5fc3e51af3d58c5308a1d878', '2019-10-14')
 
 if __name__ == '__main__':
     app.run(debug=True)
