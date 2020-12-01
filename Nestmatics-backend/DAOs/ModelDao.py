@@ -43,7 +43,7 @@ class ModelDao(ParentDao):
     def getPredictionFeatures(self, areaid, predictionDate):
         cursor = self.predictionsCollection.find_one({"service_area": areaid,
                                                       "prediction_date": predictionDate},
-                                                    {"features": 1})
+                                                    {"feature_importance": 1})
         return self.returnOne(cursor)
 
     def getErrorMetricForPredictions(self, areaid):
@@ -64,9 +64,9 @@ class ModelDao(ParentDao):
         return self.insertOne(cursor)
 
     def editPrediction(self, predictionid, prediction, featureImp, errorMetric):
-        cursor = self.experimentCollection.update_one({"_id": ObjectId(predictionid)},
+        cursor = self.predictionsCollection.update_one({"_id": ObjectId(predictionid)},
                                                       {"$set": {"prediction": prediction,
-                                                                "features":featureImp,
+                                                                "feature_importance":featureImp,
                                                                 "error_metric":errorMetric}})
         return cursor.modified_count
 
