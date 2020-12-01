@@ -39,7 +39,7 @@ def predict(area_id, date):
     min_lat = cords[0][1] #bottom
     max_lon = cords[0][0] #right
     min_lon = cords[0][0] #left
-    for lon, lat in cords: #TODO define the convention and fix
+    for lon, lat in cords: 
         if lat > max_lat:
             max_lat = lat
         if lat < min_lat:
@@ -73,6 +73,7 @@ def predict(area_id, date):
         "other": amenities_string + "other.bmp"
     }
 
+    #Getting previous days rides data
     days_before_rides = []
     for days_before in range(1, 8):
         past_day = datetime.datetime.strptime(date, '%Y-%m-%d').date() - timedelta(days=days_before)
@@ -82,15 +83,16 @@ def predict(area_id, date):
         else:
             days_before_rides.append(clean_ride_data(rides_of_past_day))
 
+    #Preparing input
     x, _ = create_input_output_matrix(date, road_bitmap, building_bitmap, amenities, None, days_before_rides, max_lat, min_lat, min_lon, max_lon)
     
-
+    #Preparing model
     model = NestmaticModel()
     model.compile(loss=custom_loss_function, optimizer='adam', metrics=['accuracy'])
-    
     model.predict(np.zeros((1,128,128,20))) # Need to make a prediction to instanciate model to load the weights
     model.load_weights(model_path)
 
+    # Subdivide and combine results in one
     res = np.zeros(shape=(x.shape[0], x.shape[1], 24))
     for ix in range(0, int(x.shape[0]/128)):
         for iy in range(0, int(x.shape[1]/128)):
@@ -104,7 +106,7 @@ def predict(area_id, date):
         "prediction": matrix_to_json(res, max_lat, max_lon),
         "prediction_date": date,
         "creation_date": datetime.datetime.now().replace(microsecond=0).isoformat(),
-        "features": {
+        "feature_importance": {
             "weather":{
                 "precipitation": -1.0,
                 "temperature": -1.0
@@ -216,6 +218,7 @@ def validate(area_id, date):
         "other": amenities_string + "other.bmp"
     }
 
+    # Get previous days data
     days_before_rides = []
     for days_before in range(1, 8):
         past_day = datetime.datetime.strptime(date, '%Y-%m-%d').date() - timedelta(days=days_before)
@@ -225,21 +228,24 @@ def validate(area_id, date):
         else:
             days_before_rides.append(clean_ride_data(rides_of_past_day))
 
+    # Getting day to validate rides data
     service_response = RidesHandler.getRidesCoordsForDateAndArea(date, area_id).json
     if "Error" in service_response:
         return service_response
     rides_of_day = clean_ride_data(service_response)
+
+    #Creating input/output matrices
     x, y = create_input_output_matrix(date, road_bitmap, building_bitmap, amenities, rides_of_day, days_before_rides, max_lat, min_lat, min_lon, max_lon)
 
+    #Prepare model
     model = NestmaticModel()
     model.compile(loss=custom_loss_function, optimizer='adam', metrics=['accuracy'])
-
     model.predict(np.zeros((1,128,128,20))) # Need to make a prediction to instanciate model to load the weights
     model.load_weights(model_path)
 
+    #Calculate loss and accuracy
     loss = 0.0
     acc = 0.0
-
     for ix in range(0, int(x.shape[0]/128)):
         for iy in range(0, int(x.shape[1]/128)):
             x_slice = x[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :]
@@ -251,13 +257,16 @@ def validate(area_id, date):
     loss /= (int(x.shape[0]/128)*int(x.shape[1]/128))
     acc /= (int(x.shape[0]/128)*int(x.shape[1]/128))
 
-    old_prediction = ModelHandler.getPredictionForDate(area_id, date).json['ok'] #here
-    print(ModelHandler.editPrediction(old_prediction['_id'], old_prediction['prediction'], old_prediction['features'], acc))
+    
+    service_data = ModelHandler.getPredictionForDate(area_id, date).json
+    if "ok" not in service_response:
+        return service_response # Error while fetching prediction data
+    old_prediction = service_data['ok']
 
+    return ModelHandler.editPrediction(old_prediction['_id'], old_prediction['prediction'], old_prediction['feature_importance'], acc)
 
 
 def get_terrain_data(area_id):
-
     
     try:
         ML_DATA_PATH = os.environ['ML_DATA_PATH']
@@ -294,11 +303,10 @@ def get_terrain_data(area_id):
     #Storing bitmaps
     street.save(ML_DATA_PATH + area_id + '_road.bmp')
     buildings.save(ML_DATA_PATH + area_id + '_building.bmp')
-
     for key in amenities.keys():
         amenities[key].save(ML_DATA_PATH + area_id + "_" +key + '.bmp')
 
-    #Adding to DB
+    #Adding Bitmaps to DB
     street_data = {
         "timestamp": datetime.datetime.now().replace(microsecond=0).isoformat(),
         "service_area": area_id,
@@ -336,11 +344,16 @@ def get_terrain_data(area_id):
         "validation_error": -1.0
         }
 
+    # Stroing Model in DB 
     service_data = ModelHandler.insertModel(model_data)
     if "ok" not in service_response:
         return service_response # Error while storing model data
 
-#TODO check conditions for training function
+
+# def can_we_train(area_id):
+#     #TODO check for new days since last training
+#     #TODO check for average error.
+# #TODO check conditions for training function
 
 
 # UTILS
