@@ -5,7 +5,7 @@ from Handlers.ParentHandler import ParentHandler
 from DAOs.ModelDao import ModelDao
 
 PREDICTIONKEYS = {"model_id":str, "prediction":list, "prediction_date":str, "creation_date":str,
-             "features":dict, "error_metric":float, "service_area":str}
+             "feature_importance":dict, "error_metric":float, "service_area":str}
 
 FEATURESDICTKEYS = {"weather": dict, "rides":float, "buildings":float, "streets":float,
                              "amenities": float}
