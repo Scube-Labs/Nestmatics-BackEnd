@@ -77,7 +77,7 @@ def predict(area_id, date):
     for days_before in range(1, 8):
         past_day = datetime.datetime.strptime(date, '%Y-%m-%d').date() - timedelta(days=days_before)
         rides_of_past_day = RidesHandler.getRidesCoordsForDateAndArea(past_day, area_id).json
-        if "Error" in rides_of_past_day: #TODO verify
+        if "Error" in rides_of_past_day: 
             days_before_rides.append(None)
         else:
             days_before_rides.append(clean_ride_data(rides_of_past_day))
@@ -91,8 +91,7 @@ def predict(area_id, date):
     model.predict(np.zeros((1,128,128,20))) # Need to make a prediction to instanciate model to load the weights
     model.load_weights(model_path)
 
-    res = np.zeros(shape=(x.shape[1], x.shape[0], 24))
-
+    res = np.zeros(shape=(x.shape[0], x.shape[1], 24))
     for ix in range(0, int(x.shape[0]/128)):
         for iy in range(0, int(x.shape[1]/128)):
             x_slice = x[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :]
@@ -168,12 +167,17 @@ def train(area_id):
 
 
 def validate(area_id, date):
-    #TODO modify this to get data from DB
-    #TODO when area is created copy model for area.
-    model_path = ModelHandler.getModelsForArea(area_id).json['ok'][0]['model_file']
-    
+    #Get model 
+    service_response = ModelHandler.getModelsForArea(area_id)
+    if "Error" in service_response.json:
+        return service_response
+    model_path = service_response.json['ok'][0]['model_file']
+
     #Services area limits
-    cords = ServiceAreaHandler.getServiceArea(area_id).json['ok']['coords']['coordinates']
+    service_response = ServiceAreaHandler.getServiceArea(area_id)
+    if "Error" in service_response.json:
+        return service_response
+    cords = service_response.json['ok']['coords']['coordinates']
     max_lat = cords[0][1] #top
     min_lat = cords[0][1] #bottom
     max_lon = cords[0][0] #right
@@ -188,9 +192,21 @@ def validate(area_id, date):
         if lon < min_lon:
             min_lon = lon
 
-    road_bitmap = ServiceAreaHandler.getStreets(area_id)['bitmap_file']
-    building_bitmap = ServiceAreaHandler.getBuildings(area_id)['bitmap_file']
-    amenities_string = ServiceAreaHandler.getAmenities(area_id)['bitmap_file']
+     # Getting bitmaps
+    service_response = ServiceAreaHandler.getStreets(area_id)
+    if "Error" in service_response:
+        return service_response
+    road_bitmap = service_response['bitmap_file']
+
+    service_response = ServiceAreaHandler.getBuildings(area_id)
+    if "Error" in service_response:
+        return service_response
+    building_bitmap = service_response['bitmap_file']
+
+    service_response = ServiceAreaHandler.getAmenities(area_id)
+    if "Error" in service_response:
+        return service_response
+    amenities_string = service_response['bitmap_file']
     amenities = {
         "education": amenities_string + "Education.bmp", 
         "entertainment": amenities_string + "Entertainment.bmp",
@@ -204,13 +220,16 @@ def validate(area_id, date):
     for days_before in range(1, 8):
         past_day = datetime.datetime.strptime(date, '%Y-%m-%d').date() - timedelta(days=days_before)
         rides_of_past_day = RidesHandler.getRidesCoordsForDateAndArea(past_day, area_id).json
-        if "Error" in rides_of_past_day: #TODO verify
+        if "Error" in rides_of_past_day: 
             days_before_rides.append(None)
         else:
             days_before_rides.append(clean_ride_data(rides_of_past_day))
 
-    rides_of_day = clean_ride_data(RidesHandler.getRidesCoordsForDateAndArea(date, area_id).json)
-    x, y = create_input_output_matrix(date, road_bitmap, building_bitmap, amenities, rides_of_day, days_before_rides, top, bottom, right, left)
+    service_response = RidesHandler.getRidesCoordsForDateAndArea(date, area_id).json
+    if "Error" in service_response:
+        return service_response
+    rides_of_day = clean_ride_data(service_response)
+    x, y = create_input_output_matrix(date, road_bitmap, building_bitmap, amenities, rides_of_day, days_before_rides, max_lat, min_lat, min_lon, max_lon)
 
     model = NestmaticModel()
     model.compile(loss=custom_loss_function, optimizer='adam', metrics=['accuracy'])
@@ -232,8 +251,9 @@ def validate(area_id, date):
     loss /= (int(x.shape[0]/128)*int(x.shape[1]/128))
     acc /= (int(x.shape[0]/128)*int(x.shape[1]/128))
 
-    old_prediction = ModelHandler.getPrediction(area_id, date).json
-    return ModelHandler.editPrediction(old_prediction['_id'], old_prediction['prediction'], old_prediction['features'], acc)
+    old_prediction = ModelHandler.getPredictionForDate(area_id, date).json['ok'] #here
+    print(ModelHandler.editPrediction(old_prediction['_id'], old_prediction['prediction'], old_prediction['features'], acc))
+
 
 
 def get_terrain_data(area_id):
@@ -326,11 +346,12 @@ def get_terrain_data(area_id):
 # UTILS
 def clean_ride_data(rides_json):
     data = []
-    for ride in rides_json['ok'][0]:
-        lat = ride['coords']['start_lon']#TODO change this when its fixed.
-        lon = ride['coords']['start_lat']#TODO change this when its fixed.
+    for ride in rides_json['ok']:
+        lat = float(ride['coords']['start_lon'])
+        lon = float(ride['coords']['start_lat'])
         hour = datetime.datetime.strptime(ride['start_time'], '%Y-%m-%dT%H:%M:%S').hour
         data.append([lat, lon, hour]) 
+    return data
 
 def matrix_to_json(arr, top, left, meter_pixel_ratio=5):
     res = {}
@@ -343,7 +364,6 @@ def matrix_to_json(arr, top, left, meter_pixel_ratio=5):
             res[str(hour)].append([lat, lon, arr[rides_of_hour[i][0],rides_of_hour[i][1],hour]])
                 
     return res
-
 
 def get_region_data(res, max_lat, min_lat, max_lon, min_lon, division=REQUEST_DIVSION):
 
@@ -365,3 +385,4 @@ def get_region_data(res, max_lat, min_lat, max_lon, min_lon, division=REQUEST_DI
             time.sleep(TIME_PER_REQUEST)
     
     return res
+

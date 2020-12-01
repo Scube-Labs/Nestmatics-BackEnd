@@ -30,21 +30,18 @@ def create_input_output_matrix(date, streets, buildings, amenities, ride_data, d
             x = np.dstack([x, total_rides])
     
     # Street and Buildings
-    print(x.shape)
-    print(np.asarray(Image.open(streets)).shape)
-    print(np.asarray(Image.open(buildings)).shape)
-    x = np.dstack([
-            x,
-            np.rot90(skimage.measure.block_reduce(np.asarray(Image.open(streets)), (meter_per_pixel, meter_per_pixel), func=np.max), k=3), #Images are loaded sidewades
-            np.rot90(skimage.measure.block_reduce(np.asarray(Image.open(buildings)), (meter_per_pixel, meter_per_pixel), func=np.max), k=3) #Images are loaded sidewades
-           ])
 
+    x = stack_uneven((
+        x,
+        np.rot90(skimage.measure.block_reduce(np.asarray(Image.open(streets)), (meter_per_pixel, meter_per_pixel), func=np.max), k=3), #Images are loaded sidewades
+        np.rot90(skimage.measure.block_reduce(np.asarray(Image.open(buildings)), (meter_per_pixel, meter_per_pixel), func=np.max), k=3) #Images are loaded sidewades
+    ))
     # Amenities
     for key in amenities:
-        x = np.dstack([
-            x,
+        x = stack_uneven((
+            x, 
             np.rot90(skimage.measure.block_reduce(np.asarray(Image.open(amenities[key])), (meter_per_pixel, meter_per_pixel), func=np.max).astype(np.float16), k=3) #Images are loaded sidewades
-        ])
+        ))
 
     # Weather
     date = datetime.datetime.strptime(date, '%Y-%m-%d')
@@ -184,3 +181,25 @@ def blur(array, iteration=1):
     
     return blur(res, iteration=(iteration-1))
 
+
+def stack_uneven(arrays, fill_value=0.):
+    
+    sizes = [a.shape for a in arrays]
+    max_sizes = np.max(list(zip(*sizes)), -1)
+    depth = 0
+    for i in range(0, len(arrays)):
+        if len(arrays[i].shape) < 3:
+            depth +=1
+        else:
+            depth += arrays[i].shape[-1]
+
+    result = np.full((max_sizes[0], max_sizes[1], depth), fill_value)
+    depth = 0
+    for i in range(0, len(arrays)):
+        if len(arrays[i].shape) < 3: #2d matrix
+            result[:arrays[i].shape[0], :arrays[i].shape[1],  depth] = arrays[i]
+            depth +=1
+        else:
+            result[:arrays[i].shape[0], :arrays[i].shape[1],  depth:depth+arrays[i].shape[-1]] = arrays[i]
+            depth += arrays[i].shape[-1]
+    return result
