@@ -211,3 +211,41 @@ class DropStrategyHandler(ParentHandler):
     def deleteDropStrategyByArea(self, areaid):
         count = self.DropStrategyDao.deleteDropStrategyByArea(areaid)
         return count
+
+    def editDropStrategyName(self, dropid, name):
+        try:
+            if not self.verifyIDString(dropid):
+                return make_response(jsonify(Error="area ID must be a valid 24-character hex string"), 400)
+
+            drop = self.DropStrategyDao.getDropStrategyFromId(dropid)
+            if drop is None:
+                return make_response(jsonify(Error="No drop strategy for that drop id"), 404)
+
+            drop = self.DropStrategyDao.editDropStrategyName(dropid, name)
+            if drop is None or drop == 0:
+                return make_response(jsonify(Error="No drop strategies were edited"), 400)
+            else:
+                response = make_response(jsonify(ok='edited ' + str(drop) + " strategies"), 200)
+            return response
+        except Exception as e:
+            response = make_response(jsonify(Error=str(e)), 500)
+            return response
+
+    def editVehiclesInDrop(self, dropid, vehicles):
+        try:
+            if not self.verifyIDString(dropid):
+                return make_response(jsonify(Error="area ID must be a valid 24-character hex string"), 400)
+
+            drop = self.DropStrategyDao.getDropStrategyFromId(dropid)
+            if drop is None:
+                return make_response(jsonify(Error="No drop strategy for that drop id"), 404)
+
+            drop = self.DropStrategyDao.editTotalVehiclesForDrop(dropid, vehicles)
+            if drop is None or drop == 0:
+                return make_response(jsonify(Error="No drop strategies were edited"), 400)
+            else:
+                response = make_response(jsonify(ok='edited ' + str(drop) + " strategies"), 200)
+            return response
+        except Exception as e:
+            response = make_response(jsonify(Error=str(e)), 500)
+            return response

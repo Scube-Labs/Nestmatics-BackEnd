@@ -168,8 +168,9 @@ class RidesHandler(ParentHandler):
                 return make_response(jsonify(Error="Area ID must be a valid 24-character hex string"), 400)
             if self.verifyIDString(nestid) is False:
                 return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
+
             if self.ServiceAreaHandler.getSArea(areaid) is None:
-                return make_response(jsonify(Error="No Area with this ID"), 404)
+                return make_response(jsonify(Error="No Area with this ID"), 200)
 
             newDate = self.toIsoFormat(date)
             if newDate == -1:
@@ -177,14 +178,14 @@ class RidesHandler(ParentHandler):
 
             rides = self.RidesDao.getRidesForDateAndArea(newDate, areaid)
             if rides is None or len(rides) == 0:
-                return make_response(jsonify(Error='No rides for this date or area'), 404)
+                return make_response(jsonify(Error='No rides for this date or area'), 200)
 
             rides_at_nest = self.startAtNest(nestid, rides, start)
 
             if rides_at_nest is None or len(rides_at_nest) == 0:
-                response = make_response(jsonify(Error="No rides in this Nest"), 404)
+                response = make_response(jsonify(Error="No rides in this Nest"), 200)
             else:
-                response = make_response(jsonify(ok=rides), 200)
+                response = make_response(jsonify(ok=rides_at_nest), 200)
             return response
         except Exception as e:
             response = make_response(jsonify(Error=str(e)), 500)
@@ -518,7 +519,7 @@ class RidesHandler(ParentHandler):
             else:
                 rides_coords = {"lat": item["coords"]["end_lat"], "lon": item["coords"]["end_lon"]}
 
-            if self.areCoordsInsideNest(nest_coords, 30, rides_coords):
+            if self.areCoordsInsideNest(nest_coords, nest_radius, rides_coords):
                 rides_at_nest.append(item)
                 ridesinnest += 1
 

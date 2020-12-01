@@ -92,6 +92,18 @@ class DropStrategyDao(ParentDao):
                                                  {"days."+dayNum+".configurations": config}})
         return cursor.modified_count
 
+    def editDropStrategyName(self, dropid, name):
+        cursor = self.dropStrategyCollection.update_one({"_id": ObjectId(dropid)},
+                                                 { "$set":
+                                                 {"name": name}})
+        return cursor.modified_count
+
+    def editTotalVehiclesForDrop(self, dropid, vehicles):
+        cursor = self.dropStrategyCollection.update_one({"_id": ObjectId(dropid)},
+                                                 { "$set":
+                                                 {"vehicles": vehicles}})
+        return cursor.modified_count
+
 
 
 

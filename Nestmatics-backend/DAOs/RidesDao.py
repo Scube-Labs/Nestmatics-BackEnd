@@ -1,5 +1,8 @@
 from bson import ObjectId
 from datetime import datetime
+
+from pymongo import MongoClient
+
 from DAOs.ParentDao import ParentDao
 
 
@@ -128,9 +131,15 @@ class RidesDAO(ParentDao):
         return cursor.deleted_count
 
 
-# rides = RidesDAO().getRidesForDateIntervalAndArea("2020-03-03T00:00:00",
-#                                                 "2020-03-03T00:00:00",
-#                                                 "5fa5df52d2959eef671a408f")
+# DB_USERNAME = "root"
+# DB_PASSWD = "example"
+# DB_HOST = "localhost"
+# PORT = 2717
 #
-# for i in rides:
-#     print(i["start_time"])
+# client = MongoClient("mongodb://"+DB_HOST+":"+str(PORT),
+#                      username=DB_USERNAME,
+#                      password=DB_PASSWD,
+#                      connect=False)
+#
+# db = client["Nestmatics"]
+# RidesDAO(db).deleteRidesByDate('2020-03-02T00:00:00')

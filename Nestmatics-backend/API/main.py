@@ -838,6 +838,7 @@ def getMostRecentDropStrategy(areaid=None, userid=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
+
 @app.route('/nestmatics/drop/area/<areaid>/user/<userid>/date/<date>/recent', methods=['GET'])
 def getLatestDropStrategyFromDate(areaid=None, userid=None, date=None):
     if request.method == 'GET':
@@ -887,6 +888,30 @@ def deleteDropStrategy(dropid=None):
 def editDropStrategy(dropid=None, daynum=None):
     if request.method == 'PUT':
         return DropStrategyHandler.editDropStrategy(dropid, daynum, request.json)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/nestmatics/drop/<dropid>/name', methods=['PUT', 'OPTIONS'])
+def editDropStrategyName(dropid=None):
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
+    if request.method == 'PUT':
+        if 'name' not in request.json:
+            return make_response(jsonify(Error="Request json should have a name key"))
+        return DropStrategyHandler.editDropStrategyName(dropid, request.json['name'])
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/nestmatics/drop/<dropid>/vehicles', methods=['PUT', 'OPTIONS'])
+def editDropStrategyVehicles(dropid=None):
+    if request.method == 'OPTIONS':
+        return _build_cors_prelight_response()
+    if request.method == 'PUT':
+        if 'vehicles' not in request.json:
+            return make_response(jsonify(Error="Request json should have a vehicles key"))
+        return DropStrategyHandler.editVehiclesInDrop(dropid, request.json['vehicles'])
     else:
         return jsonify(Error="Method not allowed."), 405
 

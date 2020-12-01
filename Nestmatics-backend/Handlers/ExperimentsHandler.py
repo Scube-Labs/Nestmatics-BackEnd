@@ -148,16 +148,28 @@ class ExperimentsHandler(ParentHandler):
             if experiment is None:
                 return make_response(jsonify(Error='No experiment with this id'), 404)
 
-            config1 = self.NestsHandler.getInfoForNestConfigStats(experiment["config1"])
+            config1 = self.NestsHandler.getNestStatsPerHour(experiment["config1"])
+
             if config1 is None or "Error" in config1:
-                config1 = {"No rides happened to include that nest configuration "+str(experiment["config1"])}
+                config1 = "No rides happened to include that nest configuration "+str(experiment["config1"])
 
-            config2 = self.NestsHandler.getInfoForNestConfigStats(experiment["config2"])
+            config2 = self.NestsHandler.getNestStatsPerHour(experiment["config2"])
+
             if config2 is None or "Error" in config2:
-                config2 = {"No rides happened to include nest configuration "+str(experiment["config2"])}
+                config2 = "No rides happened to include nest configuration "+str(experiment["config2"])
 
-            report = {"config1": config1,
-                      "config2": config2}
+            revconf1 = config1["total_revenue"]
+            revconf2 = config2["total_revenue"]
+
+            print("revconf2 ", revconf2)
+            print("revconf1 ", revconf1)
+
+            conf_1v2 = ((revconf1 - revconf2)/revconf2) * 100
+            conf_2v1 = ((revconf2 - revconf1) / revconf1) * 100
+
+            report = {"config1": config1, "config2": config2, "conf_1v2": conf_1v2, "conf_2v1": conf_2v1}
+
+            print(report)
 
             return make_response(jsonify(ok=report), 200)
         except Exception as e:
