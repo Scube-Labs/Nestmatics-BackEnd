@@ -1085,6 +1085,7 @@ def trainModel(areaid=None):
     """
     if request.method == 'POST':
         print("placeholder")
+        ML.train(areaid)
         #TODO: Add function to train model here
     else:
         return jsonify(Error="Method not allowed."), 405
@@ -1126,10 +1127,11 @@ def createPrediction(areaid=None, date=None):
     Trigger the creation of a new prediction
     :param areaid: Id of area from which to create a prediction
     :param date: date of prediction to create
-    :return: TODO what does it return?
+    :return:  
+    if request was valid: response object with status code 200 and the prediction id
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
     """
-    #TODO check parameters are valid
-
     if request.method == 'POST':
         return ML.predict(areaid, date)
     else:
@@ -1148,9 +1150,14 @@ def _corsify_actual_response(response):
     return response
 
 
-# @app.route('/nestmatics/test', methods=['GET'])
-# def test():
-#     ML.validate('5fc3e51af3d58c5308a1d878', '2019-10-14')
+@app.route('/nestmatics/test', methods=['GET'])
+def test():
+    ML.validate('5fc5ddc86c651955a92fa601', '2019-10-14')
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+#TODO 
+#  if areaid is None or startdate is None or enddate is None:
+#             return jsonify(Error="URI does not have all parameters needed"), 400
