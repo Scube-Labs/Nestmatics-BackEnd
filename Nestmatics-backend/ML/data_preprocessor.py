@@ -10,27 +10,6 @@ import math
 import random
 import csv
 
-#TODO this is needs to change for integration.
-def fetch_ride_data(month, day, dataframe):
-    """Gathers the ride starting data from a given data frame by specified date. NOTE: This function will drastically change during integration.
-
-    Args:
-        month (int): Month of interest(January=1, December=12)
-        day (int): Day of the month of interest.
-        dataframe (Object): Pandas dataframe object with ride data. This dataframe must have at least the following columns: month, day, start_lat, start_long, hour.
-
-    Returns:
-        Array: Array containing sub arrays of len = 3, in which first two element are the start latitude and longitude respectevly, and the third element is the hour of the day when the ride started.
-    """
-    rides_of_day = dataframe[dataframe['month'] == month][dataframe['day'] == day]
-
-    data = []
-    for lat, lon, hour in zip(rides_of_day['start_lat'], rides_of_day['start_long'], rides_of_day['hour']):
-        data.append([lat, lon, hour])
-    
-    return data
-
-
 def create_input_output_matrix(date, streets, buildings, amenities, ride_data, days_before_ride_data, north_lat, south_lat, east_lon, west_lon, meter_per_pixel=5):
     
     if ride_data is not None: #Case for validation or training.
@@ -51,6 +30,9 @@ def create_input_output_matrix(date, streets, buildings, amenities, ride_data, d
             x = np.dstack([x, total_rides])
     
     # Street and Buildings
+    print(x.shape)
+    print(np.asarray(Image.open(streets)).shape)
+    print(np.asarray(Image.open(buildings)).shape)
     x = np.dstack([
             x,
             np.rot90(skimage.measure.block_reduce(np.asarray(Image.open(streets)), (meter_per_pixel, meter_per_pixel), func=np.max), k=3), #Images are loaded sidewades
