@@ -741,8 +741,11 @@ def postServiceArea():
         if 'Error' in response.json:
             return response
         else:
-            ML.get_terrain_data(response.json['ok']['_id'])# Downloading terrain data in a thread #TODO error messages
-            return response
+            data_response = ML.get_terrain_data(response.json['ok']['_id'])# Downloading terrain data in a thread
+            if data_response is None:
+                return response
+            else:
+                return data_response # data fetching error
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -1128,7 +1131,7 @@ def createPrediction(areaid=None, date=None):
     #TODO check parameters are valid
 
     if request.method == 'POST':
-        return ML.predict(areaid, date) #TODO check error code
+        return ML.predict(areaid, date)
     else:
         return jsonify(Error="Method not allowed."), 405
 
