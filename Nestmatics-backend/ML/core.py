@@ -22,11 +22,18 @@ REQUEST_DIVSION = 2
 
 
 def predict(area_id, date): 
-    #TODO when area is created copy model for area.
-    model_path = ModelHandler.getModelsForArea(area_id).json['ok'][0]['model_file']
+
+    #Get model 
+    service_response = ModelHandler.getModelsForArea(area_id)
+    if "Error" in service_response.json:
+        return service_response
+    model_path = service_response.json['ok'][0]['model_file']
     
     #Services area limits
-    cords = ServiceAreaHandler.getServiceArea(area_id).json['ok']['coords']['coordinates']
+    service_response = ServiceAreaHandler.getServiceArea(area_id)
+    if "Error" in service_response.json:
+        return service_response
+    cords = service_response.json['ok']['coords']['coordinates']
     max_lat = cords[0][1] #top
     min_lat = cords[0][1] #bottom
     max_lon = cords[0][0] #right
@@ -41,9 +48,21 @@ def predict(area_id, date):
         if lon < min_lon:
             min_lon = lon
 
-    road_bitmap = ServiceAreaHandler.getStreets(area_id)['bitmap_file']
-    building_bitmap = ServiceAreaHandler.getBuildings(area_id)['bitmap_file']
-    amenities_string = ServiceAreaHandler.getAmenities(area_id)['bitmap_file']
+    # Getting bitmaps
+    service_response = ServiceAreaHandler.getStreets(area_id)
+    if "Error" in service_response:
+        return service_response
+    road_bitmap = service_response['bitmap_file']
+
+    service_response = ServiceAreaHandler.getBuildings(area_id)
+    if "Error" in service_response:
+        return service_response
+    building_bitmap = service_response['bitmap_file']
+
+    service_response = ServiceAreaHandler.getAmenities(area_id)
+    if "Error" in service_response:
+        return service_response
+    amenities_string = service_response['bitmap_file']
     amenities = {
         "education": amenities_string + "Education.bmp", 
         "entertainment": amenities_string + "Entertainment.bmp",
@@ -198,12 +217,16 @@ def validate(area_id, date):
 def get_terrain_data(area_id):
 
     # Gettings cords
-    cords = ServiceAreaHandler.getServiceArea(area_id).json['ok']['coords']['coordinates']
+    service_response = ServiceAreaHandler.getServiceArea(area_id).json
+    if "ok" not in service_response:
+        return service_response #Error obtaining the service area.
+
+    cords = service_response['ok']['coords']['coordinates'] 
     max_lat = cords[0][1] #top
     min_lat = cords[0][1] #bottom
     max_lon = cords[0][0] #right
     min_lon = cords[0][0] #left
-    for lon, lat in cords: #TODO define the convention
+    for lon, lat in cords: 
         if lat > max_lat:
             max_lat = lat
         if lat < min_lat:
@@ -221,7 +244,7 @@ def get_terrain_data(area_id):
         for y in range(0, REQUEST_DIVSION): 
             right = max_lon - (((max_lon-min_lon)/REQUEST_DIVSION)*y)
             left = max_lon - (((max_lon-min_lon)/REQUEST_DIVSION)*(y+1))
-            temp, _ = fetch_terrain_data(top, bottom, right, left) #TODO if _ not 200
+            temp, _ = fetch_terrain_data(top, bottom, right, left) #TODO here
             if res['elements'] is None:
                 res['elements'] = temp['elements']
             else:
@@ -244,23 +267,42 @@ def get_terrain_data(area_id):
         "service_area": area_id,
         "bitmap_file": '/data/ml/' + area_id + '_road.bmp'
     }
-    ServiceAreaHandler.insertStreetData(street_data)
+    service_response = ServiceAreaHandler.insertStreetData(street_data)
+    if "ok" not in service_response:
+        return service_response # Error while storing street data
 
     building_data = {
         "timestamp": datetime.datetime.now().replace(microsecond=0).isoformat(),
         "service_area": area_id,
         "bitmap_file": '/data/ml/' + area_id + '_building.bmp'
     }
-    ServiceAreaHandler.insertBuildingsData(building_data)
+    service_response = ServiceAreaHandler.insertBuildingsData(building_data) 
+    if "ok" not in service_response:
+        return service_response # Error while storing building data
 
     amenities_data = {
         "timestamp": datetime.datetime.now().replace(microsecond=0).isoformat(),
         "service_area": area_id,
         "bitmap_file": '/data/ml/' + area_id + "_"
     }
-    ServiceAreaHandler.insertAmenitiesData(amenities_data)
-    
-    #TODO add model
+    service_data = ServiceAreaHandler.insertAmenitiesData(amenities_data)
+    if "ok" not in service_response:
+        return service_response # Error while storing amenities data
+
+    # Link the master model as the first model for area.
+    model_data = {
+        "model_file": "/data/ml/model.h5", 
+        "creation_date": datetime.datetime.now().replace(microsecond=0).isoformat(), 
+        "service_area": area_id, 
+        "training_error": -1.0,
+        "critical_val_error": -1.0,
+        "validation_error": -1.0
+        }
+
+    service_data = ModelHandler.insertModel(model_data)
+    print(service_data)
+    if "ok" not in service_response:
+        return service_response # Error while storing model data
 
 
 
@@ -282,6 +324,6 @@ def matrix_to_json(arr, top, left, meter_pixel_ratio=5):
         for i in range(0,len(rides_of_hour)):
             lat = top - ((rides_of_hour[i][1]*meter_pixel_ratio)/6372800) * (180/3.14159265358979323846)
             lon = left - ((rides_of_hour[i][0]*meter_pixel_ratio)/6372800) * (180/3.14159265358979323846)
-            res[str(hour)].append([lat, lon, arr[rides_of_hour[i][0],rides_of_hour[i][1],hour]])  #TODO change to dict
-            print(res[str(hour)][-1])
+            res[str(hour)].append([lat, lon, arr[rides_of_hour[i][0],rides_of_hour[i][1],hour]])
+                
     return res
