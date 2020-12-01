@@ -259,6 +259,8 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
     #Add buildings to black image
     draw_buildings = ImageDraw.Draw(img_buildings)
     for line in buildings_to_draw:
+        if len(line) < 2:
+            continue
         draw_buildings.polygon(line, fill='white')
     
     for key in amenities_to_draw:
