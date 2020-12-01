@@ -4,13 +4,14 @@ sys.path.append('../')
 from ML.model import NestmaticModel, custom_loss_function
 from ML.feature_makers import make_rides_features, make_terrain_features
 from ML.feature_fetchers import fetch_terrain_data
-from ML.data_preprocessor import fetch_ride_data, create_input_output_matrix
+from ML.data_preprocessor import create_input_output_matrix
 from ML.data_sequencer import DataSequencer
 import numpy as np
 from datetime import timedelta
 import datetime
 import csv
 import time
+import os.path
 from skimage import io
 from PIL import Image
 from flask import jsonify
@@ -121,12 +122,34 @@ def predict(area_id, date):
     return ModelHandler.insertPrediction(prediction)
 
 
-def train(train_csv, validation_csv, model_path, new_model_path, batch_size=64, epochs=10, augmentation=True):
+def train(area_id):
     #TODO For integration the csv files most be generated.
+    batch_size=64
+    epochs=10 
+    augmentation=True
 
+    #Get days from area
+    #Get model of area
+        # rides = RidesHandler.getDistinctRideDatesForAreaAndInterval(areaid,startdate,enddate)
+    # if os.path.isfile():
+    #     #load
+    # else:
+    #     #create
+    #     #load all
+    
+    try:
+        ML_DATA_PATH = os.environ['ML_DATA_PATH']
+    except KeyError:
+        ML_DATA_PATH = "/home/pedro/nestmatics/master/Nestmatics-BackEnd/ml_data"
+
+    train_csv = ML_DATA_PATH + '/matrices/' + area_id + '_training.csv'
+    validation_csv = ML_DATA_PATH + '/matrices/' + area_id + '_validation.csv'
 
     train = list(csv.reader(open(train_csv)))
     validate = list(csv.reader(open(validation_csv)))
+
+
+
 
     train_sequencer = DataSequencer(train, batch_size=batch_size, blur=5, augmentation=augmentation)
     validation_sequencer = DataSequencer(validate, batch_size=256, blur=5)
@@ -147,7 +170,6 @@ def train(train_csv, validation_csv, model_path, new_model_path, batch_size=64, 
 def validate(area_id, date):
     #TODO modify this to get data from DB
     #TODO when area is created copy model for area.
-    print(ModelHandler.getModelsForArea(area_id).json)
     model_path = ModelHandler.getModelsForArea(area_id).json['ok'][0]['model_file']
     
     #Services area limits
@@ -216,6 +238,12 @@ def validate(area_id, date):
 
 def get_terrain_data(area_id):
 
+    
+    try:
+        ML_DATA_PATH = os.environ['ML_DATA_PATH']
+    except KeyError:
+        ML_DATA_PATH = "/home/pedro/nestmatics/master/Nestmatics-BackEnd/ml_data/"
+
     # Gettings cords
     service_response = ServiceAreaHandler.getServiceArea(area_id).json
     if "ok" not in service_response:
@@ -238,34 +266,23 @@ def get_terrain_data(area_id):
 
     # Fetching data
     res = {'elements': None}
-    for x in range(0, REQUEST_DIVSION):
-        top = max_lat - (((max_lat-min_lat)/REQUEST_DIVSION)*x)
-        bottom = max_lat - (((max_lat-min_lat)/REQUEST_DIVSION)*(x+1))
-        for y in range(0, REQUEST_DIVSION): 
-            right = max_lon - (((max_lon-min_lon)/REQUEST_DIVSION)*y)
-            left = max_lon - (((max_lon-min_lon)/REQUEST_DIVSION)*(y+1))
-            temp, _ = fetch_terrain_data(top, bottom, right, left) #TODO here
-            if res['elements'] is None:
-                res['elements'] = temp['elements']
-            else:
-                res['elements'].extend(temp['elements']) 
-            time.sleep(TIME_PER_REQUEST)
+    res = get_region_data(res, max_lat, min_lat, max_lon, min_lon)
     
     #Creating bitmaps
     street, buildings, amenities = make_terrain_features(res, max_lat, min_lat, min_lon, max_lon)
     
     #Storing bitmaps
-    street.save('/data/ml/' + area_id + '_road.bmp')
-    buildings.save('/data/ml/' + area_id + '_building.bmp')
+    street.save(ML_DATA_PATH + area_id + '_road.bmp')
+    buildings.save(ML_DATA_PATH + area_id + '_building.bmp')
 
     for key in amenities.keys():
-        amenities[key].save('/data/ml/' + area_id + "_" +key + '.bmp')
+        amenities[key].save(ML_DATA_PATH + area_id + "_" +key + '.bmp')
 
     #Adding to DB
     street_data = {
         "timestamp": datetime.datetime.now().replace(microsecond=0).isoformat(),
         "service_area": area_id,
-        "bitmap_file": '/data/ml/' + area_id + '_road.bmp'
+        "bitmap_file": ML_DATA_PATH + area_id + '_road.bmp'
     }
     service_response = ServiceAreaHandler.insertStreetData(street_data)
     if "ok" not in service_response:
@@ -274,7 +291,7 @@ def get_terrain_data(area_id):
     building_data = {
         "timestamp": datetime.datetime.now().replace(microsecond=0).isoformat(),
         "service_area": area_id,
-        "bitmap_file": '/data/ml/' + area_id + '_building.bmp'
+        "bitmap_file": ML_DATA_PATH + area_id + '_building.bmp'
     }
     service_response = ServiceAreaHandler.insertBuildingsData(building_data) 
     if "ok" not in service_response:
@@ -283,7 +300,7 @@ def get_terrain_data(area_id):
     amenities_data = {
         "timestamp": datetime.datetime.now().replace(microsecond=0).isoformat(),
         "service_area": area_id,
-        "bitmap_file": '/data/ml/' + area_id + "_"
+        "bitmap_file": ML_DATA_PATH + area_id + "_"
     }
     service_data = ServiceAreaHandler.insertAmenitiesData(amenities_data)
     if "ok" not in service_response:
@@ -291,7 +308,7 @@ def get_terrain_data(area_id):
 
     # Link the master model as the first model for area.
     model_data = {
-        "model_file": "/data/ml/model.h5", 
+        "model_file": ML_DATA_PATH + "model.h5", 
         "creation_date": datetime.datetime.now().replace(microsecond=0).isoformat(), 
         "service_area": area_id, 
         "training_error": -1.0,
@@ -300,11 +317,10 @@ def get_terrain_data(area_id):
         }
 
     service_data = ModelHandler.insertModel(model_data)
-    print(service_data)
     if "ok" not in service_response:
         return service_response # Error while storing model data
 
-
+#TODO check conditions for training function
 
 
 # UTILS
@@ -326,4 +342,26 @@ def matrix_to_json(arr, top, left, meter_pixel_ratio=5):
             lon = left - ((rides_of_hour[i][0]*meter_pixel_ratio)/6372800) * (180/3.14159265358979323846)
             res[str(hour)].append([lat, lon, arr[rides_of_hour[i][0],rides_of_hour[i][1],hour]])
                 
+    return res
+
+
+def get_region_data(res, max_lat, min_lat, max_lon, min_lon, division=REQUEST_DIVSION):
+
+    for x in range(0, division):
+        top = max_lat - (((max_lat-min_lat)/division)*x)
+        bottom = max_lat - (((max_lat-min_lat)/division)*(x+1))
+        for y in range(0, division): 
+            right = max_lon - (((max_lon-min_lon)/division)*y)
+            left = max_lon - (((max_lon-min_lon)/division)*(y+1))
+            temp = fetch_terrain_data(top, bottom, right, left)
+            if temp is None:
+                print("subdivide")
+                res = get_region_data(res, top, bottom, right, left)
+            else:
+                if res['elements'] is None:
+                    res['elements'] = temp['elements']
+                else:
+                    res['elements'].extend(temp['elements']) 
+            time.sleep(TIME_PER_REQUEST)
+    
     return res
