@@ -73,8 +73,8 @@ def make_rides_features(data, north_lat, south_lat, east_lon, west_lon, meter_pe
     """
 
     #Calculate matrix size(like an image bitmap)
-    img_x = int(haversine((north_lat, west_lon), (north_lat, east_lon))/meter_per_pixel)
-    img_y = int(haversine((north_lat, west_lon), (south_lat, west_lon))/meter_per_pixel)
+    img_x = round(haversine((north_lat, west_lon), (north_lat, east_lon))/meter_per_pixel)
+    img_y = round(haversine((north_lat, west_lon), (south_lat, west_lon))/meter_per_pixel)
 
     #Create empty matrix
     ride_matrix = np.zeros((img_x, img_y, 24), dtype = np.float)
