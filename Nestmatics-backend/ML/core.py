@@ -21,7 +21,7 @@ from API import ModelHandler, RidesHandler, ServiceAreaHandler
 
 TIME_PER_REQUEST = 1
 REQUEST_DIVSION = 2
-THRESHOLD = 0.5
+THRESHOLD = 0.3
 
 #TODO update paths for new folder structure
 
@@ -113,7 +113,7 @@ def predict(area_id, date):
     res = np.rot90(res) 
 
     prediction = {
-        "model_id": ModelHandler.getMostRecentModel(area_id).json['ok'][0]['_id'],
+        "model_id": ModelHandler.getMostRecentModel(area_id).json['ok']['_id'],
         "prediction": matrix_to_json(res, max_lat, max_lon),
         "prediction_date": date,
         "creation_date": datetime.datetime.now().replace(microsecond=0).isoformat(),
@@ -301,7 +301,7 @@ def validate(area_id, date):
     service_response = ModelHandler.getMostRecentModel(area_id)
     if "Error" in service_response.json:
         return service_response # Error getting model
-    model_path = service_response.json['ok'][0]['model_file']
+    model_path = service_response.json['ok']['model_file']
 
     #Services area limits
     service_response = ServiceAreaHandler.getServiceArea(area_id)
@@ -481,16 +481,19 @@ def validate_all(area_id):
     if "ok" not in service_response:
         return service_response # Error obtaining the days.
     for day in service_response['ok']:
-        prediction = ModelHandler.getPredictionForDate(area_id, day)
-        if "Error" in ModelHandler.getPredictionForDate(area_id, day): # No prediction made.
+        day = datetime.datetime.strptime(day, "%Y-%m-%dT%H:%M:%S")
+        day = datetime.datetime.strftime(day, "%Y-%m-%d")
+        prediction = ModelHandler.getPredictionForDate(area_id, day).json
+        if "Error" in prediction: # No prediction made.
             temp = predict(area_id, day)
             if "Error" in temp:
                 return temp
-            prediction = ModelHandler.getPredictionForDate(area_id, day)
+            prediction = ModelHandler.getPredictionForDate(area_id, day).json
+        prediction = prediction['ok']
         if prediction["error_metric"] == -1: #No validation
             validation = validate(area_id, day)
-            if "Error" in validation:
-                return validation
+            # if "Error" in validation:
+            #     return validation
 
     #TODO return ok
 
@@ -507,13 +510,39 @@ def can_we_train(area_id):
     service_response = RidesHandler.getDistinctRideDatesForArea(areaid=area_id).json
     if "ok" not in service_response:
         return service_response # Error obtaining the days.
-    # for day in service_response['ok']:
+    
+    # Count how many new days have been added since last training.
+    new_days = []
+    for day in service_response['ok']:
+        if day > model_data['creation_date']:
+            new_days.append(day)
+    
+    #Calculate average accuracy of the new days (if they have predictions)
+    acc = 0.0
+    for day in new_days:
+        service_response = ModelHandler.getPredictionForDate(area_id, day).json
+        if "ok" not in service_response:
+            return service_response # Error obtaining the days.
+        if service_response['error_metric'] == -1.0:
+            continue
+        acc += service_response['error_metric']
 
-    print(ModelHandler.getPredictionErrorMetrics(area_id))
-    print("TODO")
-    #TODO check for new days since last training
-    #TODO check for average error.
-#TODO check conditions for training functiona
+    if len(new_days) != 0: #Prevent division by 0
+        acc /= len(new_days)
+        
+    #Calculate missing days for prediction.
+    required_days = 30 - len(new_days)
+    if len(new_days) > 30:
+        required_days = 0
+    result = {
+        'ok': {
+            "can_train": (acc<THRESHOLD and len(new_days)>=30),
+            "required_days": required_days,
+            "Accuracy": acc,
+            "Threshold": THRESHOLD
+        }
+    }
+    print(result) #TODO return
 
 
 # UTILS
