@@ -11,7 +11,7 @@ import csv
 import os
 import time
 
-service_areas_list = ['5fc330e47c481aade13e1573']
+service_areas_list = ['5fc83249ba580486a53118e6']
 users_list = []
 nest_list = []
 nest_config_list = []
@@ -50,7 +50,7 @@ def main():
     # createExperimentsTable(db)
 
     # insert path of csv file here
-    csv_path = "/home/pedro/nestmatics/Nestmatics-BackEnd/ML/data_sets/mayaguez_rides_all_030320.csv"
+    csv_path = "/home/pedro/nestmatics/master/Nestmatics-BackEnd/Nestmatics-backend/ML/rides1.csv"
     with open(csv_path, 'r') as f:
         insertRides(f, db)
 
