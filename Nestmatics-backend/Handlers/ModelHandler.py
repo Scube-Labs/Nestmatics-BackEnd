@@ -285,7 +285,7 @@ class ModelHandler(ParentHandler):
                                               prediction,
                                               features,
                                               error_metric)
-            if len(model) == 0:
+            if model == 0:
                 response = json.dumps({"error":"there was an error on the request. Or no Nest with that ID"})
             else:
                 response = json.dumps({"ok":model})
