@@ -425,16 +425,16 @@ def get_terrain_data(area_id):
     street, buildings, amenities = make_terrain_features(res, max_lat, min_lat, min_lon, max_lon)
     
     #Storing bitmaps
-    street.save(ML_DATA_PATH + area_id + '_road.bmp')
-    buildings.save(ML_DATA_PATH + area_id + '_building.bmp')
+    street.save(ML_DATA_PATH + "bitmaps/" + area_id + '_road.bmp')
+    buildings.save(ML_DATA_PATH + "bitmaps/" + area_id + '_building.bmp')
     for key in amenities.keys():
-        amenities[key].save(ML_DATA_PATH + area_id + "_" +key + '.bmp')
+        amenities[key].save(ML_DATA_PATH + "bitmaps/" + area_id + "_" +key + '.bmp')
 
     #Adding Bitmaps to DB
     street_data = {
         "timestamp": datetime.datetime.now().replace(microsecond=0).isoformat(),
         "service_area": area_id,
-        "bitmap_file": ML_DATA_PATH + area_id + '_road.bmp'
+        "bitmap_file": ML_DATA_PATH + "bitmaps/" + area_id + '_road.bmp'
     }
     service_response = ServiceAreaHandler.insertStreetData(street_data)
     if "ok" not in service_response:
@@ -443,7 +443,7 @@ def get_terrain_data(area_id):
     building_data = {
         "timestamp": datetime.datetime.now().replace(microsecond=0).isoformat(),
         "service_area": area_id,
-        "bitmap_file": ML_DATA_PATH + area_id + '_building.bmp'
+        "bitmap_file": ML_DATA_PATH + "bitmaps/" + area_id + '_building.bmp'
     }
     service_response = ServiceAreaHandler.insertBuildingsData(building_data) 
     if "ok" not in service_response:
@@ -452,7 +452,7 @@ def get_terrain_data(area_id):
     amenities_data = {
         "timestamp": datetime.datetime.now().replace(microsecond=0).isoformat(),
         "service_area": area_id,
-        "bitmap_file": ML_DATA_PATH + area_id + "_"
+        "bitmap_file": ML_DATA_PATH + "bitmaps/" + area_id + "_"
     }
     service_data = ServiceAreaHandler.insertAmenitiesData(amenities_data)
     if "ok" not in service_response:

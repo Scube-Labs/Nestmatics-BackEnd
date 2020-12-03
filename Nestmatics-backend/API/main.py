@@ -1110,7 +1110,21 @@ def trainModel(areaid=None):
     """
     if request.method == 'POST':
         return ML.train(areaid)
-        #TODO: Add function to train model here
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/nestmatics/ml/area/<areaid>/trainModel/time/<timetotrain>', methods=['POST'])
+def timedtrainModel(areaid=None):
+    """
+    Route to trigger the training of a new ML model
+    :param areaid: ID of area from which to create a model
+    :return:
+    TODO: what does it return?
+    TODO: finish
+    """
+    if request.method == 'POST':
+        return ML.train(areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -1223,10 +1237,6 @@ def _corsify_actual_response(response):
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
-
-@app.route('/nestmatics/test', methods=['GET'])
-def test():
-    return ML.can_we_train('5fc6f3718e5b36682ba444e3')
 
 if __name__ == '__main__':
     app.run(debug=True)
