@@ -542,7 +542,7 @@ def can_we_train(area_id):
             "Threshold": THRESHOLD
         }
     }
-    print(result) #TODO return
+    return result 
 
 
 # UTILS
