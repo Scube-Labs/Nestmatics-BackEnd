@@ -2,8 +2,8 @@ from keras.utils import Sequence
 import numpy as np
 import math
 import random
-from feature_makers import make_temporal_features
-from data_preprocessor import blur
+from .feature_makers import make_temporal_features
+from .data_preprocessor import blur
 
 class DataSequencer(Sequence):
    

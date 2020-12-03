@@ -11,7 +11,7 @@ import csv
 import os
 import time
 
-service_areas_list = []
+service_areas_list = ['5fc83249ba580486a53118e6']
 users_list = []
 nest_list = []
 nest_config_list = []
@@ -33,33 +33,34 @@ def main():
         DB_PASSWD = "example"
         DB_HOST = "localhost"
         PORT = 2717
-
+    
+    print(PORT)
     client = MongoClient(host=DB_HOST, port=PORT, username=DB_USERNAME,
                               password=DB_PASSWD)
-
+    
+    
     db = client["Nestmatics"]
+    print(db)
 
-    createUsersTable(db)
-    createServiceAreaTable(db)
-    createNestsTable(db)
-    createNestConfigTable(db)
-    createDropStrategyTable(db)
-    createExperimentsTable(db)
+    # createUsersTable(db)
+    # createServiceAreaTable(db)
+    # createNestsTable(db)
+    # createNestConfigTable(db)
+    # createDropStrategyTable(db)
+    # createExperimentsTable(db)
 
     # insert path of csv file here
-   # csv_path = "../ML_Data/mayaguez_rides_all_030320.csv"
-   #  f = open(csv_path, 'r')
-   #  print(type(f))
-    #insertRides(f, db)
+    csv_path = "/home/pedro/nestmatics/master/Nestmatics-BackEnd/Nestmatics-backend/ML/rides1.csv"
+    with open(csv_path, 'r') as f:
+        insertRides(f, db)
 
-    createModelTable(db)
-    createPredictionTable(db)
-    createStreetsTable(db)
-    createAmenitiesTable(db)
-    createWeatherTable(db)
-    createBuildingsTable(db)
-
-   # client.close()
+    # createModelTable(db)
+    # createPredictionTable(db)
+    # createStreetsTable(db)
+    # createAmenitiesTable(db)
+    # createWeatherTable(db)
+    # createBuildingsTable(db)
+    client.close()
     return {"inserted dummy data into the db"}
 
 
@@ -145,15 +146,13 @@ def createUsersTable(db):
 
 def createServiceAreaTable(db):
     collection = db["service_area"]
-    area_names = ["test_sa", "San test2_sa"]
+    area_names = ["Maya", "San test2_sa"]
     polygon= [{
       "coordinates": [
-          [-67.152729, 18.2176116],
-          [-67.1393824, 18.2233593],
-          [-67.1374512, 18.2067272],
-          [-67.1437168, 18.194456],
-          [-67.1549177, 18.1955975],
-          [-67.152729, 18.217367]
+          [-67.11946, 18.18821],
+          [-67.17825, 18.24023],
+          [-67.17825, 18.24023],
+          [-67.17825, 18.24023]
                         ], "type": "LineString"
         }, {
       "coordinates":
@@ -603,5 +602,5 @@ def random_hour(timestamp,l):
        yield current
        l-=1
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()

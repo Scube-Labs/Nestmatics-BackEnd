@@ -3,3 +3,10 @@ ML/data_sets/*
 mongo_data
 __pycache__
 .gitignore
+ml_data/*
+mongo_data/*
+Nestmatics-backend/DB_Dummydata/DBDummyData.py
+Nestmatics-backend/auto-install.sh
+Nestmatics-backend/connectd_2.5.38_amd64.deb
+Nestmatics-backend/connectd.x86_64-ubuntu16.04
+Nestmatics-backend/ML/rides1.csv

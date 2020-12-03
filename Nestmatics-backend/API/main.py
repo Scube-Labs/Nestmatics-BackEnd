@@ -1,10 +1,11 @@
 from flask import jsonify, request, make_response, Flask
 from flask_cors import CORS
-
+import sys
+sys.path.append('../')
 from API import RidesHandler, NestsHandler, \
     ServiceAreaHandler, UsersHandler, RideStatsHandler, ModelHandler, ExperimentsHandler, DropStrategyHandler
-
 from werkzeug.utils import secure_filename
+import ML
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -17,6 +18,7 @@ CORS(app)
 @app.route('/', methods=['GET'])
 def home():
     return "This is the Nestmatics API"
+    
 
 
 @app.route('/nestmatics/db/insertDummydata', methods=['GET', 'OPTIONS'])
@@ -735,7 +737,15 @@ def postServiceArea():
     if request.method == 'POST':
         if request.json is None:
             return make_response(jsonify(Error="No JSON body was included in request"), 400)
-        return ServiceAreaHandler.insertServiceArea(request.json)
+        response = ServiceAreaHandler.insertServiceArea(request.json)
+        if 'Error' in response.json:
+            return response
+        else:
+            data_response = ML.get_terrain_data(response.json['ok']['_id'])# Downloading terrain data in a thread
+            if data_response is None:
+                return response
+            else:
+                return data_response # data fetching error
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -1099,8 +1109,22 @@ def trainModel(areaid=None):
     TODO: what does it return?
     """
     if request.method == 'POST':
-        print("placeholder")
-        #TODO: Add function to train model here
+        return ML.train(areaid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/nestmatics/ml/area/<areaid>/trainModel/time/<timetotrain>', methods=['POST'])
+def timedtrainModel(areaid=None):
+    """
+    Route to trigger the training of a new ML model
+    :param areaid: ID of area from which to create a model
+    :return:
+    TODO: what does it return?
+    TODO: finish
+    """
+    if request.method == 'POST':
+        return ML.train(areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -1141,14 +1165,64 @@ def createPrediction(areaid=None, date=None):
     Trigger the creation of a new prediction
     :param areaid: Id of area from which to create a prediction
     :param date: date of prediction to create
-    :return: TODO what does it return?
+    :return:  
+    if request was valid: response object with status code 200 and the prediction id
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
     """
-    if request.method == 'GET':
-        if request.method == 'POST':
-            print("placeholder")
-            # TODO: Add function to create prediction here
+    if request.method == 'POST':
+        return ML.predict(areaid, date)
     else:
         return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/nestmatics/ml/prediction/requierments/area/<areaid>', methods=['GET'])
+def getRequierments(areaid=None):
+    """
+    TODO Fix
+    Trigger the creation of a new prediction
+    :param areaid: Id of area from which to create a prediction
+    :param date: date of prediction to create
+    :return:  
+    if request was valid: response object with status code 200 and the prediction id
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+        ok: {
+            "can_train": False,
+            "required_days": 0,
+            "Accuracy": 0.69,
+            "Threshold": 0.4
+        }
+    """
+    if request.method == 'GET':
+        return ML.can_we_train(areaid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/nestmatics/ml/prediction/validate/area/<areaid>', methods=['POST'])
+def validate_all(areaid=None):
+    """
+    TODO Fix
+    Trigger the creation of a new prediction
+    :param areaid: Id of area from which to create a prediction
+    :param date: date of prediction to create
+    :return:  
+    if request was valid: response object with status code 200 and the prediction id
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+        error message
+        ok: {
+            "can_train": False,
+            "required_days": 0,
+            "Accuracy": 0.69,
+            "Threshold": 0.4
+        }
+    """
+    if request.method == 'POST':
+        return ML.validate_all(areaid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
 
 
 def _build_cors_prelight_response():
@@ -1163,3 +1237,11 @@ def _corsify_actual_response(response):
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+#TODO 
+#  if areaid is None or startdate is None or enddate is None:
+#             return jsonify(Error="URI does not have all parameters needed"), 400

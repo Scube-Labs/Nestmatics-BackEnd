@@ -1,5 +1,5 @@
 import numpy as np
-from utils import haversine, create_blank_image
+from .utils import haversine, create_blank_image
 import datetime
 from datetime import date
 import holidays
@@ -73,8 +73,8 @@ def make_rides_features(data, north_lat, south_lat, east_lon, west_lon, meter_pe
     """
 
     #Calculate matrix size(like an image bitmap)
-    img_x = int(haversine((north_lat, west_lon), (north_lat, east_lon))/meter_per_pixel)
-    img_y = int(haversine((north_lat, west_lon), (south_lat, west_lon))/meter_per_pixel)
+    img_x = round(haversine((north_lat, west_lon), (north_lat, east_lon))/meter_per_pixel)
+    img_y = round(haversine((north_lat, west_lon), (south_lat, west_lon))/meter_per_pixel)
 
     #Create empty matrix
     ride_matrix = np.zeros((img_x, img_y, 24), dtype = np.float)
@@ -134,6 +134,7 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
     #Getting ways and node objects
     ways_raw = []
     nodes_raw = []
+    len(data['elements'])
     for e in data["elements"]:
         if "type" in e:
             if e["type"] == "way":
@@ -147,7 +148,6 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
     ways = {}
     amenities = {}
     buildings = []
-
     for e in ways_raw:
         if "tags" in e:
             if "highway" in e["tags"]:
@@ -259,6 +259,8 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
     #Add buildings to black image
     draw_buildings = ImageDraw.Draw(img_buildings)
     for line in buildings_to_draw:
+        if len(line) < 2:
+            continue
         draw_buildings.polygon(line, fill='white')
     
     for key in amenities_to_draw:
@@ -269,6 +271,13 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
                 draw_amenities.ellipse((element[0][1]-15, element[0][1]-15, element[0][1]+15, element[0][1]+15) ,fill='white', outline='white') # create a 30 m radious circle
             else:
                 draw_amenities.polygon(element, fill='white')
+
+    #Flip fix
+    img_streets = img_streets.transpose(Image.FLIP_LEFT_RIGHT)
+    img_buildings = img_buildings.transpose(Image.FLIP_LEFT_RIGHT)
+
+    for key in amenities_to_draw:
+        img_amenities[key] = img_amenities[key].transpose(Image.FLIP_LEFT_RIGHT)
 
     return img_streets, img_buildings, img_amenities
 
