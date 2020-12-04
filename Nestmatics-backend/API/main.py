@@ -741,7 +741,7 @@ def postServiceArea():
         if 'Error' in response.json:
             return response
         else:
-            data_response = ML.get_terrain_data(response.json['ok']['_id'])# Downloading terrain data in a thread
+            data_response = ML.get_terrain_data(response.json['ok']['_id'])# Downloading terrain data
             if data_response is None:
                 return response
             else:
