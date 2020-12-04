@@ -212,6 +212,10 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
 
     #Divide the amenities by their type
     amenities_to_draw = {}
+    for key in AMENITIES_TYPE:
+        amenities_to_draw[key] = []
+    amenities_to_draw['other'] = []
+
     amenities_to_draw['other'] = [] #Creating default case
     for key in amenities:
         line = []
@@ -234,8 +238,6 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
         # Group by amenity type
         for t in AMENITIES_TYPE:
             if key in AMENITIES_TYPE[t]:
-                if t not in amenities_to_draw:
-                    amenities_to_draw[t] = []
                 amenities_to_draw[t].append(line)
             else:
                 amenities_to_draw['other'].append(line)
@@ -265,6 +267,9 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
     
     for key in amenities_to_draw:
         draw_amenities = ImageDraw.Draw(img_amenities[key])
+
+        if len(amenities_to_draw[key]) == 0: #empty case
+            continue
 
         for element in amenities_to_draw[key][0]:
             if len(element) == 1: #Point

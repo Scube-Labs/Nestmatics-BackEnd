@@ -43,23 +43,23 @@ def predict(area_id, date):
     model_path = service_response.json['ok'][0]['model_file']
     
     #Services area limits
-    service_response = ServiceAreaHandler.getServiceArea(area_id)
-    if "Error" in service_response.json:
+    service_response = ServiceAreaHandler.getServiceArea(area_id).json
+    if "Error" in service_response:
         return service_response # Error getting service area.
-    cords = service_response.json['ok']['coords']['coordinates']
-    max_lat = cords[0][1] #top
-    min_lat = cords[0][1] #bottom
-    max_lon = cords[0][0] #right
-    min_lon = cords[0][0] #left
-    for lon, lat in cords: 
-        if lat > max_lat:
-            max_lat = lat
-        if lat < min_lat:
-            min_lat = lat
-        if lon > max_lon:
-            max_lon = lon
-        if lon < min_lon:
-            min_lon = lon
+    cords = service_response['ok']['coords']['coordinates'] 
+    max_lat = cords[0]['lat'] #top
+    min_lat = cords[0]['lat'] #bottom
+    max_lon = cords[0]['lng'] #right
+    min_lon = cords[0]['lng'] #left
+    for item in cords: 
+        if item['lat'] > max_lat:
+            max_lat = item['lat']
+        if item['lat'] < min_lat:
+            min_lat = item['lat']
+        if item['lng'] > max_lon:
+            max_lon = item['lng']
+        if item['lng'] < min_lon:
+            min_lon = item['lng']
 
     # Getting bitmaps
     service_response = ServiceAreaHandler.getStreets(area_id)
@@ -150,23 +150,23 @@ def train(area_id):
     model_data = service_response.json['ok']
 
     #Services area limits
-    service_response = ServiceAreaHandler.getServiceArea(area_id)
-    if "Error" in service_response.json:
+    service_response = ServiceAreaHandler.getServiceArea(area_id).json
+    if "Error" in service_response:
         return service_response # Error getting service area
-    cords = service_response.json['ok']['coords']['coordinates']
-    max_lat = cords[0][1] #top
-    min_lat = cords[0][1] #bottom
-    max_lon = cords[0][0] #right
-    min_lon = cords[0][0] #left
-    for lon, lat in cords: 
-        if lat > max_lat:
-            max_lat = lat
-        if lat < min_lat:
-            min_lat = lat
-        if lon > max_lon:
-            max_lon = lon
-        if lon < min_lon:
-            min_lon = lon
+    cords = service_response['ok']['coords']['coordinates'] 
+    max_lat = cords[0]['lat'] #top
+    min_lat = cords[0]['lat'] #bottom
+    max_lon = cords[0]['lng'] #right
+    min_lon = cords[0]['lng'] #left
+    for item in cords: 
+        if item['lat'] > max_lat:
+            max_lat = item['lat']
+        if item['lat'] < min_lat:
+            min_lat = item['lat']
+        if item['lng'] > max_lon:
+            max_lon = item['lng']
+        if item['lng'] < min_lon:
+            min_lon = item['lng']
 
     # Getting bitmaps
     service_response = ServiceAreaHandler.getStreets(area_id)
@@ -284,10 +284,15 @@ def train(area_id):
     model = NestmaticModel()
     model.compile(loss=custom_loss_function, optimizer='adam', metrics=['accuracy'])
 
+    #TODO acomodoar
+    log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
+
     model.predict(np.zeros((1,128,128,20))) # Need to make a prediction to instanciate model to load the weights
     model.load_weights(model_data['model_file'])
 
-    history = model.fit(train_sequencer, validation_data=validation_sequencer, epochs=10, shuffle=True).history
+    history = model.fit(train_sequencer, validation_data=validation_sequencer, callbacks=[tensorboard_callback], epochs=10, shuffle=True).history
 
     new_model_path =  ML_DATA_PATH + "models/" + area_id + '-' + datetime.datetime.now().replace(microsecond=0).isoformat() + '.h5'
     new_model_data = {
@@ -315,23 +320,23 @@ def validate(area_id, date):
     model_path = service_response.json['ok']['model_file']
 
     #Services area limits
-    service_response = ServiceAreaHandler.getServiceArea(area_id)
-    if "Error" in service_response.json:
+    service_response = ServiceAreaHandler.getServiceArea(area_id).json
+    if "Error" in service_response:
         return service_response # Error getting service area
-    cords = service_response.json['ok']['coords']['coordinates']
-    max_lat = cords[0][1] #top
-    min_lat = cords[0][1] #bottom
-    max_lon = cords[0][0] #right
-    min_lon = cords[0][0] #left
-    for lon, lat in cords:
-        if lat > max_lat:
-            max_lat = lat
-        if lat < min_lat:
-            min_lat = lat
-        if lon > max_lon:
-            max_lon = lon
-        if lon < min_lon:
-            min_lon = lon
+    cords = service_response['ok']['coords']['coordinates'] 
+    max_lat = cords[0]['lat'] #top
+    min_lat = cords[0]['lat'] #bottom
+    max_lon = cords[0]['lng'] #right
+    min_lon = cords[0]['lng'] #left
+    for item in cords: 
+        if item['lat'] > max_lat:
+            max_lat = item['lat']
+        if item['lat'] < min_lat:
+            min_lat = item['lat']
+        if item['lng'] > max_lon:
+            max_lon = item['lng']
+        if item['lng'] < min_lon:
+            min_lon = item['lng']
 
      # Getting bitmaps
     service_response = ServiceAreaHandler.getStreets(area_id)
@@ -402,7 +407,8 @@ def validate(area_id, date):
 
 
 def get_terrain_data(area_id):
-    
+
+    print("Fetching data...")
     try:
         ML_DATA_PATH = os.environ['ML_DATA_PATH']
     except KeyError:
@@ -433,12 +439,13 @@ def get_terrain_data(area_id):
     res = get_region_data(res, max_lat, min_lat, max_lon, min_lon)
     
     #Creating bitmaps
+    print("Generating bitmaps...")
     street, buildings, amenities = make_terrain_features(res, max_lat, min_lat, min_lon, max_lon)
     
     # Generating directories in case they dont exist.
     if not os.path.isdir(ML_DATA_PATH + "bitmaps/"):
         os.makedirs(ML_DATA_PATH + "bitmaps/")
-
+    print(amenities.keys()) #TODO delete
     #Storing bitmaps
     street.save(ML_DATA_PATH + "bitmaps/" + area_id + '_road.bmp')
     buildings.save(ML_DATA_PATH + "bitmaps/" + area_id + '_building.bmp')

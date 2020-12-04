@@ -1159,7 +1159,7 @@ def getPredictionFeatures(areaid=None, date=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/ml/prediction/area/<areaid>/date/<date>', methods=['POST'])
+@app.route('/nestmatics/ml/generate_prediction/area/<areaid>/date/<date>', methods=['GET'])
 def createPrediction(areaid=None, date=None):
     """
     Trigger the creation of a new prediction
@@ -1170,7 +1170,7 @@ def createPrediction(areaid=None, date=None):
     if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
         error message
     """
-    if request.method == 'POST':
+    if request.method == 'GET':
         return ML.predict(areaid, date)
     else:
         return jsonify(Error="Method not allowed."), 405
@@ -1236,6 +1236,7 @@ def _build_cors_prelight_response():
 def _corsify_actual_response(response):
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
+
 
 
 if __name__ == '__main__':
