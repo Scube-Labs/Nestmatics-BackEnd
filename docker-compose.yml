@@ -43,8 +43,7 @@ services:
       - 27017
     volumes:
       - ./mongo_data:/data/db
-    ports: #Eliminate(this is for fast testing purposes)
-      - "2717:27017"
+
 
   mongo-express:
     image: mongo-express
