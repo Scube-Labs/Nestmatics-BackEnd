@@ -13,13 +13,10 @@ services:
       - DB_PASWD=example
       - DB_HOST=mongo
       - MONGO_PORT=27017
-      - ML_DATA_PATH=/data/ml/
     depends_on:
       - mongo
     expose:
       - 8080
-    volumes:
-    - ./ml_data:/data/ml
 
   nginx:
     build: ./nginx
@@ -37,8 +34,9 @@ services:
     container_name: mongo
     restart: always
     environment:
-      -MONGO_INITDB_ROOT_USERNAME: root
-      -MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: admin
     expose:
       - 27017
     volumes:
