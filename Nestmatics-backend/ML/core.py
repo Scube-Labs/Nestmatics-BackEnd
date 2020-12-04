@@ -22,6 +22,7 @@ from API import ModelHandler, RidesHandler, ServiceAreaHandler
 TIME_PER_REQUEST = 1
 REQUEST_DIVSION = 2
 THRESHOLD = 0.3
+DAYS_FOR_RETRAINING = 30
 
 #TODO update paths for new folder structure
 
@@ -542,21 +543,20 @@ def can_we_train(area_id):
         acc += service_response['error_metric']
 
     if len(new_days) != 0: #Prevent division by 0
-        acc /= len(new_days)
+        acc = -1 #Signal that theres not enought data for this field.
         
     #Calculate missing days for prediction.
-    required_days = 30 - len(new_days)
-    if len(new_days) > 30:
+    required_days = DAYS_FOR_RETRAINING - len(new_days)
+    if len(new_days) > DAYS_FOR_RETRAINING: # No more days required
         required_days = 0
     result = {
         'ok': {
-            "can_train": (acc<THRESHOLD and len(new_days)>=30),
+            "can_train": (acc<THRESHOLD and len(new_days)>=DAYS_FOR_RETRAINING),
             "required_days": required_days,
             "Accuracy": acc,
             "Threshold": THRESHOLD
         }
     }
-    #TODO -1 case
     return result 
 
 
