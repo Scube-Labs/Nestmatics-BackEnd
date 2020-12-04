@@ -403,19 +403,19 @@ def get_terrain_data(area_id):
         return service_response #Error obtaining the service area.
 
     cords = service_response['ok']['coords']['coordinates'] 
-    max_lat = cords[0][1] #top
-    min_lat = cords[0][1] #bottom
-    max_lon = cords[0][0] #right
-    min_lon = cords[0][0] #left
-    for lon, lat in cords: 
-        if lat > max_lat:
-            max_lat = lat
-        if lat < min_lat:
-            min_lat = lat
-        if lon > max_lon:
-            max_lon = lon
-        if lon < min_lon:
-            min_lon = lon
+    max_lat = cords[0]['lat'] #top
+    min_lat = cords[0]['lat'] #bottom
+    max_lon = cords[0]['lng'] #right
+    min_lon = cords[0]['lng'] #left
+    for item in cords: 
+        if item['lat'] > max_lat:
+            max_lat = item['lat']
+        if item['lat'] < min_lat:
+            min_lat = item['lat']
+        if item['lng'] > max_lon:
+            max_lon = item['lng']
+        if item['lng'] < min_lon:
+            min_lon = item['lng']
 
     # Fetching data
     res = {'elements': None}
@@ -544,7 +544,7 @@ def can_we_train(area_id):
     }
     #TODO -1 case
     return result 
-
+#TODO make dirs automaticaly
 
 # UTILS
 def clean_ride_data(rides_json):

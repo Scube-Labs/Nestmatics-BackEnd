@@ -13,10 +13,13 @@ services:
       - DB_PASWD=example
       - DB_HOST=mongo
       - MONGO_PORT=27017
+      - ML_DATA_PATH=/data/ml/
     depends_on:
       - mongo
     expose:
       - 8080
+    volumes:
+    - ./ml_data:/data/ml
 
   nginx:
     build: ./nginx
