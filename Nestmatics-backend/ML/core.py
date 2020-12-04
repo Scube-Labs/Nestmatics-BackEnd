@@ -108,10 +108,11 @@ def predict(area_id, date):
         for ix in range(0, int(x.shape[0]/128)):
             for iy in range(0, int(x.shape[1]/128)):
                 x_slice = x[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :]
+                if x_slice.shape != (128,128,24): #Not enought pixels in the border
+                    continue
                 res[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :] = model.predict(x_slice.reshape((1,128,128,20)))
 
-        #Fixed the fliping cause by numpy 
-        res = np.rot90(res, k=3)
+
 
         prediction = {
             "model_id": ModelHandler.getMostRecentModel(area_id).json['ok']['_id'],
