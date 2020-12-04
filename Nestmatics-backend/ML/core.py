@@ -207,6 +207,16 @@ def train(area_id):
                     print("here")
                     new_days.append(line[0])
     
+    # Generating directories in case they dont exist.
+    if not os.path.isdir(ML_DATA_PATH + "sets/"):
+        os.makedirs(ML_DATA_PATH + "sets/")
+    
+    if not os.path.isdir(ML_DATA_PATH + "matrices/"):
+        os.makedirs(ML_DATA_PATH + "matrices/")
+
+    if not os.path.isdir(ML_DATA_PATH + "models/"):
+        os.makedirs(ML_DATA_PATH + "models/")
+
     # Updating training data (this is to keep track of days that have been trained)
     with open(ML_DATA_PATH + "sets/" + area_id + ".csv", 'a') as f:
         writer = csv.writer(f)
@@ -424,6 +434,10 @@ def get_terrain_data(area_id):
     #Creating bitmaps
     street, buildings, amenities = make_terrain_features(res, max_lat, min_lat, min_lon, max_lon)
     
+    # Generating directories in case they dont exist.
+    if not os.path.isdir(ML_DATA_PATH + "bitmaps/"):
+        os.makedirs(ML_DATA_PATH + "bitmaps/")
+
     #Storing bitmaps
     street.save(ML_DATA_PATH + "bitmaps/" + area_id + '_road.bmp')
     buildings.save(ML_DATA_PATH + "bitmaps/" + area_id + '_building.bmp')
@@ -544,7 +558,7 @@ def can_we_train(area_id):
     }
     #TODO -1 case
     return result 
-#TODO make dirs automaticaly
+
 
 # UTILS
 def clean_ride_data(rides_json):
