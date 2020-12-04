@@ -21,7 +21,8 @@ from API import ModelHandler, RidesHandler, ServiceAreaHandler
 
 TIME_PER_REQUEST = 1
 REQUEST_DIVSION = 2
-THRESHOLD = 0.3
+RETRAINING_THRESHOLD = 0.3
+OUTPUT_THRESHOLD = 0.01
 DAYS_FOR_RETRAINING = 30
 
 
@@ -89,7 +90,7 @@ def predict(area_id, date):
         days_before_rides = []
         for days_before in range(1, 8):
             past_day = datetime.datetime.strptime(date, '%Y-%m-%d').date() - timedelta(days=days_before)
-            rides_of_past_day = RidesHandler.getRidesCoordsForDateAndArea(past_day, area_id).json
+            rides_of_past_day = RidesHandler.getRidesCoordsForDateAndArea(str(past_day), area_id).json
             if "Error" in rides_of_past_day: 
                 days_before_rides.append(None)
             else:
@@ -97,21 +98,20 @@ def predict(area_id, date):
 
         #Preparing input
         x, _ = create_input_output_matrix(date, road_bitmap, building_bitmap, amenities, None, days_before_rides, max_lat, min_lat, min_lon, max_lon)
-        
         #Preparing model
         model = NestmaticModel()
         model.compile(loss=custom_loss_function, optimizer='adam', metrics=['accuracy'])
         model.predict(np.zeros((1,128,128,20))) # Need to make a prediction to instanciate model to load the weights
         model.load_weights(model_path)
-
         # Subdivide and combine results in one matrix.
-        res = np.zeros(shape=(x.shape[0], x.shape[1], 24))
+        res = np.zeros(shape=(x.shape[1], x.shape[0], 24))
         for ix in range(0, int(x.shape[0]/128)):
             for iy in range(0, int(x.shape[1]/128)):
                 x_slice = x[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :]
                 res[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :] = model.predict(x_slice.reshape((1,128,128,20)))
 
-        res = np.rot90(res) 
+        #Fixed the fliping cause by numpy 
+        res = np.rot90(res, k=3)
 
         prediction = {
             "model_id": ModelHandler.getMostRecentModel(area_id).json['ok']['_id'],
@@ -206,7 +206,6 @@ def train(area_id):
             with open(ML_DATA_PATH + "sets/" + area_id + ".csv", 'r') as f: 
                 for line in f.read().splitlines():
                     if line not in service_response['ok']:
-                        print("here")
                         new_days.append(line[0])
         
         # Generating directories in case they dont exist.
@@ -450,7 +449,6 @@ def get_terrain_data(area_id):
         # Generating directories in case they dont exist.
         if not os.path.isdir(ML_DATA_PATH + "bitmaps/"):
             os.makedirs(ML_DATA_PATH + "bitmaps/")
-        print(amenities.keys()) #TODO delete
         #Storing bitmaps
         street.save(ML_DATA_PATH + "bitmaps/" + area_id + '_road.bmp')
         buildings.save(ML_DATA_PATH + "bitmaps/" + area_id + '_building.bmp')
@@ -503,7 +501,6 @@ def get_terrain_data(area_id):
             return {"Error":str(e)}
 
 
-
 def validate_all(area_id):
     try:
         service_response = RidesHandler.getDistinctRideDatesForArea(areaid=area_id).json
@@ -537,9 +534,9 @@ def can_we_train(area_id):
         model_data = service_response.json['ok']
 
         # Getting days
-        service_response = RidesHandler.getDistinctRideDatesForArea(areaid=area_id).json
+        service_response = RidesHandler.getDistinctRideDatesForArea(areaid=area_id).json #TODO fix
         if "ok" not in service_response:
-            return service_response # Error obtaining the days.
+            return service_response # Error obtaining the days. #TODO manage error
         
         # Count how many new days have been added since last training.
         new_days = []
@@ -552,7 +549,7 @@ def can_we_train(area_id):
         for day in new_days:
             service_response = ModelHandler.getPredictionForDate(area_id, day).json
             if "ok" not in service_response:
-                return service_response # Error obtaining the days.
+                return service_response # Error obtaining the days.#TODO
             if service_response['error_metric'] == -1.0:
                 continue
             acc += service_response['error_metric']
@@ -566,15 +563,18 @@ def can_we_train(area_id):
             required_days = 0
         result = {
             'ok': {
-                "can_train": (acc<THRESHOLD and len(new_days)>=DAYS_FOR_RETRAINING),
+                "can_train": (acc<RETRAINING_THRESHOLD and len(new_days)>=DAYS_FOR_RETRAINING),
                 "required_days": required_days,
                 "Accuracy": acc,
-                "Threshold": THRESHOLD
+                "Threshold": RETRAINING_THRESHOLD
             }
         }
         return result 
     except Exception as e:
             return {"Error":str(e)}
+
+#TODO
+# def training_scheduler():
 
 # UTILS
 def clean_ride_data(rides_json):
@@ -590,7 +590,7 @@ def matrix_to_json(arr, top, left, meter_pixel_ratio=5):
     res = {}
     for hour in range(0, 24):
         res[str(hour)] = []
-        rides_of_hour = np.argwhere(arr[:,:,hour]>0)
+        rides_of_hour = np.argwhere(arr[:,:,hour]>OUTPUT_THRESHOLD)
         for i in range(0,len(rides_of_hour)):
             lat = top - ((rides_of_hour[i][1]*meter_pixel_ratio)/6372800) * (180/3.14159265358979323846)
             lon = left - ((rides_of_hour[i][0]*meter_pixel_ratio)/6372800) * (180/3.14159265358979323846)

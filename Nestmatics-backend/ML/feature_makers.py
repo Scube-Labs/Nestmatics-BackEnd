@@ -81,8 +81,8 @@ def make_rides_features(data, north_lat, south_lat, east_lon, west_lon, meter_pe
     
     #Populate matrix
     for ride in data:
-        x = int(haversine((north_lat, west_lon), (north_lat, ride[1]))/meter_per_pixel)
-        y = int(haversine((north_lat, west_lon), (ride[0], west_lon))/meter_per_pixel)
+        x = int(haversine((north_lat, west_lon), (north_lat, ride[0]))/meter_per_pixel)
+        y = int(haversine((north_lat, west_lon), (ride[1], west_lon))/meter_per_pixel)
         try: 
             ride_matrix[x][y][ride[2]] += 1
         except:
@@ -276,13 +276,6 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
                 draw_amenities.ellipse((element[0][1]-15, element[0][1]-15, element[0][1]+15, element[0][1]+15) ,fill='white', outline='white') # create a 30 m radious circle
             else:
                 draw_amenities.polygon(element, fill='white')
-
-    #Flip fix
-    img_streets = img_streets.transpose(Image.FLIP_LEFT_RIGHT)
-    img_buildings = img_buildings.transpose(Image.FLIP_LEFT_RIGHT)
-
-    for key in amenities_to_draw:
-        img_amenities[key] = img_amenities[key].transpose(Image.FLIP_LEFT_RIGHT)
 
     return img_streets, img_buildings, img_amenities
 
