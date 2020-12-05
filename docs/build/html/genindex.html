@@ -203,8 +203,6 @@
 </li>
       <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.createAmenitiesTable">createAmenitiesTable() (in module DB_Dummydata.DBDummyData)</a>
 </li>
-      <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.createBirdAppActTable">createBirdAppActTable() (in module DB_Dummydata.DBDummyData)</a>
-</li>
       <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.createBuildingsTable">createBuildingsTable() (in module DB_Dummydata.DBDummyData)</a>
 </li>
       <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.createDropStrategyTable">createDropStrategyTable() (in module DB_Dummydata.DBDummyData)</a>
@@ -219,11 +217,9 @@
 </li>
       <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.createNestsTable">createNestsTable() (in module DB_Dummydata.DBDummyData)</a>
 </li>
+      <li><a href="API.html#API.main.createPrediction">createPrediction() (in module API.main)</a>
+</li>
       <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.createPredictionTable">createPredictionTable() (in module DB_Dummydata.DBDummyData)</a>
-</li>
-      <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.createRideStats">createRideStats() (in module DB_Dummydata.DBDummyData)</a>
-</li>
-      <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.createRideTable">createRideTable() (in module DB_Dummydata.DBDummyData)</a>
 </li>
       <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.createServiceAreaTable">createServiceAreaTable() (in module DB_Dummydata.DBDummyData)</a>
 </li>
@@ -372,11 +368,7 @@
 </li>
       </ul></li>
       <li><a href="DAOs.html#DAOs.NestsDao.NestsDao.deleteNestByArea">deleteNestByArea() (DAOs.NestsDao.NestsDao method)</a>
-
-      <ul>
-        <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.deleteNestByArea">(Handlers.NestsHandler.NestsHandler method)</a>
 </li>
-      </ul></li>
       <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.deleteNestByID">deleteNestByID() (Handlers.NestsHandler.NestsHandler method)</a>
 </li>
       <li><a href="DAOs.html#DAOs.NestsDao.NestsDao.deleteNestByUserID">deleteNestByUserID() (DAOs.NestsDao.NestsDao method)</a>
@@ -387,6 +379,8 @@
         <li><a href="API.html#API.main.deleteNestConfiguration">(in module API.main)</a>
 </li>
       </ul></li>
+      <li><a href="DAOs.html#DAOs.NestsDao.NestsDao.deleteNestConfigurationByDate">deleteNestConfigurationByDate() (DAOs.NestsDao.NestsDao method)</a>
+</li>
       <li><a href="DAOs.html#DAOs.NestsDao.NestsDao.deleteNestConfigurationByID">deleteNestConfigurationByID() (DAOs.NestsDao.NestsDao method)</a>
 </li>
       <li><a href="DAOs.html#DAOs.NestsDao.NestsDao.deleteNestConfigurationByNestID">deleteNestConfigurationByNestID() (DAOs.NestsDao.NestsDao method)</a>
@@ -463,6 +457,16 @@
         <li><a href="API.html#API.main.editDropStrategy">(in module API.main)</a>
 </li>
       </ul></li>
+      <li><a href="DAOs.html#DAOs.DropStrategyDao.DropStrategyDao.editDropStrategyName">editDropStrategyName() (DAOs.DropStrategyDao.DropStrategyDao method)</a>
+
+      <ul>
+        <li><a href="Handlers.html#Handlers.DropStrategyHandler.DropStrategyHandler.editDropStrategyName">(Handlers.DropStrategyHandler.DropStrategyHandler method)</a>
+</li>
+        <li><a href="API.html#API.main.editDropStrategyName">(in module API.main)</a>
+</li>
+      </ul></li>
+      <li><a href="API.html#API.main.editDropStrategyVehicles">editDropStrategyVehicles() (in module API.main)</a>
+</li>
       <li><a href="DAOs.html#DAOs.ExperimentsDao.ExperimentsDao.editExperiment">editExperiment() (DAOs.ExperimentsDao.ExperimentsDao method)</a>
 
       <ul>
@@ -503,9 +507,19 @@
         <li><a href="Handlers.html#Handlers.ServiceAreaHandler.ServiceAreaHandler.editServiceAreaName">(Handlers.ServiceAreaHandler.ServiceAreaHandler method)</a>
 </li>
       </ul></li>
+      <li><a href="DAOs.html#DAOs.DropStrategyDao.DropStrategyDao.editTotalVehiclesForDrop">editTotalVehiclesForDrop() (DAOs.DropStrategyDao.DropStrategyDao method)</a>
+</li>
+      <li><a href="Handlers.html#Handlers.DropStrategyHandler.DropStrategyHandler.editVehiclesInDrop">editVehiclesInDrop() (Handlers.DropStrategyHandler.DropStrategyHandler method)</a>
+</li>
+      <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.emptyNestsForDate">emptyNestsForDate() (Handlers.NestsHandler.NestsHandler method)</a>
+</li>
+      <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.emptyTimesForANest">emptyTimesForANest() (Handlers.NestsHandler.NestsHandler method)</a>
+</li>
       <li><a href="DAOs.html#DAOs.ExperimentsDao.ExperimentsDao">ExperimentsDao (class in DAOs.ExperimentsDao)</a>
 </li>
       <li><a href="Handlers.html#Handlers.ExperimentsHandler.ExperimentsHandler">ExperimentsHandler (class in Handlers.ExperimentsHandler)</a>
+</li>
+      <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.extern_deleteNestByArea">extern_deleteNestByArea() (Handlers.NestsHandler.NestsHandler method)</a>
 </li>
       <li><a href="Handlers.html#Handlers.RidesHandler.RidesHandler.extern_getRidesForDateIntervalAndArea">extern_getRidesForDateIntervalAndArea() (Handlers.RidesHandler.RidesHandler method)</a>
 </li>
@@ -517,8 +531,6 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.findConfigurationsOnDateRange">findConfigurationsOnDateRange() (in module DB_Dummydata.DBDummyData)</a>
-</li>
       <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.findNest">findNest() (Handlers.NestsHandler.NestsHandler method)</a>
 </li>
       <li><a href="DAOs.html#DAOs.NestsDao.NestsDao.findNestByCoords">findNestByCoords() (DAOs.NestsDao.NestsDao method)</a>
@@ -589,7 +601,15 @@
       </ul></li>
       <li><a href="Handlers.html#Handlers.ExperimentsHandler.ExperimentsHandler.getConfigCalculationsForReport">getConfigCalculationsForReport() (Handlers.ExperimentsHandler.ExperimentsHandler method)</a>
 </li>
+      <li><a href="DAOs.html#DAOs.RidesDao.RidesDAO.getDatesOfRides">getDatesOfRides() (DAOs.RidesDao.RidesDAO method)</a>
+</li>
+      <li><a href="DAOs.html#DAOs.RidesDao.RidesDAO.getDatesOfRidesForInterval">getDatesOfRidesForInterval() (DAOs.RidesDao.RidesDAO method)</a>
+</li>
       <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.getDB">getDB() (in module DB_Dummydata.DBDummyData)</a>
+</li>
+      <li><a href="Handlers.html#Handlers.RidesHandler.RidesHandler.getDistinctRideDatesForArea">getDistinctRideDatesForArea() (Handlers.RidesHandler.RidesHandler method)</a>
+</li>
+      <li><a href="Handlers.html#Handlers.RidesHandler.RidesHandler.getDistinctRideDatesForAreaAndInterval">getDistinctRideDatesForAreaAndInterval() (Handlers.RidesHandler.RidesHandler method)</a>
 </li>
       <li><a href="DAOs.html#DAOs.DropStrategyDao.DropStrategyDao.getDropStrategiesForArea">getDropStrategiesForArea() (DAOs.DropStrategyDao.DropStrategyDao method)</a>
 
@@ -615,6 +635,10 @@
       </ul></li>
       <li><a href="API.html#API.main.getDropStrategyFromID">getDropStrategyFromID() (in module API.main)</a>
 </li>
+      <li><a href="API.html#API.main.getEmptyNestsForDate">getEmptyNestsForDate() (in module API.main)</a>
+</li>
+      <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.getEmptyNestTimesForDate">getEmptyNestTimesForDate() (Handlers.NestsHandler.NestsHandler method)</a>
+</li>
       <li><a href="DAOs.html#DAOs.ModelDao.ModelDao.getErrorMetricForPredictions">getErrorMetricForPredictions() (DAOs.ModelDao.ModelDao method)</a>
 </li>
       <li><a href="DAOs.html#DAOs.ExperimentsDao.ExperimentsDao.getExperimentForConfigurations">getExperimentForConfigurations() (DAOs.ExperimentsDao.ExperimentsDao method)</a>
@@ -637,6 +661,14 @@
 </li>
       <li><a href="Handlers.html#Handlers.ExperimentsHandler.ExperimentsHandler.getExperimentsOfNest">getExperimentsOfNest() (Handlers.ExperimentsHandler.ExperimentsHandler method)</a>
 </li>
+      <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.getInfoForNestConfigStats">getInfoForNestConfigStats() (Handlers.NestsHandler.NestsHandler method)</a>
+</li>
+      <li><a href="Handlers.html#Handlers.DropStrategyHandler.DropStrategyHandler.getLatestDropStrategyFromDate">getLatestDropStrategyFromDate() (Handlers.DropStrategyHandler.DropStrategyHandler method)</a>
+
+      <ul>
+        <li><a href="API.html#API.main.getLatestDropStrategyFromDate">(in module API.main)</a>
+</li>
+      </ul></li>
       <li><a href="DAOs.html#DAOs.ModelDao.ModelDao.getModelByArea">getModelByArea() (DAOs.ModelDao.ModelDao method)</a>
 </li>
       <li><a href="DAOs.html#DAOs.ModelDao.ModelDao.getModelByID">getModelByID() (DAOs.ModelDao.ModelDao method)</a>
@@ -661,6 +693,8 @@
         <li><a href="API.html#API.main.getMostRecentDropStrategy">(in module API.main)</a>
 </li>
       </ul></li>
+      <li><a href="DAOs.html#DAOs.DropStrategyDao.DropStrategyDao.getMostRecentDropStrategyFromDate">getMostRecentDropStrategyFromDate() (DAOs.DropStrategyDao.DropStrategyDao method)</a>
+</li>
       <li><a href="Handlers.html#Handlers.ModelHandler.ModelHandler.getMostRecentModel">getMostRecentModel() (Handlers.ModelHandler.ModelHandler method)</a>
 
       <ul>
@@ -679,9 +713,15 @@
 </li>
       <li><a href="DAOs.html#DAOs.NestsDao.NestsDao.getNestConfiguration">getNestConfiguration() (DAOs.NestsDao.NestsDao method)</a>
 </li>
+      <li><a href="DAOs.html#DAOs.NestsDao.NestsDao.getNestConfigurationForDate">getNestConfigurationForDate() (DAOs.NestsDao.NestsDao method)</a>
+</li>
+      <li><a href="DAOs.html#DAOs.NestsDao.NestsDao.getNestConfigurationFromDateInterval">getNestConfigurationFromDateInterval() (DAOs.NestsDao.NestsDao method)</a>
+</li>
       <li><a href="DAOs.html#DAOs.NestsDao.NestsDao.getNestConfigurationFromID">getNestConfigurationFromID() (DAOs.NestsDao.NestsDao method)</a>
 </li>
       <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.getNestConfigurationFromId">getNestConfigurationFromId() (Handlers.NestsHandler.NestsHandler method)</a>
+</li>
+      <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.getNestConfigurationInfoForDay">getNestConfigurationInfoForDay() (Handlers.NestsHandler.NestsHandler method)</a>
 </li>
       <li><a href="DAOs.html#DAOs.NestsDao.NestsDao.getNestConfigurationsForNest">getNestConfigurationsForNest() (DAOs.NestsDao.NestsDao method)</a>
 
@@ -693,23 +733,27 @@
 </li>
       <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.getNestConfigurationStatsForADay">getNestConfigurationStatsForADay() (Handlers.NestsHandler.NestsHandler method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.getNestID">getNestID() (in module DB_Dummydata.DBDummyData)</a>
 </li>
       <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.getNestNames">getNestNames() (Handlers.NestsHandler.NestsHandler method)</a>
 </li>
       <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.getNestsByServiceAreaId">getNestsByServiceAreaId() (Handlers.NestsHandler.NestsHandler method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#API.main.getNestsForDate">getNestsForDate() (in module API.main)</a>
+</li>
       <li><a href="API.html#API.main.getNestsName">getNestsName() (in module API.main)</a>
 </li>
       <li><a href="DAOs.html#DAOs.NestsDao.NestsDao.getNestsNamesFromArea">getNestsNamesFromArea() (DAOs.NestsDao.NestsDao method)</a>
 </li>
-      <li><a href="API.html#API.main.getNestsOnArea">getNestsOnArea() (in module API.main)</a>
+      <li><a href="API.html#API.main.getNestsOnAreaByUser">getNestsOnAreaByUser() (in module API.main)</a>
 </li>
       <li><a href="API.html#API.main.getNestStatsForATimeInterval">getNestStatsForATimeInterval() (in module API.main)</a>
 </li>
       <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.getNestStatsForTimeInterval">getNestStatsForTimeInterval() (Handlers.NestsHandler.NestsHandler method)</a>
+</li>
+      <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.getNestStatsPerHour">getNestStatsPerHour() (Handlers.NestsHandler.NestsHandler method)</a>
 </li>
       <li><a href="Handlers.html#Handlers.ModelHandler.ModelHandler.getPrediction">getPrediction() (Handlers.ModelHandler.ModelHandler method)</a>
 </li>
@@ -735,12 +779,14 @@
         <li><a href="API.html#API.main.getPredictionForDate">(in module API.main)</a>
 </li>
       </ul></li>
-      <li><a href="Handlers.html#Handlers.ExperimentsHandler.ExperimentsHandler.getReportForExperiment">getReportForExperiment() (Handlers.ExperimentsHandler.ExperimentsHandler method)</a>
-
-      <ul>
-        <li><a href="API.html#API.main.getReportForExperiment">(in module API.main)</a>
+      <li><a href="API.html#API.main.getReportForExperiment">getReportForExperiment() (in module API.main)</a>
 </li>
-      </ul></li>
+      <li><a href="API.html#API.main.getRequierments">getRequierments() (in module API.main)</a>
+</li>
+      <li><a href="API.html#API.main.getrideDatesForArea">getrideDatesForArea() (in module API.main)</a>
+</li>
+      <li><a href="API.html#API.main.getrideDatesForAreaAndInterval">getrideDatesForAreaAndInterval() (in module API.main)</a>
+</li>
       <li><a href="API.html#API.main.getRidesCoordinates">getRidesCoordinates() (in module API.main)</a>
 </li>
       <li><a href="DAOs.html#DAOs.RidesDao.RidesDAO.getRidesCoordsForDateAndArea">getRidesCoordsForDateAndArea() (DAOs.RidesDao.RidesDAO method)</a>
@@ -834,6 +880,10 @@
 </li>
       </ul></li>
       <li><a href="DAOs.html#DAOs.RideStatsDao.RideStatsDao.getTotalRideTime">getTotalRideTime() (DAOs.RideStatsDao.RideStatsDao method)</a>
+</li>
+      <li><a href="API.html#API.main.getUnusedVehiclesForNest">getUnusedVehiclesForNest() (in module API.main)</a>
+</li>
+      <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.getUnusuedVehiclesForDate">getUnusuedVehiclesForDate() (Handlers.NestsHandler.NestsHandler method)</a>
 </li>
       <li><a href="Handlers.html#Handlers.UsersHandler.UsersHandler.getUser">getUser() (Handlers.UsersHandler.UsersHandler method)</a>
 
@@ -967,6 +1017,8 @@
         <li><a href="Handlers.html#Handlers.DropStrategyHandler.DropStrategyHandler.insertDropStrategy">(Handlers.DropStrategyHandler.DropStrategyHandler method)</a>
 </li>
       </ul></li>
+      <li><a href="API.html#API.main.insertDummyData">insertDummyData() (in module API.main)</a>
+</li>
       <li><a href="DAOs.html#DAOs.ExperimentsDao.ExperimentsDao.insertExperiment">insertExperiment() (DAOs.ExperimentsDao.ExperimentsDao method)</a>
 
       <ul>
@@ -990,7 +1042,11 @@
       <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.insertNests">insertNests() (Handlers.NestsHandler.NestsHandler method)</a>
 </li>
       <li><a href="DAOs.html#DAOs.ParentDao.ParentDao.insertOne">insertOne() (DAOs.ParentDao.ParentDao method)</a>
+
+      <ul>
+        <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.insertOne">(in module DB_Dummydata.DBDummyData)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="DAOs.html#DAOs.ModelDao.ModelDao.insertPrediction">insertPrediction() (DAOs.ModelDao.ModelDao method)</a>
@@ -1002,7 +1058,11 @@
       <li><a href="DAOs.html#DAOs.RidesDao.RidesDAO.insertRide">insertRide() (DAOs.RidesDao.RidesDAO method)</a>
 </li>
       <li><a href="Handlers.html#Handlers.RidesHandler.RidesHandler.insertRides">insertRides() (Handlers.RidesHandler.RidesHandler method)</a>
+
+      <ul>
+        <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.insertRides">(in module DB_Dummydata.DBDummyData)</a>
 </li>
+      </ul></li>
       <li><a href="DAOs.html#DAOs.ServiceAreaDao.ServiceAreaDao.insertServiceArea">insertServiceArea() (DAOs.ServiceAreaDao.ServiceAreaDao method)</a>
 
       <ul>
@@ -1021,6 +1081,8 @@
         <li><a href="Handlers.html#Handlers.ServiceAreaHandler.ServiceAreaHandler.insertStreetData">(Handlers.ServiceAreaHandler.ServiceAreaHandler method)</a>
 </li>
       </ul></li>
+      <li><a href="DAOs.html#DAOs.NestsDao.NestsDao.insertTests">insertTests() (DAOs.NestsDao.NestsDao method)</a>
+</li>
       <li><a href="DAOs.html#DAOs.UsersDao.UsersDao.insertUser">insertUser() (DAOs.UsersDao.UsersDao method)</a>
 </li>
       <li><a href="Handlers.html#Handlers.UsersHandler.UsersHandler.insertuser">insertuser() (Handlers.UsersHandler.UsersHandler method)</a>
@@ -1166,8 +1228,12 @@
 </li>
       <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.random_hour">random_hour() (in module DB_Dummydata.DBDummyData)</a>
 </li>
-      <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.random_value">random_value() (in module DB_Dummydata.DBDummyData)</a>
+      <li><a href="DAOs.html#DAOs.NestsDao.NestsDao.random_value">random_value() (DAOs.NestsDao.NestsDao method)</a>
+
+      <ul>
+        <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.random_value">(in module DB_Dummydata.DBDummyData)</a>
 </li>
+      </ul></li>
       <li><a href="DAOs.html#DAOs.ParentDao.ParentDao.returnMany">returnMany() (DAOs.ParentDao.ParentDao method)</a>
 </li>
   </ul></td>
@@ -1205,9 +1271,11 @@
 </li>
       <li><a href="Handlers.html#Handlers.ServiceAreaHandler.ServiceAreaHandler.setModelHandler">setModelHandler() (Handlers.ServiceAreaHandler.ServiceAreaHandler method)</a>
 </li>
-      <li><a href="Handlers.html#Handlers.ExperimentsHandler.ExperimentsHandler.setNestHandler">setNestHandler() (Handlers.ExperimentsHandler.ExperimentsHandler method)</a>
+      <li><a href="Handlers.html#Handlers.DropStrategyHandler.DropStrategyHandler.setNestHandler">setNestHandler() (Handlers.DropStrategyHandler.DropStrategyHandler method)</a>
 
       <ul>
+        <li><a href="Handlers.html#Handlers.ExperimentsHandler.ExperimentsHandler.setNestHandler">(Handlers.ExperimentsHandler.ExperimentsHandler method)</a>
+</li>
         <li><a href="Handlers.html#Handlers.RidesHandler.RidesHandler.setNestHandler">(Handlers.RidesHandler.RidesHandler method)</a>
 </li>
         <li><a href="Handlers.html#Handlers.ServiceAreaHandler.ServiceAreaHandler.setNestHandler">(Handlers.ServiceAreaHandler.ServiceAreaHandler method)</a>
@@ -1279,10 +1347,10 @@
 </li>
       <li><a href="Tests.html#Tests.ModelsTests.MyTestCase.test_missingFieldPrediction">test_missingFieldPrediction() (Tests.ModelsTests.MyTestCase method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Tests.html#Tests.ServiceAreaTests.MyTestCase.test_MissingKeyExceptionBuildingsData">test_MissingKeyExceptionBuildingsData() (Tests.ServiceAreaTests.MyTestCase method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="Tests.html#Tests.ServiceAreaTests.MyTestCase.test_MissingKeyExceptionWeatherData">test_MissingKeyExceptionWeatherData() (Tests.ServiceAreaTests.MyTestCase method)</a>
 </li>
       <li><a href="Tests.html#Tests.ServiceAreaTests.MyTestCase.test_MissingKeyInsertBuildingsData">test_MissingKeyInsertBuildingsData() (Tests.ServiceAreaTests.MyTestCase method)</a>
@@ -1296,8 +1364,6 @@
       <li><a href="Tests.html#Tests.ServiceAreaTests.MyTestCase.test_RepeatedDayInsertWeatherData">test_RepeatedDayInsertWeatherData() (Tests.ServiceAreaTests.MyTestCase method)</a>
 </li>
       <li><a href="Tests.html#Tests.ModelsTests.MyTestCase.test_wrongFieldTypePrediction">test_wrongFieldTypePrediction() (Tests.ModelsTests.MyTestCase method)</a>
-</li>
-      <li><a href="Handlers.html#Handlers.RidesHandler.RidesHandler.testCSV">testCSV() (Handlers.RidesHandler.RidesHandler method)</a>
 </li>
       <li>
     Tests
@@ -1320,22 +1386,30 @@
         <li><a href="Tests.html#module-Tests.ServiceAreaTests">module</a>
 </li>
       </ul></li>
-      <li><a href="DAOs.html#DAOs.ParentDao.ParentDao.toIsoFormat">toIsoFormat() (DAOs.ParentDao.ParentDao method)</a>
+      <li><a href="API.html#API.main.timedtrainModel">timedtrainModel() (in module API.main)</a>
+</li>
+      <li><a href="Handlers.html#Handlers.ParentHandler.ParentHandler.toIsoFormat">toIsoFormat() (Handlers.ParentHandler.ParentHandler method)</a>
 
       <ul>
-        <li><a href="Handlers.html#Handlers.ParentHandler.ParentHandler.toIsoFormat">(Handlers.ParentHandler.ParentHandler method)</a>
+        <li><a href="DB_Dummydata.html#DB_Dummydata.DBDummyData.toIsoFormat">(in module DB_Dummydata.DBDummyData)</a>
 </li>
       </ul></li>
+      <li><a href="API.html#API.main.trainModel">trainModel() (in module API.main)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="DAOs.html#DAOs.UsersDao.UsersDao">UsersDao (class in DAOs.UsersDao)</a>
+      <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.unusedAndEmptyVehiclesForADay">unusedAndEmptyVehiclesForADay() (Handlers.NestsHandler.NestsHandler method)</a>
+</li>
+      <li><a href="Handlers.html#Handlers.NestsHandler.NestsHandler.unusedVehicles">unusedVehicles() (Handlers.NestsHandler.NestsHandler method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="DAOs.html#DAOs.UsersDao.UsersDao">UsersDao (class in DAOs.UsersDao)</a>
+</li>
       <li><a href="Handlers.html#Handlers.UsersHandler.UsersHandler">UsersHandler (class in Handlers.UsersHandler)</a>
 </li>
   </ul></td>
@@ -1344,6 +1418,8 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="API.html#API.main.validate_all">validate_all() (in module API.main)</a>
+</li>
       <li><a href="Handlers.html#Handlers.ParentHandler.ParentHandler.verifyIDString">verifyIDString() (Handlers.ParentHandler.ParentHandler method)</a>
 </li>
       <li><a href="Handlers.html#Handlers.ParentHandler.ParentHandler.verifyInnerDict">verifyInnerDict() (Handlers.ParentHandler.ParentHandler method)</a>
@@ -1372,7 +1448,7 @@
   <div role="contentinfo">
     <p>
         
-        &copy; Copyright 2020, Sofia Saavedra
+        &copy; Copyright 2020, Scube Labs
 
     </p>
   </div>

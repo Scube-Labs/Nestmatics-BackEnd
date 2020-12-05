@@ -1,11 +1,13 @@
 from flask import jsonify, request, make_response, Flask
 from flask_cors import CORS
 import sys
-sys.path.append('../')
+
 from API import RidesHandler, NestsHandler, \
     ServiceAreaHandler, UsersHandler, RideStatsHandler, ModelHandler, ExperimentsHandler, DropStrategyHandler
 from werkzeug.utils import secure_filename
 import ML
+
+sys.path.append('../')
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -14,14 +16,21 @@ app.config["DEBUG"] = True
 # Apply CORS to this app
 CORS(app)
 
+# route prefix for nginx
+routeVar = '/api'
 
-@app.route('/', methods=['GET'])
+
+@app.route(routeVar+'/', methods=['GET'])
 def home():
+    """Dummy Route to verify of server is up and able to connect to the backend
+
+    :return: string with message which confirms connection
+    :rtype: string
+    """
     return "This is the Nestmatics API"
     
 
-
-@app.route('/nestmatics/db/insertDummydata', methods=['GET', 'OPTIONS'])
+@app.route(routeVar+'/nestmatics/db/insertDummydata', methods=['GET', 'OPTIONS'])
 def insertDummyData():
     import DB_Dummydata.DBDummyData
     if request.method == 'OPTIONS':
@@ -37,13 +46,13 @@ def insertDummyData():
 # ------------------------ Rides API routes -----------------------------------------#
 
 
-@app.route('/nestmatics/rides/area/<areaid>/date/<date>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/rides/area/<areaid>/date/<date>', methods=['GET'])
 def getRidesForDateAndArea(areaid=None, date=None):
-    """
-    Route to get coordinates of rides for a specified area on a specified day
+    """Route to get coordinates of rides for a specified area on a specified day (/api/nestmatics/rides/area/<areaid>/date/<date>)
+
     :param areaid: ID of area to get rides from
     :param date: date on which rides happened
-    :return:
+    :return: json containing information requested
     """
     if request.method == 'GET':
         if areaid is None or date is None:
@@ -54,13 +63,12 @@ def getRidesForDateAndArea(areaid=None, date=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/rides/area/<areaid>/alldates', methods=['GET'])
+@app.route(routeVar+'/nestmatics/rides/area/<areaid>/alldates', methods=['GET'])
 def getrideDatesForArea(areaid=None):
-    """
-    Route to get coordinates of rides for a specified area on a specified day
-    :param areaid: ID of area to get rides from
-    :param date: date on which rides happened
-    :return:
+    """Route to get dates available with ride data for a specified service area /api/nestmatics/rides/area/<areaid>/alldates
+
+    :param areaid: ID of service area to get rides from
+    :return: json containing a lit of dates with ride data
     """
     if request.method == 'GET':
         if areaid is None:
@@ -71,13 +79,18 @@ def getrideDatesForArea(areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/rides/area/<areaid>/start/<startdate>/end/<enddate>/alldates', methods=['GET'])
+@app.route(routeVar+'/nestmatics/rides/area/<areaid>/start/<startdate>/end/<enddate>/alldates', methods=['GET'])
 def getrideDatesForAreaAndInterval(areaid=None, startdate=None, enddate=None):
-    """
-    Route to get coordinates of rides for a specified area on a specified day
+    """Route to get dates available with ride data for a specified service area and on a specified time interval
+    /api/nestmatics/rides/area/<areaid>/start/<startdate>/end/<enddate>/alldates
+
     :param areaid: ID of area to get rides from
-    :param date: date on which rides happened
-    :return:
+    :type areaid: string
+    :param startdate: date on which rides happened
+    :type startdate: string
+    :param enddate: date on which rides happened
+    :type enddate: string
+    :return: json containing a lit of dates with ride data
     """
     if request.method == 'GET':
         if areaid is None or startdate is None or enddate is None:
@@ -88,15 +101,20 @@ def getrideDatesForAreaAndInterval(areaid=None, startdate=None, enddate=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/rides/interval/area/<areaid>/date/<date>/start/<starttime>/end/<endtime>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/rides/interval/area/<areaid>/date/<date>/start/<starttime>/end/<endtime>', methods=['GET'])
 def getRidesForTimeInterval(areaid=None, date=None, starttime=None, endtime=None):
-    """
-    Route to get coordinates of rides for a specified area on a specified day
-    :param endtime:
-    :param starttime:
+    """Route to get rides that happen on a specified area, date and between a specified interval of time.
+    /api/nestmatics/rides/interval/area/<areaid>/date/<date>/start/<starttime>/end/<endtime>
+
+    :param endtime: end time of interval from which to get rides
+    :type endtime: string
+    :param starttime:  end time of interval from which to get rides
+    :type starttime: string
     :param areaid: ID of area to get rides from
+    :type areaid: string
     :param date: date on which rides happened
-    :return:
+    :type date: string
+    :return: json containing all rides that happened on the specified parameters.
     """
     if request.method == 'GET':
         if areaid is None or date is None:
@@ -108,13 +126,14 @@ def getRidesForTimeInterval(areaid=None, date=None, starttime=None, endtime=None
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/rides/coords/area/<areaid>/date/<date>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/rides/coords/area/<areaid>/date/<date>', methods=['GET'])
 def getRidesCoordinates(areaid=None, date=None):
-    """
-    Route to get coordinates of rides for a specified area on a specified day
+    """Route to get coordinates of rides for a specified area on a specified day.
+    /api/nestmatics/rides/coords/area/<areaid>/date/<date>
+
     :param areaid: ID of area to get rides from
     :param date: date on which rides happened
-    :return:
+    :return: json containing coordinates of rides that meet the specified criteria
     """
     if request.method == 'GET':
         if areaid is None or date is None:
@@ -125,8 +144,19 @@ def getRidesCoordinates(areaid=None, date=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/rides/startat/nest/<nestid>/date/<date>/area/<areaid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/rides/startat/nest/<nestid>/date/<date>/area/<areaid>', methods=['GET'])
 def getRidesStartingAtNest(nestid=None, date=None, areaid=None):
+    """Get Rides that start at specified Nest (nestid) on a specified date on a specified area
+    /api/nestmatics/rides/startat/nest/<nestid>/date/<date>/area/<areaid>
+
+    :param nestid: ID of nest that indicated location from where desired rides started
+    :type nestid: string
+    :param date: date when desired rides happened
+    :type date: string
+    :param areaid: ID of area to get rides from
+    :type areaid: string
+    :return: json containing all rides that meet the specified criteria
+    """
     if request.method == 'GET':
         if areaid is None or date is None or nestid is None:
             return jsonify(Error="URI does not have all parameters needed"), 404
@@ -136,8 +166,19 @@ def getRidesStartingAtNest(nestid=None, date=None, areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/rides/endat/nest/<nestid>/date/<date>/hour/<hour>/area/<areaid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/rides/endat/nest/<nestid>/date/<date>/hour/<hour>/area/<areaid>', methods=['GET'])
 def getRidesEndingAtNest(nestid=None, date=None, areaid=None):
+    """Get Rides that end at specified Nest (nestid) on a specified date on a specified area.
+    /api/nestmatics/rides/endat/nest/<nestid>/date/<date>/hour/<hour>/area/<areaid>
+
+    :param nestid: ID of nest that indicated location from where desired rides started
+    :type nestid: string
+    :param date: date when desired rides happened
+    :type date: string
+    :param areaid: ID of area to get rides from
+    :type areaid: string
+    :return: json containing all rides that meet the specified criteria
+    """
     if request.method == 'GET':
         if areaid is None or date is None or nestid is None:
             return jsonify(Error="URI does not have all parameters needed"), 404
@@ -147,14 +188,14 @@ def getRidesEndingAtNest(nestid=None, date=None, areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/rides', methods=['POST'])
+@app.route(routeVar+'/nestmatics/rides', methods=['POST'])
 def postRides():
-    """
-    Route to insert Rides from a provided csv file in the request.
-    :return:
-        if request was valid: response object with status code 201 containing JSON with inserted rides IDs, skipped
-            rides and the ids of stats entry for the uploaded days
-        if request was invalid: response object with status code 400, 500 or 405 along with json with error message
+    """Route to insert Rides from a provided csv file in the request body. if request was valid: response object with
+    status code 201 containing JSON with inserted rides IDs, skipped rides and the ids of stats entry for the
+    uploaded days if request was invalid: response object with status code 400, 500 or 405 along with json with error
+    message.( /api/nestmatics/rides )
+
+    :return: Response object with ids of inserted rides, skipped rides and ids of the stats entry for the day.
     """
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -164,13 +205,10 @@ def postRides():
         if 'area' not in request.form:
             return make_response(jsonify(Error="No area was specified"), 400)
         area = request.form['area']
-        print(area)
         if file.filename == "":
             return make_response(jsonify(Error="No file"), 400)
         if file and allowed_file(file.filename):
-            print(type(file))
             filename = secure_filename(file.filename)
-
             return RidesHandler.insertRides(file, area)
         else:
             return make_response(jsonify(Error="File format not allowed or file name not provided"), 400)
@@ -179,10 +217,11 @@ def postRides():
 
 
 def allowed_file(filename):
-    """
-    Helper method ro verify if file is of a csv format
+    """Helper method to verify if file is of a csv format
+
     :param filename: name of provided file
-    :return:
+    :type filename: string
+    :return: Boolean denoting if file name contains the csv file type
     """
     return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'csv'
 
@@ -190,15 +229,17 @@ def allowed_file(filename):
 # ------------------------ Rides Stats API routes -----------------------------------#
 
 
-@app.route('/nestmatics/stats/area/<areaid>/date/<date>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/stats/area/<areaid>/date/<date>', methods=['GET'])
 def getRidesStats(areaid=None, date=None):
-    """
-    Route to get ride stats for a specified date and area
+    """Route to get ride stats for a specified date and area. if request was valid: response object with status code
+    201 containing JSON with rides stats if request was invalid: response object with status code 400, 404, 500 or 405
+    along with json with error message. /api/nestmatics/stats/area/<areaid>/date/<date>
+
     :param areaid: ID of area to get stats from
-    :param date: date of stats
-    :return:
-        if request was valid: response object with status code 201 containing JSON with rides stats
-        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
+    :type areaid: string
+    :param date: date from which to get ride stats
+    :type date: string
+    :return: response object containing a status code and, if succesful ,ride stats for the day
     """
     if request.method == 'GET':
         return RideStatsHandler.getStatsForDate(date, areaid)
@@ -206,15 +247,16 @@ def getRidesStats(areaid=None, date=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/stats/ridesnum/area/<areaid>/date/<date>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/stats/ridesnum/area/<areaid>/date/<date>', methods=['GET'])
 def getTotalNumberOfRides(areaid=None, date=None):
-    """
-    Route to only get the number of rides according to rides stats stored for an area on a specific date
+    """Route to only get the number of rides according to rides stats stored for an area on a specific date.
+    if request was valid: response object with status code 201 containing JSON with number of rides
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message.
+    /api/nestmatics/stats/ridesnum/area/<areaid>/date/<date>
+
     :param areaid: ID of area from which to obtain number of rides
     :param date: date from which to retreive the total number of rides
-    :return:
-    if request was valid: response object with status code 201 containing JSON with number of rides
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with err
+    :return: response object containing a status code and, if succesful, the number of rides for the specified day
     """
     if request.method == 'GET':
         return RideStatsHandler.getTotalNumberOfRides(date, areaid)
@@ -222,18 +264,17 @@ def getTotalNumberOfRides(areaid=None, date=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/stats/activevehicles/area/<areaid>/date/<date>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/stats/activevehicles/area/<areaid>/date/<date>', methods=['GET'])
 def getTotalActiveVehicles(areaid=None, date=None):
-    """
-    Route to only get the total active vehicles according to rides stats stored for an area on a
-        specific date
+    """Route to only get the total active vehicles according to rides stats stored for an area on a specific date.
+    Active vehicles are the vehicles that did rides on a specific day. Not evey vehicle deployed has rides on a day.
+    if request was valid: response object with status code 201 containing JSON with the total active vehicles
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
+    /api/nestmatics/stats/activevehicles/area/<areaid>/date/<date>
+
     :param areaid: ID of area from which to obtain the total active vehicles
     :param date: date from which to retreive the total active vehicles
-    :return:
-    if request was valid: response object with status code 201 containing JSON with the total
-        active vehicles
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json
-        with error message
+    :return: response object containing a status code and, if succesful, the active vehicles for the specified day
     """
     if request.method == 'GET':
         return RideStatsHandler.getTotalActiveVehicles(date, areaid)
@@ -241,18 +282,16 @@ def getTotalActiveVehicles(areaid=None, date=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/stats/revenue/area/<areaid>/date/<date>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/stats/revenue/area/<areaid>/date/<date>', methods=['GET'])
 def getTotalRevenue(areaid=None, date=None):
-    """
-    Route to only get the total revenue according to rides stats stored for an area on a
-        specific date
+    """Route to only get the total revenue according to rides stats stored for an area on a specific date
+    if request was valid: response object with status code 201 containing JSON with the total revenue for provided area
+    and date. if request was invalid: response object with status code 400, 404, 500 or 405 along with json with an error
+    message
+
     :param areaid: ID of area from which to obtain the total revenue
-    :param date: date from which to retreive the total revenue
-    :return:
-    if request was valid: response object with status code 201 containing JSON with the total
-        revenue for provided area and date
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json
-        with error message
+    :param date: date from which to retrieve the total revenue
+    :return: response object containing a status code and, if succesful, total revenue for the specified day
     """
     if request.method == 'GET':
         return RideStatsHandler.getTotalRevenue(date, areaid)
@@ -263,14 +302,13 @@ def getTotalRevenue(areaid=None, date=None):
 # ------------------------ Nest API routes ------------------------------------------#
 
 
-@app.route('/nestmatics/nests', methods=['POST'])
+@app.route(routeVar+'/nestmatics/nests', methods=['POST'])
 def postNests():
-    """
-    Route to insert Nests into the database
-   :return:
-        if request was valid: response object with status code 201 containing JSON with id of new nest
-        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-            error message
+    """Route to insert Nests into the database. if request was valid a response object with status code 201 containing
+    JSON with id of new nest will be returned. if request was invalid: response object with status code 400, 404,
+    500 or 405 along with json with error message.
+
+    :return: response object containing a status code and, if succesful, the id of the nest inserted
     """
     if request.method == 'POST':
         if request.json is None:
@@ -280,16 +318,15 @@ def postNests():
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/nests/area/<areaid>/user/<userid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/nests/area/<areaid>/user/<userid>', methods=['GET'])
 def getNestsOnAreaByUser(userid=None, areaid=None):
-    """
-    Get Nests on Service Area specified
+    """Get Nests on Service Area specified. if request was valid a response object with status code 200 containing
+    Nests on area specified will be returned. if request was invalid: response object with status code 400, 404, 500
+    or 405 along with json with error message
+
     :param userid: ID of user that created said Nests
     :param areaid: ID of area to get Nests from
-    :return:
-    if request was valid: response object with status code 200 containing Nests on area specified
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: response object containing a status code and, if succesful, the nests on the area requested.
     """
     if request.method == 'GET':
         return NestsHandler.getNestsByServiceAreaId(areaid=areaid, user_id=userid)
@@ -297,16 +334,15 @@ def getNestsOnAreaByUser(userid=None, areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/nests/names/area/<areaid>/user/<userid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/nests/names/area/<areaid>/user/<userid>', methods=['GET'])
 def getNestsName(userid=None, areaid=None):
-    """
-    Get Nest Names of Service Area specified
+    """Get Nest Names of Service Area specified. if request was valid: response object with status code 200 containing
+    Nest names on area specified wil lbe returned. if request was invalid: response object with status code 400, 404,
+    500 or 405 along with json with error message
+
     :param userid: ID of user that created said Nests
     :param areaid: ID of area to get Nests from
-    :return:
-    if request was valid: response object with status code 200 containing Nest names on area specified
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: response object containing a status code and, if succesful, the nests names on the area requested
     """
     if request.method == 'GET':
         return NestsHandler.getNestNames(areaid=areaid, user_id=userid)
@@ -314,15 +350,14 @@ def getNestsName(userid=None, areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/nests/nest/<nestid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/nests/nest/<nestid>', methods=['GET'])
 def getNest(nestid=None):
-    """
-    Get a specific Nest
+    """Get a specific Nest characterized by a nest id. if request was valid: response object with status code 200
+    containing Nest identified by provided id will be returned. if request was invalid: response object with status
+    code 400, 404, 500 or 405 along with json with error message will be returned.
+
     :param nestid: ID of Nest to find
-    :return:
-    if request was valid: response object with status code 200 containing Nest identified by provided id
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: response object containing a status code and, if succesful, the information on the nest requested
     """
     if request.method == 'GET':
         return NestsHandler.getNestById(nest_id=nestid)
@@ -330,23 +365,26 @@ def getNest(nestid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/nests/area/<areaid>/user/<userid>/date/<date>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/nests/area/<areaid>/user/<userid>/date/<date>', methods=['GET'])
 def getNestsForDate(areaid=None, userid=None, date=None):
-    """
-    Finds Nest configurations for a specified nest
+    """Finds Nest configurations for a specified nest
+
     :param nestid: ID of nest from which to look for nest configurations
-    :return:
-    if request was valid: response object with status code 200 containing the requested nest configurations
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: if request was valid: response object with status code 200 containing the requested nest configurations.
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'GET':
         return NestsHandler.getNestConfigurationInfoForDay(areaid,userid,date)
     else:
         return make_response(jsonify(Error="Method not allowed."), 405)
 
-@app.route('/nestmatics/nests/nest/<nestid>', methods=['DELETE', 'OPTIONS'])
+@app.route(routeVar+'/nestmatics/nests/nest/<nestid>', methods=['DELETE', 'OPTIONS'])
 def deleteNest(nestid=None):
+    """Deletes a specified nest
+
+    :param nestid: ID of the nest to delete
+    :return: response object containing a status code and, if succesful, the number of nests deleted
+    """
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
     if request.method == 'DELETE':
@@ -356,15 +394,13 @@ def deleteNest(nestid=None):
         return make_response(jsonify(Error="Method not allowed."), 405)
 
 
-@app.route('/nestmatics/nests/nest/<nestid>', methods=['PUT'])
+@app.route(routeVar+'/nestmatics/nests/nest/<nestid>', methods=['PUT'])
 def editNest(nestid=None):
-    """
-    Edit Nest name of specified nest id
+    """Edit Nest name of specified nest id
+
     :param nestid: ID of nest to modify
-    :return:
-    if request was valid: response object with status code 200 containing number of Nest modified
-    if request was invalid: response object with status code 400, 404,304, 500 or 405 along with json with
-        error message
+    :return:if request was valid: response object with status code 200 containing number of Nest modified. if request
+        was invalid: response object with status code 400, 404,304, 500 or 405 along with json with error message
     """
     if request.method == 'PUT':
         if "nest_name" not in request.json:
@@ -379,14 +415,12 @@ def editNest(nestid=None):
 # ----------------- Nest Configuration API routes -------------------------
 
 
-@app.route('/nestmatics/nests/nestconfig', methods=['POST'])
+@app.route(routeVar+'/nestmatics/nests/nestconfig', methods=['POST'])
 def postNestConfigurations():
-    """
-    Route to insert a new Nest Configuration into the database
-    :return:
-    if request was valid: response object with status code 201 containing the id of newly entered document
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    """Route to insert a new Nest Configuration into the database
+
+    :return: if request was valid: response object with status code 201 containing the id of newly entered document.
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'POST':
         if request.json is None:
@@ -396,15 +430,13 @@ def postNestConfigurations():
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/nests/nestconfig/nest/<nestid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/nests/nestconfig/nest/<nestid>', methods=['GET'])
 def findNestConfigurationsForNest(nestid=None):
-    """
-    Finds Nest configurations for a specified nest
+    """Finds Nest configurations for a specified nest
+
     :param nestid: ID of nest from which to look for nest configurations
-    :return:
-    if request was valid: response object with status code 200 containing the requested nest configurations
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: if request was valid: response object with status code 200 containing the requested nest configurations.
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'GET':
         return NestsHandler.getNestConfigurationsForNest(nestid)
@@ -412,15 +444,14 @@ def findNestConfigurationsForNest(nestid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/nests/nestconfig/<nestconfigid>/stats', methods=['GET'])
+@app.route(routeVar+'/nestmatics/nests/nestconfig/<nestconfigid>/stats', methods=['GET'])
 def getNestConfigurationStats(nestconfigid=None):
-    """
-    Gets Stats belonging to a nest configuration on a particular day
+    """Gets Stats belonging to a nest configuration on a particular day
+
     :param nestconfigid: ID of nest from which to look for nest configurations
-    :return:
-    if request was valid: response object with status code 200 containing the requested nest configuration stats
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: if request was valid: response object with status code 200 containing the requested nest configuration
+        stats. if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error
+        message
     """
     if request.method == 'GET':
         return NestsHandler.getNestConfigurationStatsForADay(nestconfigid)
@@ -428,15 +459,14 @@ def getNestConfigurationStats(nestconfigid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/nests/nestconfig/<nestconfigid>/date/<date>/start/<starttime>/end/<endtime>/stats', methods=['GET'])
+@app.route(routeVar+'/nestmatics/nests/nestconfig/<nestconfigid>/date/<date>/start/<starttime>/end/<endtime>/stats', methods=['GET'])
 def getNestStatsForATimeInterval(nestconfigid=None, date=None, starttime=None, endtime=None):
-    """
-    Gets Stats belonging to a nest configuration on a particular day
+    """Gets Stats belonging to a nest configuration on a particular day
+
     :param nestconfigid: ID of nest from which to look for nest configurations
-    :return:
-    if request was valid: response object with status code 200 containing the requested nest configuration stats
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: if request was valid: response object with status code 200 containing the requested nest configuration
+        stats. if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error
+        message
     """
     if request.method == 'GET':
         return NestsHandler.getNestStatsForTimeInterval(nestconfigid, date, starttime, endtime)
@@ -444,10 +474,15 @@ def getNestStatsForATimeInterval(nestconfigid=None, date=None, starttime=None, e
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/nests/area/<areaid>/date/<date>/empty', methods=['GET'])
+@app.route(routeVar+'/nestmatics/nests/area/<areaid>/date/<date>/empty', methods=['GET'])
 def getEmptyNestsForDate(areaid=None, date=None):
-    """
+    """Route to get nests that were empty on a specific area and date, as well as how much time they remained empty.
 
+    :param areaid: ID of area from which to get nests
+    :param date: date of the day from which to retrieve empty nests.
+    :return: if request was valid: response object with status code 200 containing the requested nest information.
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error
+        message
     """
     if request.method == 'GET':
         if areaid is None or date is None:
@@ -457,10 +492,15 @@ def getEmptyNestsForDate(areaid=None, date=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/nests/area/<areaid>/date/<date>/unused', methods=['GET'])
+@app.route(routeVar+'/nestmatics/nests/area/<areaid>/date/<date>/unused', methods=['GET'])
 def getUnusedVehiclesForNest(areaid=None, date=None):
-    """
+    """Route to get the amount of vehicles unused on the nests of a particular day and area
 
+    :param areaid: ID of area from which to get the unused vehicles
+    :param date: data from which to get the unused vehicles
+    :return: if request was valid: response object with status code 200 containing the requested nest information.
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error
+        message
     """
     if request.method == 'GET':
         if areaid is None or date is None:
@@ -470,15 +510,13 @@ def getUnusedVehiclesForNest(areaid=None, date=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/nests/nestconfig/<nestconfigid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/nests/nestconfig/<nestconfigid>', methods=['GET'])
 def findNestConfiguration(nestconfigid=None):
-    """
-    Finds Nest configurations identified by provided nest vonfiguration id
+    """Finds Nest configurations identified by provided nest configuration id
+
     :param nestconfigid: ID of nest configuration to find
-    :return:
-    if request was valid: response object with status code 200 containing the requested nest configuration
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: if request was valid: response object with status code 200 containing the requested nest configuration
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'GET':
         return NestsHandler.getNestConfigurationFromId(nestconfigid)
@@ -486,14 +524,13 @@ def findNestConfiguration(nestconfigid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/nests/nestconfig/<nestconfigid>', methods=['DELETE', 'OPTIONS'])
+@app.route(routeVar+'/nestmatics/nests/nestconfig/<nestconfigid>', methods=['DELETE', 'OPTIONS'])
 def deleteNestConfiguration(nestconfigid=None):
-    """
-    Deletes a Nest Configuration
+    """Deletes a Nest Configuration
+
     :param nestconfigid: ID of nest config to delete
-    :return:
-    if request was valid: response object with status code 200 containing the number of entries deleted
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+    :return: if request was valid: response object with status code 200 containing the number of entries deleted
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
         error message
     """
     if request.method == 'OPTIONS':
@@ -505,15 +542,13 @@ def deleteNestConfiguration(nestconfigid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/nests/nestconfig/<nestconfigid>', methods=['PUT'])
+@app.route(routeVar+'/nestmatics/nests/nestconfig/<nestconfigid>', methods=['PUT'])
 def editNestConfiguration(nestconfigid=None):
-    """
-    Edits a specified nest configuration's vehicle qty
+    """Edits a specified nest configuration's vehicle qty
+
     :param nestconfigid: ID of nest configuration to update
-    :return:
-    if request was valid: response object with status code 200 containing the number of entries updated
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: if request was valid: response object with status code 200 containing the number of entries updated
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
@@ -529,27 +564,21 @@ def editNestConfiguration(nestconfigid=None):
 # ---------------------- Users API routes -------------------------------------
 
 
-@app.route('/nestmatics/users', methods=['GET', 'OPTIONS'])
+@app.route(routeVar+'/nestmatics/users', methods=['GET', 'OPTIONS'])
 def getAllUsers():
-    """
-    Route to get all users registered in the system
-    :return:
-        if request is successful (status code 200), will return a response object with the information of all Users
+    """Route to get all users registered in the system
+
+    :return:if request is successful (status code 200), will return a response object with the information of all Users
         in the database. Response will have the format:
         [
-            {
-                "_id": document_id,
-                "email": user_email,
-                "type": user_type
-            },
-            .
-            .
+        { "_id": document_id,
+        "email": user_email,
+        "type": user_type
+        },
         ]
         if error in request, will return a 400, 404, 500 or 405 status code with corresponding information,
         following the format:
-        {
-            "Error": "error information string"
-        }
+        { "Error": "error information string" }
     """
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
@@ -560,24 +589,22 @@ def getAllUsers():
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/users/<userid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/users/<userid>', methods=['GET'])
 def getUser(userid=None):
-    """
-    Route to get a specific user's information from the database
+    """Route to get a specific user's information from the database
+
     :param userid: User ID of a specific user
-    :return:
-        if request is successful (status code 200), will return a response object with the information of requested
+    :return: if request is successful (status code 200), will return a response object with the information of requested
         user. Response will have the format:
         {
-            "_id": document_id,
-            "email": user_email,
-            "type": user_type
+        "_id": document_id,
+        "email": user_email,
+        "type": user_type
         }
-
         if error in request, will return a 400, 404, 500 or 405 ststus code with corresponding information,
         following the format:
         {
-            "Error": "error information string"
+        "Error": "error information string"
         }
     """
     if request.method == 'GET':
@@ -586,22 +613,19 @@ def getUser(userid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/users', methods=['POST'])
+@app.route(routeVar+'/nestmatics/users', methods=['POST'])
 def insertUser():
-    """
-    Route to insert a user in the system
-    :return:
-        if request is successful, will return a response object with the id of the inserted object with format:
+    """Route to insert a user in the system
+
+    :return: if request is successful, will return a response object with the id of the inserted object with format:
         { "ok":
-            { "_id": id_Number  }
+        { "_id": id_Number  }
         }
         ** id_Number refers to the db id for the newly inserted field
 
         if error in request, will return a 400, 404, 500 or 405 error with corresponding information, following the
         format:
-        {
-            "Error": "error information string"
-        }
+        { "Error": "error information string" }
     """
     if request.method == 'POST':
         if request.json is None:
@@ -611,22 +635,19 @@ def insertUser():
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/users/<userid>', methods=['DELETE', 'OPTIONS'])
+@app.route(routeVar+'/nestmatics/users/<userid>', methods=['DELETE', 'OPTIONS'])
 def deleteUser(userid=None):
-    """
-    Route to delete users from the database. User will be identified with the userid in the URI route.
+    """ Route to delete users from the database. User will be identified with the userid in the URI route.
+
     :param userid: ID of the user to delete
-    :return:
-        if request is successful, will return a response object with the number of deleted documents with format:
-            { "ok":
-                { "deleted": number_of_documents_deleted  }
-            }
+    :return: if request is successful, will return a response object with the number of deleted documents with format:
+        { "ok":
+        { "deleted": number_of_documents_deleted  }
+        }
 
         if error in request, will return a 400, 404, 500 or 405 error with corresponding information, following the
         format:
-        {
-            "Error": "error information string"
-        }
+        { "Error": "error information string" }
     """
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
@@ -640,37 +661,24 @@ def deleteUser(userid=None):
 # ----------------------- Service Area API routes -----------------
 
 
-@app.route('/nestmatics/areas', methods=['GET'])
+@app.route(routeVar+'/nestmatics/areas', methods=['GET'])
 def getAllServiceAreas():
-    """
-    Route to get all Service areas in the database.
-    :return:
-        if request is successful, will return a response object with the id of the inserted object with format:
+    """ Route to get all Service areas in the database.
+
+    :return: if request is successful, will return a response object with the id of the inserted object with format:
         { "ok":[
-            {
-                "_id": id of service area,
-                "area_name": name of service area,
-                "coords": {
-                    "coordinates": [
-                        [
-                            -67.152729,
-                            18.2176116
-                        ]
-                        .
-                        .
-                    ],
-                    "type": "LineString"
-                }
-            },
-             .
-             .
-             .  ]
-         }
-         if error in request, will return a 400, 404, 500 or 405 ststus code with corresponding information,
-         following the format:
         {
-            "Error": "error information string"
+        "_id": id of service area,
+        "area_name": name of service area,
+        "coords": {
+        "coordinates": [ [-67.152729,18.2176116], ...],
+        "type": "LineString"
         }
+        },  ]
+        }
+        if error in request, will return a 400, 404, 500 or 405 ststus code with corresponding information,
+        following the format:
+        { "Error": "error information string" }
     """
     if request.method == 'GET':
         return ServiceAreaHandler.getAllServiceAreas()
@@ -678,29 +686,24 @@ def getAllServiceAreas():
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/areas/<areaid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/areas/<areaid>', methods=['GET'])
 def getServiceArea(areaid=None):
-    """
-    Route to retrieve service area information identified by the areaid used as parameter
+    """ Route to retrieve service area information identified by the areaid used as parameter
+
     :param areaid: ID of the service area to request
-    :return:
-        if request is successful (status code 200), will return a response object with the information of requested
+    :return: if request is successful (status code 200), will return a response object with the information of requested
         user. Response will have the format:
-           {
-            "_id": id of service area,
-            "area_name": name of service area,
-            "coords": {
-                "coordinates": [
-                    coordinates of service area
-                ],
-                "type": (optional) type of polygon coordinates
-            }
+        {
+        "_id": id of service area,
+        "area_name": name of service area,
+        "coords": {
+        "coordinates": [ coordinates of service area ],
+        "type": (optional) type of polygon coordinates
+        }
 
         if error in request, will return a 400, 404, 500 or 405 status code with corresponding information, following
         the format:
-        {
-            "Error": "error information string"
-        }
+        { "Error": "error information string" }
     """
     if request.method == 'GET':
         return ServiceAreaHandler.getServiceArea(areaid=areaid)
@@ -708,31 +711,26 @@ def getServiceArea(areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/areas', methods=['POST'])
+@app.route(routeVar+'/nestmatics/areas', methods=['POST'])
 def postServiceArea():
-    """
-    Route to insert a Service Area in the database. Service Area to be inserted should have the following structure:
+    """Route to insert a Service Area in the database. Service Area to be inserted should have the following structure:
     {
-        "_id": id of service area,
-        "area_name": name of service area,
-        "coords": {
-            "coordinates": [
-                coordinates of service area
-            ],
-            "type": (optional) type of polygon coordinates
+    "_id": id of service area,
+    "area_name": name of service area,
+    "coords": {
+    "coordinates": [ coordinates of service area],
+    "type": (optional) type of polygon coordinates
     }
-    :return:
-        if request is successful, will return a response object with the id of the inserted object with format:
+
+    :return:if request is successful, will return a response object with the id of the inserted object with format:
         { "ok":
-            { "_id": id_Number  }
+        { "_id": id_Number  }
         }
         ** id_Number refers to the db id for the newly inserted field
 
         if error in request, will return a 400, 404, 500 or 405 error with corresponding information, following the
         format:
-        {
-            "Error": "error information string"
-        }
+        { "Error": "error information string" }
     """
     if request.method == 'POST':
         if request.json is None:
@@ -750,15 +748,13 @@ def postServiceArea():
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/areas/<areaid>', methods=['PUT'])
+@app.route(routeVar+'/nestmatics/areas/<areaid>', methods=['PUT'])
 def editServiceArea(areaid=None):
-    """
-    Edits a specified nest configuration's vehicle qty
+    """Edits a specified nest configuration's vehicle qty
+
     :param areaid: ID of service area to update
-    :return:
-    if request was valid: response object with status code 200 containing the number of entries updated
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: if request was valid: response object with status code 200 containing the number of entries updated
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
@@ -771,15 +767,13 @@ def editServiceArea(areaid=None):
         return make_response(jsonify(Error="Method not allowed."), 405)
 
 
-@app.route('/nestmatics/areas/<areaid>', methods=['DELETE','OPTIONS' ])
+@app.route(routeVar+'/nestmatics/areas/<areaid>', methods=['DELETE','OPTIONS' ])
 def deleteServiceArea(areaid=None):
-    """
-    Edits a specified nest configuration's vehicle qty
+    """Edits a specified nest configuration's vehicle qty
+
     :param areaid: ID of service area to update
-    :return:
-    if request was valid: response object with status code 200 containing the number of entries updated
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: if request was valid: response object with status code 200 containing the number of entries updated
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
@@ -792,13 +786,13 @@ def deleteServiceArea(areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/areas/<areaid>/date/<date>/weather', methods=['GET'])
+@app.route(routeVar+'/nestmatics/areas/<areaid>/date/<date>/weather', methods=['GET'])
 def getWeatherData(areaid=None, date=None):
-    """
-    Route to get weather data from a specified location on a specified date
+    """Route to get weather data from a specified location on a specified date
+
     :param areaid: ID of area requested weather belongs to
     :param date: date of requested weather information
-    :return:
+    :return: response object with weather data
     """
     if request.method == 'GET':
         return ServiceAreaHandler.getWeatherForDay(areaid, date)
@@ -809,11 +803,11 @@ def getWeatherData(areaid=None, date=None):
 # ------------------------ Drop Strategy API routes ----------------------------
 
 
-@app.route('/nestmatics/drop/area/<areaid>/date/<sdate>/<edate>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/drop/area/<areaid>/date/<sdate>/<edate>', methods=['GET'])
 def getDropStrategyForDate(areaid=None, sdate=None, edate=None):
-    """
-    Gets a drop strategy between two dates. Intended so the request will receive all drop strategies
+    """Gets a drop strategy between two dates. Intended so the request will receive all drop strategies
     between the specified start and end date
+
     :param areaid: ID of area that drop strategy belongs to
     :param sdate: start date of drop strategy to find
     :param edate: end date of drop strategy to find
@@ -825,54 +819,75 @@ def getDropStrategyForDate(areaid=None, sdate=None, edate=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/drop/area/<areaid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/drop/area/<areaid>', methods=['GET'])
 def getDropStrategiesForArea(areaid=None):
+    """Get drop strategies for a specific area
+
+    :param areaid: ID of area from which to get drop strategies
+    :return: response object with drop strategy info requested
+    """
     if request.method == 'GET':
         return DropStrategyHandler.getDropStrategyForArea(areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/drop/<dropid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/drop/<dropid>', methods=['GET'])
 def getDropStrategyFromID(dropid=None):
+    """Get a specific drop strategy
+
+    :param dropid: ID of the drop strategy to take
+    :return: response object with drop strategy info requested
+    """
     if request.method == 'GET':
         return DropStrategyHandler.getDropStrategyFromId(dropid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/drop/area/<areaid>/user/<userid>/recent', methods=['GET'])
+@app.route(routeVar+'/nestmatics/drop/area/<areaid>/user/<userid>/recent', methods=['GET'])
 def getMostRecentDropStrategy(areaid=None, userid=None):
+    """Gets the most recent drop strategy introduced in the system
+
+    :param areaid: ID of area from which to get a drop strategy
+    :param userid: ID of user that made the drop strategy
+    :return:
+    """
     if request.method == 'GET':
         return DropStrategyHandler.getMostRecentDropStrategy(areaid, userid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/drop/area/<areaid>/user/<userid>/date/<date>/recent', methods=['GET'])
+@app.route(routeVar+'/nestmatics/drop/area/<areaid>/user/<userid>/date/<date>/recent', methods=['GET'])
 def getLatestDropStrategyFromDate(areaid=None, userid=None, date=None):
+    """Get Latest drop strategy from a specified date
+
+    :param areaid: ID of area from which to get the drop stretegy
+    :param userid: ID of users that own the nests
+    :param date: date that denotes the limit from which to get the latest drop strategy
+    :return:
+    """
     if request.method == 'GET':
         return DropStrategyHandler.getLatestDropStrategyFromDate(areaid, userid, date)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/drop', methods=['POST'])
+@app.route(routeVar+'/nestmatics/drop', methods=['POST'])
 def postDropStrategy():
-    """
-    Route to insert a drop strategy in the system
-    :return:
-        if request is successful, will return a response object with the id of the inserted object with
+    """Route to insert a drop strategy in the system
+
+    :return:if request is successful, will return a response object with the id of the inserted object with
         format:
         { "ok":
-            { "_id": id_Number  }
+        { "_id": id_Number  }
         }
         ** id_Number refers to the db id for the newly inserted field
-
         if error in request, will return a 400, 403, 404, 500 or 405 error with corresponding information,
         following the format:
         {
-            "Error": "error information string"
+        "Error": "error information string"
         }
     """
     if request.method == 'POST':
@@ -883,8 +898,13 @@ def postDropStrategy():
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/drop/<dropid>', methods=['DELETE', 'OPTIONS'])
+@app.route(routeVar+'/nestmatics/drop/<dropid>', methods=['DELETE', 'OPTIONS'])
 def deleteDropStrategy(dropid=None):
+    """Deletes a specific drop strategy
+
+    :param dropid: ID of drop strategy to delete
+    :return:
+    """
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
     if request.method == 'DELETE':
@@ -894,16 +914,28 @@ def deleteDropStrategy(dropid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/drop/<dropid>/day/<daynum>', methods=['PUT'])
+@app.route(routeVar+'/nestmatics/drop/<dropid>/day/<daynum>', methods=['PUT'])
 def editDropStrategy(dropid=None, daynum=None):
+    """Edit the configurations of a drop strategy. Nest configurations are part of an array on the drop strategy, the
+    daynum parameter denotes the index of that array to replace with a new list of nest configurations
+
+    :param dropid: ID of drop strategy to edit
+    :param daynum: number of the day of the configurations that will be replaced
+    :return: Number of drop strategies edited
+    """
     if request.method == 'PUT':
         return DropStrategyHandler.editDropStrategy(dropid, daynum, request.json)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/drop/<dropid>/name', methods=['PUT', 'OPTIONS'])
+@app.route(routeVar+'/nestmatics/drop/<dropid>/name', methods=['PUT', 'OPTIONS'])
 def editDropStrategyName(dropid=None):
+    """Edit a drop strategy name
+
+    :param dropid: ID of drop strategy to edit
+    :return:
+    """
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
     if request.method == 'PUT':
@@ -914,8 +946,13 @@ def editDropStrategyName(dropid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/drop/<dropid>/vehicles', methods=['PUT', 'OPTIONS'])
+@app.route(routeVar+'/nestmatics/drop/<dropid>/vehicles', methods=['PUT', 'OPTIONS'])
 def editDropStrategyVehicles(dropid=None):
+    """Edit the number of vehicles set for a drop strategy
+
+    :param dropid: ID of drop strategy to edit
+    :return:
+    """
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
     if request.method == 'PUT':
@@ -929,21 +966,19 @@ def editDropStrategyVehicles(dropid=None):
 # --------------------- Experiments API routes -----------------------------
 
 
-@app.route('/nestmatics/experiment', methods=['POST'])
+@app.route(routeVar+'/nestmatics/experiment', methods=['POST'])
 def postExperiment():
-    """
-    Route to insert a user in the system
-    :return:
-        if request is successful, will return a response object with the id of the inserted object with format:
+    """Route to insert a user in the system
+
+    :return: if request is successful, will return a response object with the id of the inserted object with format:
         { "ok":
-            { "_id": id_Number  }
+        { "_id": id_Number  }
         }
         ** id_Number refers to the db id for the newly inserted field
-
         if error in request, will return a 400, 404, 500 or 405 error with corresponding information, following the
         format:
         {
-            "Error": "error information string"
+        "Error": "error information string"
         }
     """
     if request.method == 'POST':
@@ -954,15 +989,13 @@ def postExperiment():
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/experiment/<experimentid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/experiment/<experimentid>', methods=['GET'])
 def getExperimentFromID(experimentid=None):
-    """
-    Route to get an experiment from a provided ID
+    """Route to get an experiment from a provided ID
+
     :param experimentid: ID of experiment to retreive
-    :return:
-    if request was valid: response object with status code 200 containing the experiment requested
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return:if request was valid: response object with status code 200 containing the experiment requested
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'GET':
         return ExperimentsHandler.getExperimentFromID(experimentid)
@@ -970,16 +1003,14 @@ def getExperimentFromID(experimentid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/experiment/area/<areaid>/user/<userid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/experiment/area/<areaid>/user/<userid>', methods=['GET'])
 def getExperimentsForAreaID(areaid=None, userid=None):
-    """
-    Gets experiments related to an area ID
+    """Gets experiments related to an area ID
+
     :param areaid: ID of service area
     :param userid: ID of user. Needed to retrieve Nests that belong to that user
-    :return:
-    if request was valid: response object with status code 200 containing the experiments requested
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: if request was valid: response object with status code 200 containing the experiments requested
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'GET':
         return ExperimentsHandler.getExperimentsForArea(areaid, userid)
@@ -987,15 +1018,13 @@ def getExperimentsForAreaID(areaid=None, userid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/experiment/nest/<nestid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/experiment/nest/<nestid>', methods=['GET'])
 def getExperimentsForNestID(nestid=None):
-    """
-    Get all experiments belonging to a specified nest id
+    """Get all experiments belonging to a specified nest id
+
     :param nestid: ID of nest from which to get experiments
-    :return:
-    if request was valid: response object with status code 200 containing the experiments requested
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return:if request was valid: response object with status code 200 containing the experiments requested
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'GET':
         return ExperimentsHandler.getExperimentsOfNest(nestid)
@@ -1003,15 +1032,13 @@ def getExperimentsForNestID(nestid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/experiment/<experimentid>', methods=['DELETE','OPTIONS'])
+@app.route(routeVar+'/nestmatics/experiment/<experimentid>', methods=['DELETE','OPTIONS'])
 def deleteExperiment(experimentid=None):
-    """
-    Route to delete an experiment
-    :param experimentid:
-    :return:
-    if request was valid: response object with status code 200 containing the number of experiments deleted
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    """Route to delete an experiment
+
+    :param experimentid: Id of experiment to delete
+    :return: if request was valid: response object with status code 200 containing the number of experiments deleted
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
@@ -1022,15 +1049,13 @@ def deleteExperiment(experimentid=None):
         return make_response(jsonify(Error="Method not allowed."), 405)
 
 
-@app.route('/nestmatics/experiment/<experimentid>', methods=['PUT'])
+@app.route(routeVar+'/nestmatics/experiment/<experimentid>', methods=['PUT'])
 def editExperiment(experimentid=None):
-    """
-    Route to edit experiments name
-    :param experimentid:
-    :return:
-    if request was valid: response object with status code 200 containing the number of edited experimetns
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    """Route to edit experiments name
+
+    :param experimentid: Id of experiment to edit
+    :return: if request was valid: response object with status code 200 containing the number of edited experimetns
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'OPTIONS':
         return _build_cors_prelight_response()
@@ -1043,8 +1068,13 @@ def editExperiment(experimentid=None):
         return make_response(jsonify(Error="Method not allowed."), 405)
 
 
-@app.route('/nestmatics/experiment/<experimentid>/report', methods=['GET'])
+@app.route(routeVar+'/nestmatics/experiment/<experimentid>/report', methods=['GET'])
 def getReportForExperiment(experimentid=None):
+    """Route to get a report for an experiment
+
+    :param experimentid: Id of experiment to take report from
+    :return: Statistics for the configurations on the report
+    """
     if request.method == 'GET':
         return ExperimentsHandler.getConfigCalculationsForReport(experimentid)
     else:
@@ -1054,15 +1084,13 @@ def getReportForExperiment(experimentid=None):
 # ------------------------------ Models API routes ---------------------------------
 
 
-@app.route('/nestmatics/ml/<modelid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/ml/<modelid>', methods=['GET'])
 def getModelFromID(modelid=None):
-    """
-    Route to get a model from a specified ID
+    """Route to get a model from a specified ID
+
     :param modelid: ID of model to retrieve
-    :return:
-    if request was valid: response object with status code 200 containing model information
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: if request was valid: response object with status code 200 containing model information
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'GET':
         return ModelHandler.getModelForID(modelid)
@@ -1070,43 +1098,38 @@ def getModelFromID(modelid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/ml/area/<areaid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/ml/area/<areaid>', methods=['GET'])
 def getModelsForArea(areaid=None):
-    """
-    Get all models in a specific area
+    """Get all models in a specific area
+
     :param areaid: ID of area to retrieve model information from
-    :return:
-    if request was valid: response object with status code 200 containing model information
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: if request was valid: response object with status code 200 containing model information
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'GET':
         return ModelHandler.getModelsForArea(areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
-@app.route('/nestmatics/ml/recent/area/<areaid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/ml/recent/area/<areaid>', methods=['GET'])
 def getMostRecentModel(areaid=None):
-    """
-    Gets most recent model (last made model for area)
+    """Gets most recent model (last made model for area)
+
     :param areaid: ID of area from which to look for model
-    :return:
-    if request was valid: response object with status code 200 containing model information
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return: if request was valid: response object with status code 200 containing model information
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'GET':
         return ModelHandler.getMostRecentModel(areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
-@app.route('/nestmatics/ml/area/<areaid>/trainModel', methods=['POST'])
+@app.route(routeVar+'/nestmatics/ml/area/<areaid>/trainModel', methods=['POST'])
 def trainModel(areaid=None):
-    """
-    Route to trigger the training of a new ML model
+    """Route to trigger the training of a new ML model
+
     :param areaid: ID of area from which to create a model
     :return:
-    TODO: what does it return?
     """
     if request.method == 'POST':
         return ML.train(areaid)
@@ -1114,14 +1137,13 @@ def trainModel(areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/ml/area/<areaid>/trainModel/time/<timetotrain>', methods=['POST'])
+@app.route(routeVar+'/nestmatics/ml/area/<areaid>/trainModel/time/<timetotrain>', methods=['POST'])
 def timedtrainModel(areaid=None):
-    """
-    Route to trigger the training of a new ML model
+    """Route to trigger the training of a new ML model
+
     :param areaid: ID of area from which to create a model
     :return:
-    TODO: what does it return?
-    TODO: finish
+
     """
     if request.method == 'POST':
         return ML.train(areaid)
@@ -1131,10 +1153,10 @@ def timedtrainModel(areaid=None):
 # -------------------------- Predictions API routes ----------------------
 
 
-@app.route('/nestmatics/ml/prediction/area/<areaid>/date/<date>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/ml/prediction/area/<areaid>/date/<date>', methods=['GET'])
 def getPredictionForDate(areaid=None, date=None):
-    """
-    Route to get Predictions for a specified area and date
+    """Route to get Predictions for a specified area and date
+
     :param areaid: Id of area from which to get predictions
     :param date: date of prediction to retreive
     :return:
@@ -1145,10 +1167,10 @@ def getPredictionForDate(areaid=None, date=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/ml/prediction/area/<areaid>/date/<date>/features', methods=['GET'])
+@app.route(routeVar+'/nestmatics/ml/prediction/area/<areaid>/date/<date>/features', methods=['GET'])
 def getPredictionFeatures(areaid=None, date=None):
-    """
-    Get predictions features for a specified area and date
+    """Get predictions features for a specified area and date
+
     :param areaid: Id of area from which to get predictions
     :param date: date of prediction to retreive
     :return:
@@ -1159,16 +1181,14 @@ def getPredictionFeatures(areaid=None, date=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/ml/prediction/area/<areaid>/date/<date>', methods=['POST'])
+@app.route(routeVar+'/nestmatics/ml/prediction/area/<areaid>/date/<date>', methods=['POST'])
 def createPrediction(areaid=None, date=None):
-    """
-    Trigger the creation of a new prediction
+    """Trigger the creation of a new prediction
+
     :param areaid: Id of area from which to create a prediction
     :param date: date of prediction to create
-    :return:  
-    if request was valid: response object with status code 200 and the prediction id
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
+    :return:  if request was valid: response object with status code 200 and the prediction id
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
     if request.method == 'POST':
         return ML.predict(areaid, date)
@@ -1176,22 +1196,20 @@ def createPrediction(areaid=None, date=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/ml/prediction/requierments/area/<areaid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/ml/prediction/requierments/area/<areaid>', methods=['GET'])
 def getRequierments(areaid=None):
-    """
-    TODO Fix
-    Trigger the creation of a new prediction
+    """Trigger the creation of a new prediction
+
     :param areaid: Id of area from which to create a prediction
     :param date: date of prediction to create
-    :return:  
-    if request was valid: response object with status code 200 and the prediction id
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+    :return:  if request was valid: response object with status code 200 and the prediction id
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
         error message
         ok: {
-            "can_train": False,
-            "required_days": 0,
-            "Accuracy": 0.69,
-            "Threshold": 0.4
+        "can_train": False,
+        "required_days": 0,
+        "Accuracy": 0.69,
+        "Threshold": 0.4
         }
     """
     if request.method == 'GET':
@@ -1200,22 +1218,20 @@ def getRequierments(areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/ml/prediction/validate/area/<areaid>', methods=['POST'])
+@app.route(routeVar+'/nestmatics/ml/prediction/validate/area/<areaid>', methods=['POST'])
 def validate_all(areaid=None):
-    """
-    TODO Fix
-    Trigger the creation of a new prediction
+    """Trigger the creation of a new prediction
+
     :param areaid: Id of area from which to create a prediction
     :param date: date of prediction to create
-    :return:  
-    if request was valid: response object with status code 200 and the prediction id
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+    :return:  if request was valid: response object with status code 200 and the prediction id
+        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
         error message
         ok: {
-            "can_train": False,
-            "required_days": 0,
-            "Accuracy": 0.69,
-            "Threshold": 0.4
+        "can_train": False,
+        "required_days": 0,
+        "Accuracy": 0.69,
+        "Threshold": 0.4
         }
     """
     if request.method == 'POST':
@@ -1226,6 +1242,10 @@ def validate_all(areaid=None):
 
 
 def _build_cors_prelight_response():
+    """Build CORS preflight response before returning it in a response
+
+    :return:
+    """
     response = make_response()
     response.headers.add("Access-Control-Allow-Origin", "*")
     response.headers.add('Access-Control-Allow-Headers', "*")
@@ -1238,8 +1258,8 @@ def _corsify_actual_response(response):
     return response
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
 
 #TODO 
