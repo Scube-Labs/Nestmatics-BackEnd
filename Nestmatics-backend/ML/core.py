@@ -6,6 +6,7 @@ from ML.feature_makers import make_rides_features, make_terrain_features
 from ML.feature_fetchers import fetch_terrain_data
 from ML.data_preprocessor import create_input_output_matrix
 from ML.data_sequencer import DataSequencer
+import ML
 import numpy as np
 from datetime import timedelta
 import datetime
@@ -17,16 +18,19 @@ from PIL import Image
 from flask import jsonify
 import random
 import tensorflow as tf
-import schedule
 import threading
+import uuid
+from DAOs import ModelDao
+from pymongo import MongoClient
 
 from API import ModelHandler, RidesHandler, ServiceAreaHandler
 
 TIME_PER_REQUEST = 1
 REQUEST_DIVSION = 2
 RETRAINING_THRESHOLD = 0.3
-OUTPUT_THRESHOLD = 0.01
+OUTPUT_THRESHOLD = 0.00
 DAYS_FOR_RETRAINING = 30
+SCHEDULER_SLEEP_TIME = 1200 #20 minutes
 
 
 def predict(area_id, date): 
@@ -111,12 +115,12 @@ def predict(area_id, date):
         for ix in range(0, int(x.shape[0]/128)):
             for iy in range(0, int(x.shape[1]/128)):
                 x_slice = x[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :]
-                if x_slice.shape != (128,128,24): #Not enought pixels in the border
+                if x_slice.shape != (128,128,20): #Not enought pixels in the border
                     continue
                 res[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :] = model.predict(x_slice.reshape((1,128,128,20)))
 
 
-
+        
         prediction = {
             "model_id": ModelHandler.getMostRecentModel(area_id).json['ok']['_id'],
             "prediction": matrix_to_json(res, max_lat, max_lon),
@@ -503,12 +507,13 @@ def get_terrain_data(area_id):
         TRAININGMETADATAKEYS = {"service_area":str, "status":str, "process_id":str, "weekday": str, "hour":int}
         # Create a training metadata component.
         training_metadata = {
+            "service_area": area_id,
             "status": "ready",
-            "process_id": -1,
+            "process_id": "-1",
             "weekday": 0,
             "hour": 0
         }
-        service_data = ModelHandler.insertTrainingMetadata(training_metadata)
+        service_response = ModelHandler.insertTrainingMetadata(training_metadata)
         if "ok" not in service_response:
             return service_response
         
@@ -611,10 +616,66 @@ def can_we_train(area_id):
             return {"Error":str(e)}
 
 
-# def training_job_tracker(areaid, weekday, hour):
+def training_job_tracker(areaid, jobid, app_context):
+
+    try:
+        
+        with app_context:
+            while True:
+                
+                # Check training metadata
+                metadata = ModelHandler.getTrainingMetadata(areaid).json
+                if "ok" not in metadata:
+                    print("ERROR: " + str(metadata))
+                    print("killing job " + jobid)
+                if metadata['ok'][0]['status'] == 'ready': #Canceled or completed job
+                    print("Training done by another process, killing job " + jobid)
+                if metadata['ok'][0]['process_id'] != jobid: #Job has been canceled and restarted
+                    print("Training canceled")
+                
+                # Check the requierments
+                service_response = can_we_train(areaid)
+                if "ok" not in service_response:
+                    print("ERROR:" + str(service_response))
+                    ModelHandler.editTrainingMetadata(metadata['ok'][0]['_id'], 'ready', jobid, metadata['ok'][0]['weekday'], metadata['ok'][0]['hour'])
+                    print("killing job " + jobid)
+                    break
+                if not service_response['ok']['can_train']:
+                    ModelHandler.editTrainingMetadata(metadata['ok'][0]['_id'], 'ready', jobid, metadata['ok'][0]['weekday'], metadata['ok'][0]['hour'])
+                    print("Requierments for trianing invalid, killing job " + jobid)
+                    break
+
+                
+                now = datetime.datetime.now() #NOTE: weekday in datetime starts at Monday, but input from front end starts at Sunday
+                if ((now.weekday()+1)%7 == metadata['ok'][0]['weekday'] and now.hour == metadata['ok'][0]['hour']) or metadata['ok'][0]['hour'] == -1: #Time for training 
+                    print("Training started")
+                    ModelHandler.editTrainingMetadata(metadata['ok'][0]['_id'], 'training', jobid, metadata['ok'][0]['weekday'], metadata['ok'][0]['hour'])
+                    train(areaid)
+                    ModelHandler.editTrainingMetadata(metadata['ok'][0]['_id'], 'ready', jobid, metadata['ok'][0]['weekday'], metadata['ok'][0]['hour'])
+                    print("Training done") 
+
+                time.sleep(SCHEDULER_SLEEP_TIME) 
+
+    except Exception as e:
+        print(str(e))
     
-# #TODO
-# def training_scheduler():
+
+    
+def training_scheduler(areaid, status, weekday, hour, app_context):
+
+    job_id = str(uuid.uuid1())
+    metadata = ModelHandler.getTrainingMetadata(areaid).json
+
+    if "ok" not in metadata:
+        return metadata
+    service_request = ModelHandler.editTrainingMetadata(metadata['ok'][0]['_id'], status, job_id, weekday, hour)
+    if "ok" not in service_request:
+        return service_request
+    
+    if status == "waiting":
+        threading.Thread(target=training_job_tracker, args=[areaid, job_id, app_context]).start()
+
+    return {"ok": "Training scheduled for day: " + str(weekday) + " and hour: " + str(hour)}
 
 
 

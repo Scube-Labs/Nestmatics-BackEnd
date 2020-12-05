@@ -55,7 +55,6 @@ TODO
             x = total_rides
         else:
             x = np.dstack([x, total_rides])
-    
     # Street and Buildings
 
     x = stack_uneven((
@@ -79,7 +78,7 @@ TODO
         temperature = make_weather_features(temperature, north_lat, south_lat, east_lon, west_lon)
     else:
         with open(ML_DATA_PATH + 'keys.json') as json_file: 
-            api_key = json.load(json_file)["OpenWeatherKey"] #TODO try catch invalid date
+            api_key = json.load(json_file)["OpenWeatherKey"] 
         temperature, precipitation = fetch_weather_forecast_data(north_lat, east_lon, dt.strftime(date, format='%Y-%m-%d'), api_key) #Forecast
 
     x = np.dstack([x, 

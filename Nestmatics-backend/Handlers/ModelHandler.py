@@ -15,6 +15,8 @@ WEATHERDICTKEYS = {"precipitation":float, "temperature":float}
 MODELKEYS = {"model_file":str, "creation_date":str, "service_area":str, "training_error":float,
              "critical_val_error":float, "validation_error":float}
 
+TRAININGMETADATAKEYS = {"service_area":str, "status":str, "process_id":str, "weekday": int, "hour":int}
+
 class ModelHandler(ParentHandler):
 
     def __init__(self, db):
@@ -304,4 +306,83 @@ class ModelHandler(ParentHandler):
         else:
             return True
 
+ # --------------------------- Training Metadata methods -------------------------------------------
 
+
+#     #TODO Verify
+    def insertTrainingMetadata(self, metadata_json):
+        try:
+            for key in TRAININGMETADATAKEYS:
+                if key not in metadata_json:
+                    return json.dumps({"Error":'Missing key from submission: ' + key})
+
+                keyType = TRAININGMETADATAKEYS[key]
+                print("key type: ", keyType)
+                print("user[" + key +"]: ", type(metadata_json[key]))
+                if type(metadata_json[key]) is not keyType:
+                    return {"Error": 'Key ' + key + ' is not the expected type: ' + str(keyType)}
+
+                if key == "service_area":
+                    if not self.verifyIDString(metadata_json[key]):
+                        return {"Error":"Area ID must be a valid 24-character hex string"}
+
+                if key == "status":
+                    if metadata_json[key] != "waiting" and metadata_json[key] != "ready":
+                        return {"Error": "Status must be \"watining\" or \"ready\""}
+                
+                if key == "weekday":
+                    if metadata_json[key] > 6 or metadata_json[key] < 0:
+                        return {"Error": "weekday must be a number from 0(Sunday) to 6(Saturday)"}
+                
+                if key == "hour":
+                    if metadata_json[key] > 23 or metadata_json[key] < 0:
+                        return {"Error": "hour must be an int number from 0 to 23"}
+                
+
+
+            # verify if there is another training metadata for that service area.
+            metadata = self.ModelDao.getTrainingMetadataByArea(metadata_json["service_area"])
+            if metadata is not None:
+                if len(metadata) != 0:
+                    print(metadata)
+                    return json.dumps({"Error":"There is already a training metadata for this service area"})
+
+            id = self.ModelDao.insertTrainingMetadata(metadata_json)
+            print("id ", id)
+            if id is None:
+                response = {"Error":"Error on insertion"}
+            else:
+                response = {"ok":id}
+            return response
+        except Exception as e:
+            return {"Error":str(e)}
+
+    def getTrainingMetadata(self, areaid):
+        try:
+            if not self.verifyIDString(areaid):
+                return make_response(jsonify(Error="area ID must be a valid 24-character hex string"), 400)
+
+            metadata = self.ModelDao.getTrainingMetadataByArea(areaid)
+            if metadata is None:
+                response = make_response(jsonify(Error="No metadata for that date"), 404)
+            else:
+                response = make_response(jsonify(ok=metadata), 200)
+            return response
+        except Exception as e:
+            return make_response(jsonify(Error=str(e)), 500)
+
+    def editTrainingMetadata(self, metadataid, status, processid, weekday, hour):
+        try:
+            metadata = self.ModelDao.editTrainingMetadata(metadataid,
+                                              status,
+                                              processid,
+                                              weekday,
+                                              hour)
+            if metadata == 0:
+                response = json.dumps({"error":"there was an error on the request. Or no Metadata with that ID"})
+            else:
+                response = json.dumps({"ok":metadata})
+            return response
+        except Exception as e:
+            return json.dumps({"Error":str(e)})
+    

@@ -8,6 +8,7 @@ class ModelDao(ParentDao):
        # super().__init__()
         self.modelCollection = db["models"]
         self.predictionsCollection = db["predictions"]
+        self.trainingMetadataCollection = db["trainingmetadata"] #TODO verify if i can just do thi
 
     def getModelByID(self, modelid):
         cursor = self.modelCollection.find_one({"_id": ObjectId(modelid)})
@@ -78,3 +79,26 @@ class ModelDao(ParentDao):
         cursor = self.predictionsCollection.delete_many({"service_area":areaid})
         return cursor.deleted_count
 
+
+# --------------------------- Training Metadata ------------------------------------------------
+#TODO Verify
+
+    def getTrainingMetadataByArea(self, areaid):
+        cursor = self.trainingMetadataCollection.find({"service_area":areaid})
+        return self.returnMany(cursor)
+
+    def insertTrainingMetadata(self, trainingmetadata):
+        cursor = self.trainingMetadataCollection.insert_one(trainingmetadata)
+        return self.insertOne(cursor)
+
+    def editTrainingMetadata(self, training_metadata_id, status, process_id, weekday, hour):
+        cursor = self.trainingMetadataCollection.update_one({"_id": ObjectId(training_metadata_id)},
+                                                      {"$set": {"status": status,
+                                                                "process_id":process_id,
+                                                                "weekday":weekday,
+                                                                "hour": hour}})
+        return cursor.modified_count
+
+    def deleteTrainingMetadata(self, areaid):
+        cursor = self.trainingMetadataCollection.delete_many({"service_area":areaid})
+        return cursor.deleted_count

@@ -1085,6 +1085,7 @@ def getModelsForArea(areaid=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
+
 @app.route('/nestmatics/ml/recent/area/<areaid>', methods=['GET'])
 def getMostRecentModel(areaid=None):
     """
@@ -1099,6 +1100,7 @@ def getMostRecentModel(areaid=None):
         return ModelHandler.getMostRecentModel(areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
+
 
 @app.route('/nestmatics/ml/area/<areaid>/trainModel', methods=['POST'])
 def trainModel(areaid=None):
@@ -1129,13 +1131,15 @@ def scheduletrainModel(areaid=None):
     TODO: finish
     """
     if request.method == 'PUT':
-        if "nest_name" not in request.json:
-            return jsonify(Error="BODY should have a nest_name key"), 400
+        if "status" not in request.json:
+            return jsonify(Error="BODY should have a status key"), 400
+        if "weekday" not in request.json:
+            return jsonify(Error="BODY should have a weekday key"), 400
+        if "hour" not in request.json:
+            return jsonify(Error="BODY should have a hour key"), 400
         if areaid is None:
-            return jsonify(Error="service area id is empty"), 400
-        # #TODO insert scheduler here
-        # process_id = ML.
-        return ModelHandler.editTrainingMetadata(areaid, request.json["status"], process_id, request.json["weekday"], request.json["hour"])
+            return jsonify(Error="area id is empty"), 400
+        return ML.training_scheduler(areaid,request.json["status"], request.json["weekday"], request.json["hour"], app.app_context()) 
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -1150,15 +1154,7 @@ def getTrainingMetadata(areaid=None):
     :return:  
     if request was valid: response object with status code 200 and the prediction id
     if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-    {
-        "model_id":str,
-        "service_area":str,
-        "status":str,
-        "process_id":str, 
-        "weekday": str, 
-        "hour":int
-        }
-        error message
+
         {
             ""
             "status": ready|waiting|training,
@@ -1167,7 +1163,9 @@ def getTrainingMetadata(areaid=None):
         }
     """
     if request.method == 'GET':
-        return ML.can_we_train(areaid)
+        if areaid is None:
+            return jsonify(Error="area id is empty"), 400
+        return ModelHandler.getTrainingMetadata(areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -1247,22 +1245,10 @@ def getRequierments(areaid=None):
 def validate_all(areaid=None):
     """
     TODO Fix
-    Trigger the creation of a new prediction
-    :param areaid: Id of area from which to create a prediction
-    :param date: date of prediction to create
-    :return:  
-    if request was valid: response object with status code 200 and the prediction id
-    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
-        ok: {
-            "can_train": False,
-            "required_days": 0,
-            "Accuracy": 0.69,
-            "Threshold": 0.4
-        }
+    Trig
     """
     if request.method == 'GET':
-        return ML.validate_all(areaid) #TODO turn into schedule
+        return ML.validate_all(areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -1285,7 +1271,5 @@ def _corsify_actual_response(response):
 if __name__ == '__main__':
     app.run(debug=True)
 
-
 #TODO 
-#  if areaid is None or startdate is None or enddate is None:
 #             return jsonify(Error="URI does not have all parameters needed"), 400
