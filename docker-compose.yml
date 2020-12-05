@@ -34,7 +34,7 @@ services:
       - "443:443"
     volumes:
       - ../Nestmatics-frontend/dist/NestmaticsUI:/usr/share/nginx/html
-      - ../dh-param/dhparam-2048.pem:/etc/ssl/certs/dhparam-2048.pem
+      - ../dhparam/dhparam-2048.pem:/etc/ssl/certs/dhparam-2048.pem
       - /docker-volumes/etc/letsencrypt/live/nestmatics.tk/fullchain.pem:/etc/letsencrypt/live/nestmatics.tk/fullchain.pem
       - /docker-volumes/etc/letsencrypt/live/nestmatics.tk/privkey.pem:/etc/letsencrypt/live/nestmatics.tk/privkey.pem
 
