@@ -16,6 +16,7 @@ from skimage import io
 from PIL import Image
 from flask import jsonify
 import random
+import tensorflow as tf
 
 from API import ModelHandler, RidesHandler, ServiceAreaHandler
 
@@ -285,10 +286,8 @@ def train(area_id):
         model = NestmaticModel()
         model.compile(loss=custom_loss_function, optimizer='adam', metrics=['accuracy'])
 
-        #TODO acomodoar
-        log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        log_dir = ML_DATA_PATH + "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
-
 
         model.predict(np.zeros((1,128,128,20))) # Need to make a prediction to instanciate model to load the weights
         model.load_weights(model_data['model_file'])
@@ -519,14 +518,22 @@ def validate_all(area_id):
             prediction = prediction['ok']
             if prediction["error_metric"] == -1: #No validation
                 validation = validate(area_id, day)
-                # if "Error" in validation:
-                #     return validation
+        
+        return {"ok"}
+
     except Exception as e:
             return {"Error":str(e)}
     #TODO return ok
 
  
 def can_we_train(area_id):
+    
+    try:
+        ML_DATA_PATH = os.environ['ML_DATA_PATH']
+    except KeyError:
+        ML_DATA_PATH = "/home/pedro/nestmatics/master/Nestmatics-BackEnd/ml_data/" #TODO eliminate
+
+
     try:
         #Get model
         service_response = ModelHandler.getMostRecentModel(area_id)
@@ -534,15 +541,25 @@ def can_we_train(area_id):
             return service_response # Error getting model.
         model_data = service_response.json['ok']
 
-        # Getting days
-        service_response = RidesHandler.getDistinctRideDatesForArea(areaid=area_id).json #TODO fix
+        # Getting days with data from service area.
+        service_response = RidesHandler.getDistinctRideDatesForArea(areaid=area_id).json 
         if "ok" not in service_response:
-            return service_response # Error obtaining the days. #TODO manage error
+            service_response['ok'] = [] 
         
         # Count how many new days have been added since last training.
+        try:
+            with open(ML_DATA_PATH + "sets/" + model_data["service_area"] + ".csv") as f:
+                stored_days = list(csv.reader(f))
+                new_store_days = []
+                for day in stored_days:
+                    new_store_days.append(day[0])
+                stored_days = new_store_days
+        except: #No previous training case.
+            stored_days = []
+
         new_days = []
         for day in service_response['ok']:
-            if day > model_data['creation_date']:
+            if str(day) not in stored_days:
                 new_days.append(day)
         
         #Calculate average accuracy of the new days (if they have predictions)
@@ -550,13 +567,16 @@ def can_we_train(area_id):
         for day in new_days:
             service_response = ModelHandler.getPredictionForDate(area_id, day).json
             if "ok" not in service_response:
-                return service_response # Error obtaining the days.#TODO
-            if service_response['error_metric'] == -1.0:
+                continue # Prediction doesnt exist
+            print(service_response)
+            if service_response['ok']['error_metric'] == -1.0: #Prediction exist but hasnt been validated.
                 continue
-            acc += service_response['error_metric']
+            acc += service_response['ok']['error_metric']
 
-        if len(new_days) != 0: #Prevent division by 0
+        if len(new_days) == 0: #Prevent division by 0
             acc = -1 #Signal that theres not enought data for this field.
+        else:
+            acc /= len(new_days)
             
         #Calculate missing days for prediction.
         required_days = DAYS_FOR_RETRAINING - len(new_days)
@@ -566,8 +586,8 @@ def can_we_train(area_id):
             'ok': {
                 "can_train": (acc<RETRAINING_THRESHOLD and len(new_days)>=DAYS_FOR_RETRAINING),
                 "required_days": required_days,
-                "Accuracy": acc,
-                "Threshold": RETRAINING_THRESHOLD
+                "accuracy": acc,
+                "threshold": RETRAINING_THRESHOLD
             }
         }
         return result 
