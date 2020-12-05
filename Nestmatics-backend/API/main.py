@@ -1114,17 +1114,60 @@ def trainModel(areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/ml/area/<areaid>/trainModel/time/<timetotrain>', methods=['POST'])
-def timedtrainModel(areaid=None):
+@app.route('/nestmatics/ml/area/<areaid>/trainModel', methods=['PUT'])
+def scheduletrainModel(areaid=None):
     """
     Route to trigger the training of a new ML model
+    ok: {
+            "status": ready|waiting,
+            "weekday": 0-6,
+            "hour": 0-23
+        }
     :param areaid: ID of area from which to create a model
     :return:
     TODO: what does it return?
     TODO: finish
     """
-    if request.method == 'POST':
-        return ML.train(areaid)
+    if request.method == 'PUT':
+        if "nest_name" not in request.json:
+            return jsonify(Error="BODY should have a nest_name key"), 400
+        if areaid is None:
+            return jsonify(Error="service area id is empty"), 400
+        # #TODO insert scheduler here
+        # process_id = ML.
+        return ModelHandler.editTrainingMetadata(areaid, request.json["status"], process_id, request.json["weekday"], request.json["hour"])
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/nestmatics/ml/area/<areaid>/training/metadata/', methods=['GET'])
+def getTrainingMetadata(areaid=None):
+    """
+    TODO Fix
+    Trigger the creation of a new prediction
+    :param areaid: Id of area from which to create a prediction
+    :param date: date of prediction to create
+    :return:  
+    if request was valid: response object with status code 200 and the prediction id
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+    {
+        "model_id":str,
+        "service_area":str,
+        "status":str,
+        "process_id":str, 
+        "weekday": str, 
+        "hour":int
+        }
+        error message
+        {
+            ""
+            "status": ready|waiting|training,
+            "weekday": 0-6,
+            "hour": 0-23
+        }
+    """
+    if request.method == 'GET':
+        return ML.can_we_train(areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -1176,7 +1219,7 @@ def createPrediction(areaid=None, date=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/ml/prediction/requierments/area/<areaid>', methods=['GET'])
+@app.route('/nestmatics/ml/requierments/area/<areaid>', methods=['GET'])
 def getRequierments(areaid=None):
     """
     TODO Fix
@@ -1190,8 +1233,8 @@ def getRequierments(areaid=None):
         ok: {
             "can_train": False,
             "required_days": 0,
-            "Accuracy": 0.69,
-            "Threshold": 0.4
+            "accuracy": 0.69,
+            "threshold": 0.4
         }
     """
     if request.method == 'GET':
@@ -1200,7 +1243,7 @@ def getRequierments(areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/nestmatics/ml/prediction/validate/area/<areaid>', methods=['POST'])
+@app.route('/nestmatics/ml/prediction/validate/area/<areaid>', methods=['GET'])
 def validate_all(areaid=None):
     """
     TODO Fix
@@ -1218,8 +1261,8 @@ def validate_all(areaid=None):
             "Threshold": 0.4
         }
     """
-    if request.method == 'POST':
-        return ML.validate_all(areaid)
+    if request.method == 'GET':
+        return ML.validate_all(areaid) #TODO turn into schedule
     else:
         return jsonify(Error="Method not allowed."), 405
 

@@ -17,6 +17,8 @@ from PIL import Image
 from flask import jsonify
 import random
 import tensorflow as tf
+import schedule
+import threading
 
 from API import ModelHandler, RidesHandler, ServiceAreaHandler
 
@@ -313,7 +315,6 @@ def train(area_id):
     except Exception as e:
             return {"Error":str(e)}
 
-
 def validate(area_id, date):
     try:
         #Get model 
@@ -497,6 +498,20 @@ def get_terrain_data(area_id):
         service_data = ModelHandler.insertModel(model_data)
         if "ok" not in service_response:
             return service_response # Error while storing model data
+
+        
+        TRAININGMETADATAKEYS = {"service_area":str, "status":str, "process_id":str, "weekday": str, "hour":int}
+        # Create a training metadata component.
+        training_metadata = {
+            "status": "ready",
+            "process_id": -1,
+            "weekday": 0,
+            "hour": 0
+        }
+        service_data = ModelHandler.insertTrainingMetadata(training_metadata)
+        if "ok" not in service_response:
+            return service_response
+        
     except Exception as e:
             return {"Error":str(e)}
 
@@ -531,6 +546,7 @@ def can_we_train(area_id):
     try:
         ML_DATA_PATH = os.environ['ML_DATA_PATH']
     except KeyError:
+        # return {"Error":  "ML_DATA_PATH enviorment variable not found."} #TODO add to tohers
         ML_DATA_PATH = "/home/pedro/nestmatics/master/Nestmatics-BackEnd/ml_data/" #TODO eliminate
 
 
@@ -594,8 +610,14 @@ def can_we_train(area_id):
     except Exception as e:
             return {"Error":str(e)}
 
-#TODO
+
+# def training_job_tracker(areaid, weekday, hour):
+    
+# #TODO
 # def training_scheduler():
+
+
+
 
 # UTILS
 def clean_ride_data(rides_json):
