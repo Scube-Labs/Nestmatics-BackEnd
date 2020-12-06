@@ -13,7 +13,6 @@ import datetime
 import csv
 import time
 import os.path
-from skimage import io
 from PIL import Image
 from flask import jsonify
 import random
