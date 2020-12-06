@@ -1,5 +1,4 @@
 import sys
-sys.path.append('../')
 
 from ML.model import NestmaticModel, custom_loss_function
 from ML.feature_makers import make_rides_features, make_terrain_features
@@ -22,6 +21,9 @@ import uuid
 import json
 from DAOs import ModelDao
 from flask import jsonify
+import math
+
+sys.path.append('../')
 
 from API import ModelHandler, RidesHandler, ServiceAreaHandler
 
@@ -728,12 +730,13 @@ def clean_ride_data(rides_json):
 
 def matrix_to_json(arr, top, left, meter_pixel_ratio=5):
     res = {}
+
     for hour in range(0, 24):
         res[str(hour)] = []
         rides_of_hour = np.argwhere(arr[:,:,hour]>OUTPUT_THRESHOLD)
         for i in range(0,len(rides_of_hour)):
-            lat = top - ((rides_of_hour[i][1]*meter_pixel_ratio)/6372800) * (180/3.14159265358979323846)
-            lon = left - ((rides_of_hour[i][0]*meter_pixel_ratio)/6372800) * (180/3.14159265358979323846)
+            lat = top - ((rides_of_hour[i][1]*meter_pixel_ratio)/6372800) * (180/math.pi)
+            lon = left - ((rides_of_hour[i][0]*meter_pixel_ratio)/(6372800*math.cos((math.pi/180)*lat))) * (180/math.pi)
             res[str(hour)].append([lat, lon, arr[rides_of_hour[i][0],rides_of_hour[i][1],hour]])
                 
     return res
