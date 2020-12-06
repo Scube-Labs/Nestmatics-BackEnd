@@ -3,23 +3,23 @@ version: '3.7'
 
 services:
 
-#  flask:
-#    build: ./Nestmatics-backend
-#    container_name: flask
-#    restart: always
-#    environment:
-#      - APP_NAME=Nestmatics
-#      - DB_USERNAME=root
-#      - DB_PASWD=example
-#      - DB_HOST=mongo
-#      - MONGO_PORT=27017
-#      - ML_DATA_PATH=/data/ml/
-#    depends_on:
-#      - mongo
-#    expose:
-#      - 8080
-#    volumes:
-#    - ./ml_data:/data/ml
+  flask:
+    build: ./Nestmatics-backend
+    container_name: flask
+    restart: always
+    environment:
+      - APP_NAME=Nestmatics
+      - DB_USERNAME=root
+      - DB_PASWD=example
+      - DB_HOST=mongo
+      - MONGO_PORT=27017
+      - ML_DATA_PATH=/data/ml/
+    depends_on:
+      - mongo
+    expose:
+      - 8080
+    volumes:
+    - ./ml_data:/data/ml
 
   nginx:
     build: ./nginx
@@ -34,15 +34,10 @@ services:
       - "443:443"
     volumes:
       - ../Nestmatics-frontend/dist/NestmaticsUI:/usr/share/nginx/html
+      # uncomment when in server environment. THis is for the ssl certificates
       - ../dhparam/dhparam-2048.pem:/etc/ssl/certs/dhparam-2048.pem
       - /docker-volumes/etc/letsencrypt/live/nestmatics.tk/fullchain.pem:/etc/letsencrypt/live/nestmatics.tk/fullchain.pem
       - /docker-volumes/etc/letsencrypt/live/nestmatics.tk/privkey.pem:/etc/letsencrypt/live/nestmatics.tk/privkey.pem
-
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
 
   mongo:
     image: mongo
@@ -55,8 +50,6 @@ services:
       - 27017
     volumes:
       - ./mongo_data:/data/db
-    ports: #Eliminate(this is for fast testing purposes)
-      - "2717:27017"
 
   mongo-express:
     image: mongo-express
