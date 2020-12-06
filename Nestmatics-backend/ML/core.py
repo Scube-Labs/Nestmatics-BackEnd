@@ -20,17 +20,19 @@ import random
 import tensorflow as tf
 import threading
 import uuid
+import json
 from DAOs import ModelDao
-from pymongo import MongoClient
+from flask import jsonify
 
 from API import ModelHandler, RidesHandler, ServiceAreaHandler
 
 TIME_PER_REQUEST = 1
 REQUEST_DIVSION = 2
 RETRAINING_THRESHOLD = 0.3
-OUTPUT_THRESHOLD = 0.00
+OUTPUT_THRESHOLD = 0.01
 DAYS_FOR_RETRAINING = 30
-SCHEDULER_SLEEP_TIME = 1200 #20 minutes
+SCHEDULER_SLEEP_TIME = 300 #5 minutes
+VALIDATIONS_PER_CALL = 3
 
 
 def predict(area_id, date): 
@@ -41,9 +43,11 @@ def predict(area_id, date):
         date (string): ISO format date of the desired day to predict.
 
     Returns:
-        [type]: [description] #TODO
+        [type]: [description] 
     """
     try:
+        print("Generating prediction")
+
         #Get model 
         service_response = ModelHandler.getModelsForArea(area_id)
         if "Error" in service_response.json:
@@ -115,8 +119,12 @@ def predict(area_id, date):
         for ix in range(0, int(x.shape[0]/128)):
             for iy in range(0, int(x.shape[1]/128)):
                 x_slice = x[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :]
-                if x_slice.shape != (128,128,20): #Not enought pixels in the border
+                if x_slice.shape != (128,128,20): # Not enought pixels in the border
+                    print(x_slice.shape)
                     continue
+                if res[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :].shape != (128,128,24): # Not enought pixels in the border
+                    print(res[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :].shape)
+                    continue 
                 res[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :] = model.predict(x_slice.reshape((1,128,128,20)))
 
 
@@ -139,8 +147,9 @@ def predict(area_id, date):
             "error_metric": -1.0,
             "service_area": area_id
         }
-
+        print("Prediction completed")
         return ModelHandler.insertPrediction(prediction) #Store results
+
     except Exception as e:
             return {"Error":str(e)}
 
@@ -151,7 +160,7 @@ def train(area_id):
         try:
             ML_DATA_PATH = os.environ['ML_DATA_PATH']
         except KeyError:
-            ML_DATA_PATH = "/home/pedro/nestmatics/master/Nestmatics-BackEnd/ml_data/" #TODO eliminate
+            return {"Error":  "ML_DATA_PATH enviorment variable not found."}
 
         #Get model
         service_response = ModelHandler.getMostRecentModel(area_id)
@@ -211,7 +220,7 @@ def train(area_id):
         new_days = []
         if model_data['training_error'] == -1: # Never trained case.
             new_days = service_response['ok']
-        else: #Previously trained case. #TODO test this case
+        else: #Previously trained case.
             with open(ML_DATA_PATH + "sets/" + area_id + ".csv", 'r') as f: 
                 for line in f.read().splitlines():
                     if line not in service_response['ok']:
@@ -262,7 +271,7 @@ def train(area_id):
                 for iy in range(0, int(x.shape[1]/128)):
                     x_slice = x[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :]
                     y_slice = y[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :]
-                    np.savez_compressed(ML_DATA_PATH + "matrices/" + area_id + "-" + day + '-' + str(ix) + '-' + str(iy) + '.npz', x=x_slice, y=y_slice) #TODO add service area
+                    np.savez_compressed(ML_DATA_PATH + "matrices/" + area_id + "-" + day + '-' + str(ix) + '-' + str(iy) + '.npz', x=x_slice, y=y_slice)
                     slices.append(ML_DATA_PATH + "matrices/" + area_id + "-" + day + '-' + str(ix) + '-' + str(iy) + '.npz')
 
         train_csv = ML_DATA_PATH + 'sets/' + area_id + '-training.csv'
@@ -317,6 +326,7 @@ def train(area_id):
         model.save_weights(new_model_path)
 
         return service_response
+
     except Exception as e:
             return {"Error":str(e)}
 
@@ -403,6 +413,11 @@ def validate(area_id, date):
             for iy in range(0, int(x.shape[1]/128)):
                 x_slice = x[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :]
                 y_slice = y[ix*128:(ix+1)*128, iy*128:(iy+1)*128, :]
+                if x_slice.shape != (128, 128, 20) or y_slice.shape != (128, 128, 24):
+                    print("boom")
+                    print(x_slice.shape)
+                    print(y_slice.shape)
+                    continue
                 res_dic = model.evaluate(x_slice.reshape((1,128,128,20)), y_slice.reshape((1,128,128,24)), return_dict=True)
                 acc += res_dic['accuracy']
 
@@ -424,7 +439,7 @@ def get_terrain_data(area_id):
         try:
             ML_DATA_PATH = os.environ['ML_DATA_PATH']
         except KeyError:
-            ML_DATA_PATH = "/home/pedro/nestmatics/master/Nestmatics-BackEnd/ml_data/" #TODO eliminate
+            return {"Error":  "ML_DATA_PATH enviorment variable not found."}
 
         # Gettings cords
         service_response = ServiceAreaHandler.getServiceArea(area_id).json
@@ -526,27 +541,39 @@ def get_terrain_data(area_id):
 
 def validate_all(area_id):
     try:
+        validations_done = 0
         service_response = RidesHandler.getDistinctRideDatesForArea(areaid=area_id).json
         if "ok" not in service_response:
             return service_response # Error obtaining the days.
         for day in service_response['ok']:
             day = datetime.datetime.strptime(day, "%Y-%m-%dT%H:%M:%S")
             day = datetime.datetime.strftime(day, "%Y-%m-%d")
+
+            # Generate Prediction if missing
             prediction = ModelHandler.getPredictionForDate(area_id, day).json
             if "Error" in prediction: # No prediction made.
                 temp = predict(area_id, day)
-                if "Error" in temp:
-                    return temp
                 prediction = ModelHandler.getPredictionForDate(area_id, day).json
+                if "Error" in prediction:
+                    print("Error: Could not do validation for: " + str(day) + " from area " + str(area_id))
+                    return temp
             prediction = prediction['ok']
+
+            # Validate
             if prediction["error_metric"] == -1: #No validation
                 validation = validate(area_id, day)
+                if "Error" in validation:
+                    print("Error during validation")
+                    return validation
+                validations_done += 1
+            
+            if validations_done >=VALIDATIONS_PER_CALL:
+                break
         
-        return {"ok"}
+        return {"ok":"Validations completed"}
 
     except Exception as e:
             return {"Error":str(e)}
-    #TODO return ok
 
  
 def can_we_train(area_id):
@@ -554,8 +581,8 @@ def can_we_train(area_id):
     try:
         ML_DATA_PATH = os.environ['ML_DATA_PATH']
     except KeyError:
-        # return {"Error":  "ML_DATA_PATH enviorment variable not found."} #TODO add to tohers
-        ML_DATA_PATH = "/home/pedro/nestmatics/master/Nestmatics-BackEnd/ml_data/" #TODO eliminate
+        print("ML_DATA_PATH enviorment variable not found.")
+        return {"Error":  "ML_DATA_PATH enviorment variable not found."}
 
 
     try:
@@ -588,19 +615,25 @@ def can_we_train(area_id):
         
         #Calculate average accuracy of the new days (if they have predictions)
         acc = 0.0
+        days_with_validation = 0
         for day in new_days:
             service_response = ModelHandler.getPredictionForDate(area_id, day).json
             if "ok" not in service_response:
                 continue # Prediction doesnt exist
-            print(service_response)
             if service_response['ok']['error_metric'] == -1.0: #Prediction exist but hasnt been validated.
                 continue
+            days_with_validation += 1
             acc += service_response['ok']['error_metric']
 
-        if len(new_days) == 0: #Prevent division by 0
+        if len(new_days) == 0 or days_with_validation == 0: #Prevent division by 0
             acc = -1 #Signal that theres not enought data for this field.
         else:
-            acc /= len(new_days)
+            if acc/len(new_days) * 100 < 1:
+                acc /= len(new_days) * 100 
+            elif acc/len(new_days) * 10 < 1:
+                acc /= len(new_days) * 10
+            else:
+                acc /= len(new_days)
             
         #Calculate missing days for prediction.
         required_days = DAYS_FOR_RETRAINING - len(new_days)

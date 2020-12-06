@@ -1270,6 +1270,3 @@ def _corsify_actual_response(response):
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-#TODO 
-#             return jsonify(Error="URI does not have all parameters needed"), 400

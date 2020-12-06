@@ -9,9 +9,9 @@ six==1.15.0
 uWSGI==2.0.19.1
 Werkzeug==1.0.1
 numpy==1.18.1
-tensorflow
 keras==2.4.3
 imageio==2.6.1
 holidays==0.10.3
 climata==0.5.0
 scikit-image
+tensorflow==2.3.0

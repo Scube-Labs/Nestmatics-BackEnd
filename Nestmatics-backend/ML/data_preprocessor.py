@@ -12,10 +12,8 @@ import csv
 import json
 import os
 
-#TODO move to utils
 def create_input_output_matrix(date, streets, buildings, amenities, ride_data, days_before_ride_data, north_lat, south_lat, east_lon, west_lon, meter_per_pixel=5):
     """[summary]
-TODO
     Args:
         date ([type]): [description]
         streets ([type]): [description]
@@ -36,7 +34,7 @@ TODO
     try:
         ML_DATA_PATH = os.environ['ML_DATA_PATH']
     except KeyError:
-        ML_DATA_PATH = "/home/pedro/nestmatics/master/Nestmatics-BackEnd/ml_data/" #TODO eliminate
+        ML_DATA_PATH = "/home/pedro/nestmatics/master/Nestmatics-BackEnd/ml_data/"
 
 
     if ride_data is not None: #Case for validation or training.
@@ -77,9 +75,13 @@ TODO
         precipitation = make_weather_features(precipitation, north_lat, south_lat, east_lon, west_lon)
         temperature = make_weather_features(temperature, north_lat, south_lat, east_lon, west_lon)
     else:
-        with open(ML_DATA_PATH + 'keys.json') as json_file: 
-            api_key = json.load(json_file)["OpenWeatherKey"] 
-        temperature, precipitation = fetch_weather_forecast_data(north_lat, east_lon, dt.strftime(date, format='%Y-%m-%d'), api_key) #Forecast
+        if datetime.date.today() > datetime.date(date.year, date.month, date.day) - datetime.timedelta(days=7): # We can get forecast
+            with open(ML_DATA_PATH + 'keys.json') as json_file: 
+                api_key = json.load(json_file)["OpenWeatherKey"] 
+            temperature, precipitation = fetch_weather_forecast_data(north_lat, east_lon, dt.strftime(date, format='%Y-%m-%d'), api_key) #Forecast
+        else:
+            temperature = 70.0 # Average
+            precipitation = 0.0
 
     x = np.dstack([x, 
             np.full((x.shape[0], x.shape[1]), precipitation),
@@ -110,7 +112,7 @@ def blur(array, iteration=1):
         iy = non_zeros[1][i]
 
         if ix+1 < array.shape[0]:
-            res[ix+1, iy] = 1 #TODO change to +=
+            res[ix+1, iy] = 1
             if iy+1 < array.shape[1]:
                 res[ix, iy+1] = 1
                 res[ix+1, iy+1] = 1
