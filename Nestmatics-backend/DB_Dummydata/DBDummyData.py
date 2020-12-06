@@ -42,24 +42,24 @@ def main():
     db = client["Nestmatics"]
     print(db)
 
-    # createUsersTable(db)
-    # createServiceAreaTable(db)
-    # createNestsTable(db)
-    # createNestConfigTable(db)
-    # createDropStrategyTable(db)
-    # createExperimentsTable(db)
+    createUsersTable(db)
+    createServiceAreaTable(db)
+    createNestsTable(db)
+    createNestConfigTable(db)
+    createDropStrategyTable(db)
+    createExperimentsTable(db)
 
     # insert path of csv file here
-    csv_path = "/home/pedro/nestmatics/master/Nestmatics-BackEnd/Nestmatics-backend/ML/rides1.csv"
-    with open(csv_path, 'r') as f:
-        insertRides(f, db)
+    # csv_path = "/home/pedro/nestmatics/master/Nestmatics-BackEnd/Nestmatics-backend/ML/rides1.csv"
+    # with open(csv_path, 'r') as f:
+    #     insertRides(f, db)
 
-    # createModelTable(db)
-    # createPredictionTable(db)
-    # createStreetsTable(db)
-    # createAmenitiesTable(db)
-    # createWeatherTable(db)
-    # createBuildingsTable(db)
+    createModelTable(db)
+    createPredictionTable(db)
+    createStreetsTable(db)
+    createAmenitiesTable(db)
+    createWeatherTable(db)
+    createBuildingsTable(db)
     client.close()
     return {"inserted dummy data into the db"}
 

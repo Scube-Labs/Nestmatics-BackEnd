@@ -81,8 +81,8 @@ def make_rides_features(data, north_lat, south_lat, east_lon, west_lon, meter_pe
     
     #Populate matrix
     for ride in data:
-        x = int(haversine((north_lat, west_lon), (north_lat, ride[1]))/meter_per_pixel)
-        y = int(haversine((north_lat, west_lon), (ride[0], west_lon))/meter_per_pixel)
+        x = int(haversine((north_lat, west_lon), (north_lat, ride[0]))/meter_per_pixel)
+        y = int(haversine((north_lat, west_lon), (ride[1], west_lon))/meter_per_pixel)
         try: 
             ride_matrix[x][y][ride[2]] += 1
         except:
@@ -212,6 +212,10 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
 
     #Divide the amenities by their type
     amenities_to_draw = {}
+    for key in AMENITIES_TYPE:
+        amenities_to_draw[key] = []
+    amenities_to_draw['other'] = []
+
     amenities_to_draw['other'] = [] #Creating default case
     for key in amenities:
         line = []
@@ -234,8 +238,6 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
         # Group by amenity type
         for t in AMENITIES_TYPE:
             if key in AMENITIES_TYPE[t]:
-                if t not in amenities_to_draw:
-                    amenities_to_draw[t] = []
                 amenities_to_draw[t].append(line)
             else:
                 amenities_to_draw['other'].append(line)
@@ -266,18 +268,14 @@ def make_terrain_features(data, north_lat, south_lat, east_lon, west_lon):
     for key in amenities_to_draw:
         draw_amenities = ImageDraw.Draw(img_amenities[key])
 
+        if len(amenities_to_draw[key]) == 0: #empty case
+            continue
+
         for element in amenities_to_draw[key][0]:
             if len(element) == 1: #Point
                 draw_amenities.ellipse((element[0][1]-15, element[0][1]-15, element[0][1]+15, element[0][1]+15) ,fill='white', outline='white') # create a 30 m radious circle
             else:
                 draw_amenities.polygon(element, fill='white')
-
-    #Flip fix
-    img_streets = img_streets.transpose(Image.FLIP_LEFT_RIGHT)
-    img_buildings = img_buildings.transpose(Image.FLIP_LEFT_RIGHT)
-
-    for key in amenities_to_draw:
-        img_amenities[key] = img_amenities[key].transpose(Image.FLIP_LEFT_RIGHT)
 
     return img_streets, img_buildings, img_amenities
 
