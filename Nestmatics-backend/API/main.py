@@ -739,7 +739,7 @@ def postServiceArea():
         if 'Error' in response.json:
             return response
         else:
-            data_response = ML.get_terrain_data(response.json['ok']['_id'])# Downloading terrain data in a thread
+            data_response = ML.get_terrain_data(response.json['ok']['_id'])# Downloading terrain data
             if data_response is None:
                 return response
             else:
@@ -1111,6 +1111,7 @@ def getModelsForArea(areaid=None):
     else:
         return jsonify(Error="Method not allowed."), 405
 
+
 @app.route(routeVar+'/nestmatics/ml/recent/area/<areaid>', methods=['GET'])
 def getMostRecentModel(areaid=None):
     """Gets most recent model (last made model for area)
@@ -1123,6 +1124,7 @@ def getMostRecentModel(areaid=None):
         return ModelHandler.getMostRecentModel(areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
+
 
 @app.route(routeVar+'/nestmatics/ml/area/<areaid>/trainModel', methods=['POST'])
 def trainModel(areaid=None):
@@ -1137,16 +1139,56 @@ def trainModel(areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route(routeVar+'/nestmatics/ml/area/<areaid>/trainModel/time/<timetotrain>', methods=['POST'])
-def timedtrainModel(areaid=None):
-    """Route to trigger the training of a new ML model
 
+@app.route(routeVar+'/nestmatics/ml/area/<areaid>/trainModel/time/<timetotrain>', methods=['POST'])
+def scheduletrainModel(areaid=None):
+    """
+    Route to trigger the training of a new ML model
+    ok: {
+            "status": ready|waiting,
+            "weekday": 0-6,
+            "hour": 0-23
+        }
     :param areaid: ID of area from which to create a model
     :return:
 
     """
-    if request.method == 'POST':
-        return ML.train(areaid)
+    if request.method == 'PUT':
+        if "status" not in request.json:
+            return jsonify(Error="BODY should have a status key"), 400
+        if "weekday" not in request.json:
+            return jsonify(Error="BODY should have a weekday key"), 400
+        if "hour" not in request.json:
+            return jsonify(Error="BODY should have a hour key"), 400
+        if areaid is None:
+            return jsonify(Error="area id is empty"), 400
+        return ML.training_scheduler(areaid,request.json["status"], request.json["weekday"], request.json["hour"], app.app_context()) 
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route(routeVar+'/nestmatics/ml/area/<areaid>/training/metadata/', methods=['GET'])
+def getTrainingMetadata(areaid=None):
+    """
+    TODO Fix
+    Trigger the creation of a new prediction
+    :param areaid: Id of area from which to create a prediction
+    :param date: date of prediction to create
+    :return:  
+    if request was valid: response object with status code 200 and the prediction id
+    if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
+
+        {
+            ""
+            "status": ready|waiting|training,
+            "weekday": 0-6,
+            "hour": 0-23
+        }
+    """
+    if request.method == 'GET':
+        if areaid is None:
+            return jsonify(Error="area id is empty"), 400
+        return ModelHandler.getTrainingMetadata(areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -1181,7 +1223,7 @@ def getPredictionFeatures(areaid=None, date=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route(routeVar+'/nestmatics/ml/prediction/area/<areaid>/date/<date>', methods=['POST'])
+@app.route(routeVar+'/nestmatics/ml/generate_prediction/area/<areaid>/date/<date>', methods=['POST'])
 def createPrediction(areaid=None, date=None):
     """Trigger the creation of a new prediction
 
@@ -1190,13 +1232,13 @@ def createPrediction(areaid=None, date=None):
     :return:  if request was valid: response object with status code 200 and the prediction id
         if request was invalid: response object with status code 400, 404, 500 or 405 along with json with error message
     """
-    if request.method == 'POST':
+    if request.method == 'GET':
         return ML.predict(areaid, date)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route(routeVar+'/nestmatics/ml/prediction/requierments/area/<areaid>', methods=['GET'])
+@app.route(routeVar+'/nestmatics/ml/requierments/area/<areaid>', methods=['GET'])
 def getRequierments(areaid=None):
     """Trigger the creation of a new prediction
 
@@ -1206,10 +1248,10 @@ def getRequierments(areaid=None):
         if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
         error message
         ok: {
-        "can_train": False,
-        "required_days": 0,
-        "Accuracy": 0.69,
-        "Threshold": 0.4
+            "can_train": False,
+            "required_days": 0,
+            "accuracy": 0.69,
+            "threshold": 0.4
         }
     """
     if request.method == 'GET':
@@ -1218,23 +1260,9 @@ def getRequierments(areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route(routeVar+'/nestmatics/ml/prediction/validate/area/<areaid>', methods=['POST'])
+@app.route(routeVar+'/nestmatics/ml/prediction/validate/area/<areaid>', methods=['GET'])
 def validate_all(areaid=None):
-    """Trigger the creation of a new prediction
-
-    :param areaid: Id of area from which to create a prediction
-    :param date: date of prediction to create
-    :return:  if request was valid: response object with status code 200 and the prediction id
-        if request was invalid: response object with status code 400, 404, 500 or 405 along with json with
-        error message
-        ok: {
-        "can_train": False,
-        "required_days": 0,
-        "Accuracy": 0.69,
-        "Threshold": 0.4
-        }
-    """
-    if request.method == 'POST':
+    if request.method == 'GET':
         return ML.validate_all(areaid)
     else:
         return jsonify(Error="Method not allowed."), 405
@@ -1258,10 +1286,14 @@ def _corsify_actual_response(response):
     return response
 
 
+<<<<<<< HEAD
 # if __name__ == '__main__':
 #     app.run(debug=True)
+=======
 
+if __name__ == '__main__':
+    app.run(debug=True)
+>>>>>>> master
 
 #TODO 
-#  if areaid is None or startdate is None or enddate is None:
 #             return jsonify(Error="URI does not have all parameters needed"), 400
