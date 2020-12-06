@@ -19,31 +19,22 @@ class UsersHandler(ParentHandler):
         self.NestsHandler = nestsHandler
 
     def getAllUsers(self):
-        """
-        Function to get all users in the database.
-        :return:
-            response with status code 404: Status code due to there not being any users in the system. Response
-                will have the format:
-                {
-                    "Error": "error information string"
-                }
+        """Function to get all users in the database.
+
+        :return: response with status code 404: Status code due to there not being any users in the system. Response
+            will have the format:
+            {
+            "Error": "error information string"
+            }
             response with status code 200: Status code acknowledges request was successful. Response will have the
-                format:
-                [
-                    {
-                        "_id": document_id,
-                        "email": user_email,
-                        "type": user_type
-                    },
-                    {
-                        "_id": document_id,
-                        "email": user_email,
-                        "type": user_type
-                    },
-                    .
-                    .
-                    .
-                ]
+            format:
+            [
+            {
+            "_id": document_id,
+            "email": user_email,
+            "type": user_type
+            },
+            ]
             response with status code 500: Response code signifies there was an error in the server while processing
             the request.
         """
@@ -60,26 +51,26 @@ class UsersHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getUser(self, userid):
-        """
-        Function to Get a Specific User from the database using the document id as an identifier. Will perform
+        """Function to Get a Specific User from the database using the document id as an identifier. Will perform
         validation for id to verify it is not empty and it has the correct length. Will also verify id belongs to an
         actual user in the database.
+
         :param userid: ID of the database document holding the user information.
         :return: response with status code 404: Response code due to the document id not existing on the user
-                collection in the database. Response will have the format:
-                {
-                    "Error": "error information string"
-                }
+            collection in the database. Response will have the format:
+            {
+            "Error": "error information string"
+            }
             response with status code 400: Response code due to the id passed as a parameter not being valid. Response
-                will have the same format as the 404 response explained above.
+            will have the same format as the 404 response explained above.
 
             response with status code 200: Response code acknowledges request was successful. Response will have the
-                format:
-                    {
-                        "_id": document_id,
-                        "email": user_email,
-                        "type": user_type
-                    }
+            format:
+            {
+            "_id": document_id,
+            "email": user_email,
+            "type": user_type
+            }
             response with status code 500: Response code signifies there was an error in the server while processing
             the request.
         """
@@ -102,8 +93,8 @@ class UsersHandler(ParentHandler):
         return self.UsersDao.getUserByID(userid)
 
     def getUserByEmail(self, email):
-        """
-        Function to get user a unique user from the database by their email
+        """Function to get user a unique user from the database by their email
+
         :param email: email of desired user
         :return:
         """
@@ -118,28 +109,28 @@ class UsersHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def insertuser(self, user):
-        """
-        Function to insert Users in the database. Will validate JSON parameter corresponding to the request body of
+        """Function to insert Users in the database. Will validate JSON parameter corresponding to the request body of
         the API route /nestmatics/users. Validation will make sure request.json has the required keys and also that
         the value of keys are of the correct type. If values are not expected, if keys are missing, if user is already
         registered, if values of "email" key or "type" key are not valid, 4xx client errors will be issued. If request
         is accepted, the json parameter will the user information will be inserted in the database
+
         :param user: json object with new user information. Should have the format:
             {
-                "email":"user_email@domain.com",
-                "type":"user_type"
+            "email":"user_email@domain.com",
+            "type":"user_type"
             }
             ** domain should be either gmail or skootel
             ** user_type should be either "user" or "admin"
         :return:
             response with status code 400: missing fields, incorrect value type, incorrect email domain,
-                incorrect user_type value.
+            incorrect user_type value.
             response with status code 201: successful insertion of new user into system. Will return an HTTP response
-                with the format:
-                { "ok":
-                    { "_id": id_Number  }
-                }
-                ** id_Number refers to the db id for the newly inserted field
+            with the format:
+            { "ok":
+            { "_id": id_Number  }
+            }
+            ** id_Number refers to the db id for the newly inserted field
             response with status code 500: error in server
             response with status code 403: request was ok but user is already registered in system
         """
@@ -179,25 +170,23 @@ class UsersHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def deleteUser(self, userid):
-        """
-        Delete a specified user from the database. User to be deleted is identified by the userid passed as a
+        """Delete a specified user from the database. User to be deleted is identified by the userid passed as a
         parameter.
+
         :param userid: ID of the user to delete
         :return:
             response with status code 201: successful insertion of new user into system. Will return an HTTP response
-                with the format:
-                { "ok":
-                    { "deleted": number_of_documents_deleted  }
-                }
-
+            with the format:
+            { "ok":
+            { "deleted": number_of_documents_deleted  }
+            }
             response with status code 400: User Id in incorrect format.
             response with status code 500: error in server.
             response with status code 404: No user with specified ID, no user was found to delete.
             Response for codes 400,404,500 will have format:
             {
-                "Error": "error information string"
+            "Error": "error information string"
             }
-
         """
         try:
             if userid is None:

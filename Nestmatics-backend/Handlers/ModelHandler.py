@@ -24,8 +24,7 @@ class ModelHandler(ParentHandler):
         self.ModelDao = ModelDao(db)
 
     def insertModel(self, model_json):
-        """
-        Function to insert a model information in the database. Will validate JSON parameter corresponding to the
+        """Function to insert a model information in the database. Will validate JSON parameter corresponding to the
         request body of the API route /nestmatics/ml. Validation will make sure request.json has the required
         keys and also that the value of keys are of the correct type. If values are not expected, if keys are missing,
         if there is already a model with that same model path, a 4xx client error will
@@ -33,12 +32,9 @@ class ModelHandler(ParentHandler):
         in the database.
 
         :param model_json: json containing the experiment to be inserted into the database
-        :return: ID of newly inserted document
-        if json is valid, response will be of the format:
+        :return: ID of newly inserted document. if json is valid, response will be of the format:
             {
-                "ok":{
-                    "id": id of inserted document
-                }
+            "ok":{ "id": id of inserted document }
             }
         """
         try:
@@ -78,16 +74,13 @@ class ModelHandler(ParentHandler):
             return {"Error":str(e)}
 
     def getModelsForArea(self, areaid):
-        """
-        Gets all models on a specified area
+        """Gets all models on a specified area
+
         :param areaid: ID of area that identified models to retrieve
-        :return:
-        response with status code 200: if request was valid, will return rseponse with models for a
-            specific area
-        response with status code 400: if id does not follow correct format, will issue a json with a error
-            information
-        response with status code 404: no models for area id provided
-        response with status code 500: if an error happened in the server
+        :return:response with status code 200: if request was valid, will return rseponse with models for a specific area
+            response with status code 400: if id does not follow correct format, will issue a json with a error information
+            response with status code 404: no models for area id provided
+            response with status code 500: if an error happened in the server
         """
         try:
             if not self.verifyIDString(areaid):
@@ -103,16 +96,13 @@ class ModelHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getModelForID(self, modelid):
-        """
-        Gets a specfic model identified by provided ID
+        """Gets a specfic model identified by provided ID
+
         :param modelid: ID for model to retrieve
-        :return:
-        response with status code 200: if request was valid, will return rseponse with model identified by
-            provided ID
-        response with status code 400: if id does not follow correct format, will issue a json with a error
-            information
-        response with status code 404: model for specified id for model
-        response with status code 500: if an error happened in the server
+        :return: response with status code 200: if request was valid, will return rseponse with model identified by
+            provided ID. response with status code 400: if id does not follow correct format, will issue a json with
+            a error information. response with status code 404: model for specified id for model response with status
+            code 500: if an error happened in the server
         """
         try:
             if not self.verifyIDString(modelid):
@@ -128,16 +118,13 @@ class ModelHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getMostRecentModel(self, areaid):
-        """
-        Gets most recent model from DB
+        """Gets most recent model from DB
+
         :param areaid: ID of area from which to retrieve most recent model
-        :return:
-        response with status code 200: if request was valid, will return rseponse with most recently
-            created model in area (which should be the default model for the current predictions)
-        response with status code 400: if id does not follow correct format, will issue a json with a error
-            information
-        response with status code 404: no models for area id provided
-        response with status code 500: if an error happened in the server
+        :return: response with status code 200: if request was valid, will return rseponse with most recently created
+            model in area (which should be the default model for the current predictions). response with status code
+            400: if id does not follow correct format, will issue a json with a error information.response with status
+            code 404: no models for area id provided. response with status code 500: if an error happened in the server
         """
         try:
             if not self.verifyIDString(areaid):
@@ -158,6 +145,11 @@ class ModelHandler(ParentHandler):
     # --------------------------- Prediction methods -------------------------------------------
 
     def insertPrediction(self, predict_json):
+        """Insert prediction into the DB
+
+        :param predict_json:
+        :return:
+        """
         try:
             for key in PREDICTIONKEYS:
                 if key not in predict_json:
@@ -229,6 +221,12 @@ class ModelHandler(ParentHandler):
             return {"Error":str(e)}
 
     def getPredictionForDate(self, areaid, date):
+        """Get a prediction for a specific date
+
+        :param areaid: ID of area to get prediction from
+        :param date: date to get prediction from
+        :return:
+        """
         try:
             if not self.verifyIDString(areaid):
                 return make_response(jsonify(Error="area ID must be a valid 24-character hex string"), 400)
@@ -259,6 +257,12 @@ class ModelHandler(ParentHandler):
         return predictions
 
     def getPredictionFeatures(self, areaid, date):
+        """Get features imporatance from a prediction on a specific date
+
+        :param areaid: ID of area to get prediction from
+        :param date: date to get prediction from
+        :return:
+        """
         try:
             if not self.verifyIDString(areaid):
                 return make_response(jsonify(Error="area ID must be a valid 24-character hex string"), 400)
@@ -281,6 +285,14 @@ class ModelHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def editPrediction(self, predictionid, prediction, features, error_metric):
+        """Edit a prediction
+
+        :param predictionid: ID of prediction to edit
+        :param prediction: values of prediction to replace on specified prediction
+        :param features: features of new prediction
+        :param error_metric: error metric of new prediction
+        :return:
+        """
         try:
 
             model = self.ModelDao.editPrediction(predictionid,

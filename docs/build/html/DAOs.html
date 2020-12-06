@@ -35,7 +35,9 @@
 
     
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Handlers package" href="Handlers.html" />
+    <link rel="prev" title="API package" href="API.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -80,24 +82,29 @@
               
             
             
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">DAOs package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-DAOs.DropStrategyDao">DAOs.DropStrategyDao module</a></li>
-<li><a class="reference internal" href="#module-DAOs.ExperimentsDao">DAOs.ExperimentsDao module</a></li>
-<li><a class="reference internal" href="#module-DAOs.ModelDao">DAOs.ModelDao module</a></li>
-<li><a class="reference internal" href="#module-DAOs.NestsDao">DAOs.NestsDao module</a></li>
-<li><a class="reference internal" href="#module-DAOs.ParentDao">DAOs.ParentDao module</a></li>
-<li><a class="reference internal" href="#module-DAOs.RideStatsDao">DAOs.RideStatsDao module</a></li>
-<li><a class="reference internal" href="#module-DAOs.RidesDao">DAOs.RidesDao module</a></li>
-<li><a class="reference internal" href="#module-DAOs.ServiceAreaDao">DAOs.ServiceAreaDao module</a></li>
-<li><a class="reference internal" href="#module-DAOs.UsersDao">DAOs.UsersDao module</a></li>
-<li><a class="reference internal" href="#module-DAOs">Module contents</a></li>
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Nestmatics-backend</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="API.html">API package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">DAOs package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-DAOs.DropStrategyDao">DAOs.DropStrategyDao module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-DAOs.ExperimentsDao">DAOs.ExperimentsDao module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-DAOs.ModelDao">DAOs.ModelDao module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-DAOs.NestsDao">DAOs.NestsDao module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-DAOs.ParentDao">DAOs.ParentDao module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-DAOs.RideStatsDao">DAOs.RideStatsDao module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-DAOs.RidesDao">DAOs.RidesDao module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-DAOs.ServiceAreaDao">DAOs.ServiceAreaDao module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-DAOs.UsersDao">DAOs.UsersDao module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-DAOs">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Handlers.html">Handlers package</a></li>
 </ul>
 </li>
 </ul>
-</div>
+
             
           
         </div>
@@ -142,6 +149,8 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
+          <li><a href="modules.html">Nestmatics-backend</a> &raquo;</li>
+        
       <li>DAOs package</li>
     
     
@@ -170,7 +179,7 @@
 <span id="daos-dropstrategydao-module"></span><h2>DAOs.DropStrategyDao module<a class="headerlink" href="#module-DAOs.DropStrategyDao" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="DAOs.DropStrategyDao.DropStrategyDao">
-<em class="property">class </em><code class="sig-prename descclassname">DAOs.DropStrategyDao.</code><code class="sig-name descname">DropStrategyDao</code><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.DropStrategyDao.</code><code class="sig-name descname">DropStrategyDao</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
 <dl class="py method">
 <dt id="DAOs.DropStrategyDao.DropStrategyDao.deleteDropStrategy">
@@ -191,6 +200,16 @@
 <dl class="py method">
 <dt id="DAOs.DropStrategyDao.DropStrategyDao.editDropStrategy">
 <code class="sig-name descname">editDropStrategy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dropid</span></em>, <em class="sig-param"><span class="n">dayNum</span></em>, <em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao.editDropStrategy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.DropStrategyDao.DropStrategyDao.editDropStrategyName">
+<code class="sig-name descname">editDropStrategyName</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dropid</span></em>, <em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao.editDropStrategyName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.DropStrategyDao.DropStrategyDao.editTotalVehiclesForDrop">
+<code class="sig-name descname">editTotalVehiclesForDrop</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dropid</span></em>, <em class="sig-param"><span class="n">vehicles</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao.editTotalVehiclesForDrop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -221,7 +240,15 @@
 
 <dl class="py method">
 <dt id="DAOs.DropStrategyDao.DropStrategyDao.getMostRecentDropStrategy">
-<code class="sig-name descname">getMostRecentDropStrategy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao.getMostRecentDropStrategy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getMostRecentDropStrategy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">userid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao.getMostRecentDropStrategy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets most recently made drop strategy
+:param areaid:
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.DropStrategyDao.DropStrategyDao.getMostRecentDropStrategyFromDate">
+<code class="sig-name descname">getMostRecentDropStrategyFromDate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">userid</span></em>, <em class="sig-param"><span class="n">date_lt</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.DropStrategyDao.DropStrategyDao.getMostRecentDropStrategyFromDate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets most recently made drop strategy
 :param areaid:
 :return:</p>
@@ -242,7 +269,7 @@
 <span id="daos-experimentsdao-module"></span><h2>DAOs.ExperimentsDao module<a class="headerlink" href="#module-DAOs.ExperimentsDao" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="DAOs.ExperimentsDao.ExperimentsDao">
-<em class="property">class </em><code class="sig-prename descclassname">DAOs.ExperimentsDao.</code><code class="sig-name descname">ExperimentsDao</code><a class="headerlink" href="#DAOs.ExperimentsDao.ExperimentsDao" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.ExperimentsDao.</code><code class="sig-name descname">ExperimentsDao</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ExperimentsDao.ExperimentsDao" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
 <dl class="py method">
 <dt id="DAOs.ExperimentsDao.ExperimentsDao.deleteExperiment">
@@ -309,7 +336,7 @@
 <span id="daos-modeldao-module"></span><h2>DAOs.ModelDao module<a class="headerlink" href="#module-DAOs.ModelDao" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="DAOs.ModelDao.ModelDao">
-<em class="property">class </em><code class="sig-prename descclassname">DAOs.ModelDao.</code><code class="sig-name descname">ModelDao</code><a class="headerlink" href="#DAOs.ModelDao.ModelDao" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.ModelDao.</code><code class="sig-name descname">ModelDao</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ModelDao.ModelDao" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
 <dl class="py method">
 <dt id="DAOs.ModelDao.ModelDao.deleteModelByArea">
@@ -393,7 +420,7 @@
 <span id="daos-nestsdao-module"></span><h2>DAOs.NestsDao module<a class="headerlink" href="#module-DAOs.NestsDao" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="DAOs.NestsDao.NestsDao">
-<em class="property">class </em><code class="sig-prename descclassname">DAOs.NestsDao.</code><code class="sig-name descname">NestsDao</code><a class="headerlink" href="#DAOs.NestsDao.NestsDao" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.NestsDao.</code><code class="sig-name descname">NestsDao</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
 <dl class="py method">
 <dt id="DAOs.NestsDao.NestsDao.deleteNest">
@@ -417,6 +444,14 @@
 <dd><p>Deletes all Nests identified by a userID
 :param userid: ID of user from which to delete nests
 :return: number of nests deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.deleteNestConfigurationByDate">
+<code class="sig-name descname">deleteNestConfigurationByDate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.deleteNestConfigurationByDate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete all nest configurations identified by provided nestid
+:param date: ID of nest that identifies nest configurations to delete
+:return: number of nest configurations deleted</p>
 </dd></dl>
 
 <dl class="py method">
@@ -523,6 +558,16 @@
 </dd></dl>
 
 <dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.getNestConfigurationForDate">
+<code class="sig-name descname">getNestConfigurationForDate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">nestid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.getNestConfigurationForDate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.getNestConfigurationFromDateInterval">
+<code class="sig-name descname">getNestConfigurationFromDateInterval</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.getNestConfigurationFromDateInterval" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="DAOs.NestsDao.NestsDao.getNestConfigurationFromID">
 <code class="sig-name descname">getNestConfigurationFromID</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nestConfig_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.getNestConfigurationFromID" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -560,6 +605,22 @@
 :return: id of newly inserted document</p>
 </dd></dl>
 
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.insertTests">
+<code class="sig-name descname">insertTests</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">nests</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.insertTests" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.NestsDao.NestsDao.random_value">
+<code class="sig-name descname">random_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">l_l</span></em>, <em class="sig-param"><span class="n">u_l</span></em>, <em class="sig-param"><span class="n">decimals</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.NestsDao.NestsDao.random_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce random values
+:param n: number of random values to create
+:param l_l: lower threshold
+:param u_l: upper threshold
+:param decimals: how many decimals for the random number
+:return:</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -589,11 +650,6 @@
 <code class="sig-name descname">returnOne</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cursor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ParentDao.ParentDao.returnOne" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt id="DAOs.ParentDao.ParentDao.toIsoFormat">
-<code class="sig-name descname">toIsoFormat</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ParentDao.ParentDao.toIsoFormat" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 </div>
@@ -601,7 +657,7 @@
 <span id="daos-ridestatsdao-module"></span><h2>DAOs.RideStatsDao module<a class="headerlink" href="#module-DAOs.RideStatsDao" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="DAOs.RideStatsDao.RideStatsDao">
-<em class="property">class </em><code class="sig-prename descclassname">DAOs.RideStatsDao.</code><code class="sig-name descname">RideStatsDao</code><a class="headerlink" href="#DAOs.RideStatsDao.RideStatsDao" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.RideStatsDao.</code><code class="sig-name descname">RideStatsDao</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RideStatsDao.RideStatsDao" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
 <dl class="py method">
 <dt id="DAOs.RideStatsDao.RideStatsDao.deleteStatsByArea">
@@ -650,7 +706,7 @@
 <span id="daos-ridesdao-module"></span><h2>DAOs.RidesDao module<a class="headerlink" href="#module-DAOs.RidesDao" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="DAOs.RidesDao.RidesDAO">
-<em class="property">class </em><code class="sig-prename descclassname">DAOs.RidesDao.</code><code class="sig-name descname">RidesDAO</code><a class="headerlink" href="#DAOs.RidesDao.RidesDAO" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.RidesDao.</code><code class="sig-name descname">RidesDAO</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RidesDao.RidesDAO" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
 <dl class="py method">
 <dt id="DAOs.RidesDao.RidesDAO.deleteRidesByArea">
@@ -666,6 +722,24 @@
 <dd><p>Delete rides that belong to a provided date
 :param date: date from which to delete rides
 :return: number of rides deleted</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RidesDao.RidesDAO.getDatesOfRides">
+<code class="sig-name descname">getDatesOfRides</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RidesDao.RidesDAO.getDatesOfRides" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all distinct dates for an area
+:param areaid: ID of area from which to get distinct dates
+:return: array with all distinct dates</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="DAOs.RidesDao.RidesDAO.getDatesOfRidesForInterval">
+<code class="sig-name descname">getDatesOfRidesForInterval</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">areaid</span></em>, <em class="sig-param"><span class="n">date_gt</span></em>, <em class="sig-param"><span class="n">date_lt</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RidesDao.RidesDAO.getDatesOfRidesForInterval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets all distinct dates for an area
+:param areaid: ID of area from which to get distinct dates
+:param date_gt: lower threshold of date interval
+:param date_lt: upper threshold of date interval
+:return: array with all distinct dates on the specified interval</p>
 </dd></dl>
 
 <dl class="py method">
@@ -690,8 +764,8 @@
 <dt id="DAOs.RidesDao.RidesDAO.getRidesForDateIntervalAndArea">
 <code class="sig-name descname">getRidesForDateIntervalAndArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date_gt</span></em>, <em class="sig-param"><span class="n">date_lt</span></em>, <em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RidesDao.RidesDAO.getRidesForDateIntervalAndArea" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get rides for a date interval on a specified area
-:param date_gt: lower threshold for the date interval
-:param date_lt: upper threshold for the date interval
+:param date_gt: date greater than or equal
+:param date_lt: date lower than or equal
 :param areaid: ID of area rides belong to
 :return: array of rides that meet the provided criteria</p>
 </dd></dl>
@@ -711,8 +785,8 @@
 <dt id="DAOs.RidesDao.RidesDAO.getRidesForTimeIntervalAndArea">
 <code class="sig-name descname">getRidesForTimeIntervalAndArea</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span></em>, <em class="sig-param"><span class="n">time_gt</span></em>, <em class="sig-param"><span class="n">time_lt</span></em>, <em class="sig-param"><span class="n">areaid</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.RidesDao.RidesDAO.getRidesForTimeIntervalAndArea" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get rides between a provided time interval and an area
-:param time_gt: lower threshold for the time interval
-:param time_lt: upper threshold for the time interval
+:param time_gt: time greater than or equal
+:param time_lt: time lower than or equal
 :param areaid: ID of area rides belong to
 :return: array of rides that meet the provided criteria</p>
 </dd></dl>
@@ -741,7 +815,7 @@
 <span id="daos-serviceareadao-module"></span><h2>DAOs.ServiceAreaDao module<a class="headerlink" href="#module-DAOs.ServiceAreaDao" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="DAOs.ServiceAreaDao.ServiceAreaDao">
-<em class="property">class </em><code class="sig-prename descclassname">DAOs.ServiceAreaDao.</code><code class="sig-name descname">ServiceAreaDao</code><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.ServiceAreaDao.</code><code class="sig-name descname">ServiceAreaDao</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.ServiceAreaDao.ServiceAreaDao" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
 <dl class="py method">
 <dt id="DAOs.ServiceAreaDao.ServiceAreaDao.deleteAmentiesData">
@@ -893,7 +967,7 @@
 <span id="daos-usersdao-module"></span><h2>DAOs.UsersDao module<a class="headerlink" href="#module-DAOs.UsersDao" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="DAOs.UsersDao.UsersDao">
-<em class="property">class </em><code class="sig-prename descclassname">DAOs.UsersDao.</code><code class="sig-name descname">UsersDao</code><a class="headerlink" href="#DAOs.UsersDao.UsersDao" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">DAOs.UsersDao.</code><code class="sig-name descname">UsersDao</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">db</span></em><span class="sig-paren">)</span><a class="headerlink" href="#DAOs.UsersDao.UsersDao" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#DAOs.ParentDao.ParentDao" title="DAOs.ParentDao.ParentDao"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAOs.ParentDao.ParentDao</span></code></a></p>
 <dl class="py method">
 <dt id="DAOs.UsersDao.UsersDao.deleteUser">
@@ -948,13 +1022,22 @@
           </div>
           <footer>
   
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="Handlers.html" class="btn btn-neutral float-right" title="Handlers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="API.html" class="btn btn-neutral float-left" title="API package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
         
-        &copy; Copyright 2020, Sofia Saavedra
+        &copy; Copyright 2020, Scube Labs
 
     </p>
   </div>
