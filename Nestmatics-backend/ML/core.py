@@ -144,6 +144,7 @@ def predict(area_id, date):
     except Exception as e:
             return {"Error":str(e)}
 
+
 def train(area_id):
 
     try:
@@ -319,6 +320,7 @@ def train(area_id):
     except Exception as e:
             return {"Error":str(e)}
 
+
 def validate(area_id, date):
     try:
         #Get model 
@@ -414,6 +416,7 @@ def validate(area_id, date):
         return ModelHandler.editPrediction(old_prediction['_id'], old_prediction['prediction'], old_prediction['feature_importance'], acc)
     except Exception as e:
             return {"Error":str(e)}
+
 
 def get_terrain_data(area_id):
     try:
@@ -633,21 +636,22 @@ def training_job_tracker(areaid, jobid, app_context):
                 if metadata['ok'][0]['process_id'] != jobid: #Job has been canceled and restarted
                     print("Training canceled")
                 
-                # Check the requierments
-                service_response = can_we_train(areaid)
-                if "ok" not in service_response:
-                    print("ERROR:" + str(service_response))
-                    ModelHandler.editTrainingMetadata(metadata['ok'][0]['_id'], 'ready', jobid, metadata['ok'][0]['weekday'], metadata['ok'][0]['hour'])
-                    print("killing job " + jobid)
-                    break
-                if not service_response['ok']['can_train']:
-                    ModelHandler.editTrainingMetadata(metadata['ok'][0]['_id'], 'ready', jobid, metadata['ok'][0]['weekday'], metadata['ok'][0]['hour'])
-                    print("Requierments for trianing invalid, killing job " + jobid)
-                    break
-
                 
                 now = datetime.datetime.now() #NOTE: weekday in datetime starts at Monday, but input from front end starts at Sunday
                 if ((now.weekday()+1)%7 == metadata['ok'][0]['weekday'] and now.hour == metadata['ok'][0]['hour']) or metadata['ok'][0]['hour'] == -1: #Time for training 
+                        # Check the requierments
+                    service_response = can_we_train(areaid)
+                    if "ok" not in service_response:
+                        print("ERROR:" + str(service_response))
+                        ModelHandler.editTrainingMetadata(metadata['ok'][0]['_id'], 'ready', jobid, metadata['ok'][0]['weekday'], metadata['ok'][0]['hour'])
+                        print("killing job " + jobid)
+                        break
+                    if not service_response['ok']['can_train']:
+                        ModelHandler.editTrainingMetadata(metadata['ok'][0]['_id'], 'ready', jobid, metadata['ok'][0]['weekday'], metadata['ok'][0]['hour'])
+                        print("Requierments for trianing invalid, killing job " + jobid)
+                        break
+
+
                     print("Training started")
                     ModelHandler.editTrainingMetadata(metadata['ok'][0]['_id'], 'training', jobid, metadata['ok'][0]['weekday'], metadata['ok'][0]['hour'])
                     train(areaid)
@@ -672,7 +676,7 @@ def training_scheduler(areaid, status, weekday, hour, app_context):
     if "ok" not in service_request:
         return service_request
     
-    if status == "waiting":
+    if status == "waiting" or status == "training":
         threading.Thread(target=training_job_tracker, args=[areaid, job_id, app_context]).start()
 
     return {"ok": "Training scheduled for day: " + str(weekday) + " and hour: " + str(hour)}
