@@ -35,8 +35,7 @@ class NestsHandler(ParentHandler):
 
     # This implied, No nests can have the same name or location
     def insertNests(self, nests_json):
-        """
-        Function to insert a Nest in the database. Will validate JSON parameter corresponding to the request body of
+        """Function to insert a Nest in the database. Will validate JSON parameter corresponding to the request body of
         the API route /nestmatics/nests. Validation will make sure request.json has the required keys and also that
         the value of keys are of the correct type. If values are not expected, if keys are missing, if there
         is already a nest with that same name and location, a 4xx client error will
@@ -45,12 +44,8 @@ class NestsHandler(ParentHandler):
 
         :param nests_json: json containing the nest information to be inserted into the database
         :return: ID of newly inserted nest
-        if json is valid, response will be of the format:
-            {
-                "ok":{
-                    "id": id of inserted document
-                }
-            }
+            if json is valid, response will be of the format:
+            { "ok":{ "id": id of inserted document }}
         """
         try:
             for key in NESTKEYS:
@@ -105,17 +100,15 @@ class NestsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getNestsByServiceAreaId(self, areaid, user_id):
-        """
-        Gets all nests on the specified service area
+        """Gets all nests on the specified service area
+
         :param areaid: ID of service area to get nests from
         :param user_id: ID of user that owns the nests
-        :return:
-        response with status code 200: if request was valid, will return rseponse with Nests on specified service
-            area
-        response with status code 400: if area id or user id does not follow correct format, will issue an
-            error json with a error information
-        response with status code 404: if nest is not found
-        response with status code 500: if an error happened in the server
+        :return: response with status code 200: if request was valid, will return rseponse with Nests on specified
+            service area. response with status code 400: if area id or user id does not follow correct format, will
+            issue an error json with a error information
+            response with status code 404: if nest is not found
+            response with status code 500: if an error happened in the server
         """
         try:
             if not self.verifyIDString(areaid):
@@ -145,15 +138,13 @@ class NestsHandler(ParentHandler):
         return nests
 
     def getNestById(self, nest_id):
-        """
-        Get A specific Nest
+        """Get A specific Nest
+
         :param nest_id: ID of Nest to look for
-        :return:
-        response with status code 200: if request was valid, will return rseponse with Nest identified by provided ID
-        response with status code 400: if area id or user id does not follow correct format, will issue an
-            error json with error information
-        response with status code 404: if nest is not found
-        response with status code 500: if an error happened in the server
+        :return:response with status code 200: if request was valid, will return rseponse with Nest identified by
+            provided ID. response with status code 400: if area id or user id does not follow correct format, will
+            issue an error json with error information. response with status code 404: if nest is not found
+            response with status code 500: if an error happened in the server
         """
         try:
             if not self.verifyIDString(nest_id):
@@ -179,18 +170,15 @@ class NestsHandler(ParentHandler):
             return False
 
     def getNestNames(self, areaid, user_id):
-        """
-        Gets all nests names on the specified service area
+        """Gets all nests names on the specified service area
+
         :param areaid: ID of service area to get nests from
         :param user_id: ID of user that owns the nests
-        :return:
-        response with status code 200: if request was valid, will return rseponse with Nests names on specified service
-            area
-        response with status code 400: if area id or user id does not follow correct format, will issue an
-            error json with a error information
-        response with status code 404: no nests with that service area id or user id. ALso if user or service aera
-            dont exists
-        response with status code 500: if an error happened in the server
+        :return:  response with status code 200: if request was valid, will return rseponse with Nests names on
+            specified service area. response with status code 400: if area id or user id does not follow correct
+            format, will issue an error json with a error information. response with status code 404: no nests with
+            that service area id or user id. ALso if user or service aera dont exists. response with status code 500:
+            if an error happened in the server
         """
         try:
             if not self.verifyIDString(areaid):
@@ -214,6 +202,11 @@ class NestsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def deleteNestByID(self, nestid):
+        """Delete a specific Nest
+
+        :param nestid: ID identifying nest to delete
+        :return:
+        """
         try:
             if not self.verifyIDString(nestid):
                 return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
@@ -245,18 +238,16 @@ class NestsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def editNest(self, nestid, nestName):
-        """
-        Function To edit a Nest's name
+        """Function To edit a Nest's name
+
         :param nestid: Id of nest to edit
         :param nestName: name to update nest with
-         :return:
-        response with status code 200: if request was valid, will return rseponse with Nests names on specified service
-            area
-        response with status code 400: if area id or user id does not follow correct format, will issue an
-            error json with a error information. Also, If nest is empty.
-        response with status code 404: no nests with that id.
-        response with status code 304: no nests were modified
-        response with status code 500: if an error happened in the server
+        :return: response with status code 200: if request was valid, will return rseponse with Nests names on
+            specified service area. response with status code 400: if area id or user id does not follow correct
+            format, will issue an error json with a error information. Also, If nest is empty.
+            response with status code 404: no nests with that id.
+            response with status code 304: no nests were modified
+            response with status code 500: if an error happened in the server
         """
         try:
             if not self.verifyIDString(nestid):
@@ -284,8 +275,7 @@ class NestsHandler(ParentHandler):
     # -------------- Nest Configuration methods -----------------------#
 
     def insertNestConfiguration(self, nestConfig_json):
-        """
-        Function to insert a Nest Configuration in the database. Will validate JSON parameter corresponding to the
+        """Function to insert a Nest Configuration in the database. Will validate JSON parameter corresponding to the
         request body of the API route /nestmatics/nestconfig. Validation will make sure request.json has the required
         keys and also that the value of keys are of the correct type. If values are not expected, if keys are missing,
         if there is already a nest configuration for that date, a 4xx client error will
@@ -293,12 +283,9 @@ class NestsHandler(ParentHandler):
         in the database.
 
         :param nestConfig_json: json containing the nest information to be inserted into the database
-        :return: ID of newly inserted nest
-        if json is valid, response will be of the format:
+        :return: ID of newly inserted nest. if json is valid, response will be of the format:
             {
-                "ok":{
-                    "id": id of inserted document
-                }
+            "ok":{ "id": id of inserted document}
             }
         """
         try:
@@ -345,15 +332,13 @@ class NestsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getNestConfigurationsForNest(self, nestid):
-        """
-        Gets Nest congifurations that belong to a specified Nest
+        """ Gets Nest congifurations that belong to a specified Nest
+
         :param nestid: ID of nest that nest configurations belong to
-        :return:
-        response with status code 200: if request was valid, will return rseponse with Nest configurations
-            belonging to the specified ID
-        response with status code 400: if id does not follow correct format, will issue a json with a error information
-        response with status code 404: no nest configurations for nest id provided
-        response with status code 500: if an error happened in the server
+        :return: response with status code 200: if request was valid, will return rseponse with Nest configurations
+            belonging to the specified ID. response with status code 400: if id does not follow correct format, will
+            issue a json with a error information. response with status code 404: no nest configurations for nest id
+            provided. response with status code 500: if an error happened in the server
         """
         try:
             if not self.verifyIDString(nestid):
@@ -368,6 +353,14 @@ class NestsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getNestConfigurationInfoForDay(self, areaid, userid, date):
+        """Get nest configurations for a specific day on a specific service area, created by a user identified by
+        the provided user id.
+
+        :param areaid: ID of area from which to get Nests
+        :param userid: ID of users that created the nest
+        :param date: date of configurations to retreive
+        :return:
+        """
         try:
             if not self.verifyIDString(areaid):
                 return make_response(jsonify(Error="area ID must be a valid 24-character hex string"), 400)
@@ -401,15 +394,15 @@ class NestsHandler(ParentHandler):
 
 
     def getNestConfigurationFromId(self, nestconfigid):
-        """
-        Gets Nest congifuration that belong to a specified ID
+        """Gets Nest congifuration that belong to a specified ID
+
         :param nestid: ID of nest configuration to find
-        :return:
-        response with status code 200: if request was valid, will return rseponse with Nest configurations
+        :return: response with status code 200: if request was valid, will return rseponse with Nest configurations
             belonging to the specified ID
-        response with status code 400: if id does not follow correct format, will issue a json with a error information
-        response with status code 404: no nest configurations for nest id provided
-        response with status code 500: if an error happened in the server
+            response with status code 400: if id does not follow correct format, will issue a json with a error information
+            response with status code 404: no nest configurations for nest id provided
+            response with status code 500: if an error happened in the server
+
         """
         try:
             if not self.verifyIDString(nestconfigid):
@@ -428,6 +421,15 @@ class NestsHandler(ParentHandler):
         return config
 
     def calculateNestConfigurationStats(self, rides, nest, nestConfig):
+        """Calculate statistics such as revenue, active vehicles and total vehicles that happened on the area
+        denoted by a nest on the day described by the nestconfiguration
+
+        :param rides: rides that started on of the nestconfig provided
+        :param nest: Nest that has the provided nest configuration
+        :param nestConfig: nest configuration from which to calculate stats
+        :return: json with statistics of a nest configuration. These statistics include rides that started at a nest,
+            rides that ended at the nest, the total revenue, vehicles and active vehicles for the day.
+        """
         revenue = 0
         nest_active_vehicles = {}
         rides_started = []
@@ -464,26 +466,25 @@ class NestsHandler(ParentHandler):
         return item
 
     def getNestStatsForTimeInterval(self, nestconfigid, date, start_time, end_time):
-        """
-        Gets Nest Configuration Statistics for a specific date and time interval. Used when it is desired to find
+        """Gets Nest Configuration Statistics for a specific date and time interval. Used when it is desired to find
         stats for a specified time interval, i.e. see how many vehicles started in that nest for that date and time.
+
         :param nestconfigid: id of nestconfiguration from which to view rides that ocurred on that nest
         :param date: date from which to get statistics
         :param start_time: lower threshold of time interval to evaluate
         :param end_time: upper thresold of time interval to evaluate
-        :return:
-            response with status code 200: if request was valid, will return response with stats of nest indicated
+        :return: response with status code 200: if request was valid, will return response with stats of nest indicated
             for time interval specified. It will have the format:
             item = {
-                "vehicle_qty": quantity of nestconfig established,
-                "revenue": total revenue from all vehicles that started on that area,
-                "total_rides": total tides that happened on that area for that time,
-                "active_vehicles": active vehicles on that nest,
-                "rides_started_nest": ids of rides that started in that area,
-                "rides_end_nest": ids of rides that ended in that area
+            "vehicle_qty": quantity of nestconfig established,
+            "revenue": total revenue from all vehicles that started on that area,
+            "total_rides": total tides that happened on that area for that time,
+            "active_vehicles": active vehicles on that nest,
+            "rides_started_nest": ids of rides that started in that area,
+            "rides_end_nest": ids of rides that ended in that area
             }
             response with status code 400: if id does not follow correct format or date / times ara not in correct
-                format, will issue a json with a error information
+            format, will issue a json with a error information
             response with status code 404: no nest configurations, no nests, no rides or no rides for area found
             response with status code 500: if an error happened in the server
         """
@@ -532,6 +533,11 @@ class NestsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getNestStatsPerHour(self, nestconfigid):
+        """Get Nest Statistics on a per hour basis.
+
+        :param nestconfigid: ID of nest configuration from which to get stats.
+        :return:
+        """
         try:
             if not self.verifyIDString(nestconfigid):
                 return make_response(jsonify(Error="Nest ID must be a valid 24-character hex string"), 400)
@@ -593,6 +599,11 @@ class NestsHandler(ParentHandler):
             return {'Error': str(e)}
 
     def getInfoForNestConfigStats(self, configid):
+        """Get information on nest configuration stats such as revenue, total vehciles and active vehicles
+
+        :param configid: ID of configuration on which to get statistics
+        :return:
+        """
         nestConfig = self.NestsDao.getNestConfigurationFromID(configid)
         config_start_date = nestConfig["start_date"]
         config_end_date = nestConfig["end_date"]
@@ -646,6 +657,14 @@ class NestsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def unusedVehicles(self, areaid, date, nests):
+        """Get unused vehicles on a particular date for a particular nest. This call will return unused vehicles for
+        a particular nest on a particular day
+
+        :param areaid: ID of area that the nest belongs to
+        :param date: data from which to look for unused vehicles
+        :param nests: nest to look for unused vehicles
+        :return:
+        """
         result_list = {}
 
         rides = self.RidesHandler.extern_getRidesForDateIntervalAndArea(date, date, areaid)
@@ -751,6 +770,14 @@ class NestsHandler(ParentHandler):
         return nest_list
 
     def getUnusuedVehiclesForDate(self, areaid, userid, date):
+        """Get unused vehicles for a specific date. Function is called from the main.py, as it returnes a flask
+        response object for http requests.
+
+        :param areaid: ID of area from which to get unused vehicles
+        :param userid: ID of user that created said nests
+        :param date: date from which to get these unused vehiles
+        :return:
+        """
         try:
             if not self.verifyIDString(areaid):
                 return make_response(jsonify(Error="area ID must be a valid 24-character hex string"), 400)
@@ -772,14 +799,13 @@ class NestsHandler(ParentHandler):
         except Exception as e:
             return make_response(jsonify(Error=str(e)), 500)
 
-    #TODO; verify this works. I am not sure how to test it and corroborate its working
     def emptyNestsForDate(self, areaid, date, nests):
-        """
-        :param areaid:
-        :param date:
+        """Get empty nests and the time these nests remained empty for a particular date
+
+        :param areaid:ID of area from which to get this nest infiormation
+        :param date: date from which to get the nest inforamtion
         :return:
         """
-       # nests = self.NestsDao.getAllNestsForAnArea(areaid)
         result_list = []
 
         rides = self.RidesHandler.extern_getRidesForDateIntervalAndArea(date, date, areaid)
@@ -802,12 +828,8 @@ class NestsHandler(ParentHandler):
             for i in rides:
                 ride_coords = {"lat": float(i["coords"]["start_lat"]), "lon": float(i["coords"]["start_lon"])}
                 if self.RidesHandler.areCoordsInsideNest(nest_coords, 30, ride_coords):
-                    #  rides_started.append(i["_id"])
-                    print("ride start coords in nest: ")
-                    print(i)
 
                     amount -= 1
-                    print("ride left nest: ", amount)
 
                     if start == 0:
                         start = 1
@@ -821,12 +843,7 @@ class NestsHandler(ParentHandler):
                     if start == 1:
                         ride_coords = {"lat": float(i["coords"]["end_lat"]), "lon": float(i["coords"]["end_lon"])}
                         if self.RidesHandler.areCoordsInsideNest(nest_coords, 30, ride_coords):
-                            # rides_ended.append(i["_id"])
-                            print("ride end coords in nest: ")
-                            print(i)
-
                             amount += 1
-                            print("ride entered nest: ", amount)
 
                             if amount == 1:
                                 temp = datetime.fromisoformat(temp_time)
@@ -835,20 +852,17 @@ class NestsHandler(ParentHandler):
                                 nest_list["empty"][temp_time] = empty_time.seconds /60
                                 result_list.append(nest_list)
 
-        print(result_list)
         return result_list
 
     def emptyTimesForANest(self, rides, nest, config):
-        """
+        """Get the time a nest remained empty on a particular day denoted by the nest configuration
+
         :param areaid:
         :param date:
         :return:
         """
-       # nests = self.NestsDao.getAllNestsForAnArea(areaid)
-        result_list = []
 
-        # config = self.NestsDao.getNestConfigurationForDate(date, nest["_id"])
-        # if config is None:
+        result_list = []
 
         name = nest["nest_name"]
         amount = config["vehicle_qty"]
@@ -919,6 +933,11 @@ class NestsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def deleteNestsByUserID(self, userid):
+        """Delete nests that belong to a user
+
+        :param userid: ID of the user whose nests are going to be deleted
+        :return:
+        """
         deletedConfigs = 0
         deletedNests = 0
         deletedExperiments = 0
@@ -960,16 +979,15 @@ class NestsHandler(ParentHandler):
         return {"deleted_nests":deletedNests,"deleted_configs":deletedConfigs, "deleted_Experiments":deletedExperiments}
 
     def editNestConfiguration(self, nestconfigid, vehicleqty):
-        """
-        Edits Nest configuration
+        """Edits Nest configuration
+
         :param nestconfigid: ID of nest configuration to update
         :param vehicleqty: vehicle qty to update
-        :return:
-        response with status code 200: if request was valid, will return response with number of entries modified
-        response with status code 400: if id does not follow correct format or quantity is not a number,
+        :return: response with status code 200: if request was valid, will return response with number of entries modified
+            response with status code 400: if id does not follow correct format or quantity is not a number,
             will issue a json with a error information
-        response with status code 404: no nest configurations for nest id provided
-        response with status code 500: if an error happened in the server
+            response with status code 404: no nest configurations for nest id provided
+            response with status code 500: if an error happened in the server
         """
         try:
             if not self.verifyIDString(nestconfigid):
@@ -995,15 +1013,14 @@ class NestsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def deleteNestConfiguration(self, nestconfigid):
-        """
-        Deletes a specified Nest configuration
+        """ Deletes a specified Nest configuration
+
         :param nestconfigId: ID of Nest to delete
-        :return:
-        response with status code 200: if request was valid, will return response with number of entries deleted
-        response with status code 400: if id does not follow correct format or quantity is not a number,
+        :return: response with status code 200: if request was valid, will return response with number of entries deleted
+            response with status code 400: if id does not follow correct format or quantity is not a number,
             will issue a json with a error information
-        response with status code 404: no nest configurations for nest id provided
-        response with status code 500: if an error happened in the server
+            response with status code 404: no nest configurations for nest id provided
+            response with status code 500: if an error happened in the server
         """
         try:
             from Handlers.ExperimentsHandler import ExperimentsHandler

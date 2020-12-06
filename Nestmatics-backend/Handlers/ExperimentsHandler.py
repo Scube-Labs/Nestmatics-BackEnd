@@ -18,8 +18,7 @@ class ExperimentsHandler(ParentHandler):
         self.NestsHandler = nestHandler
 
     def insertExperiment(self, experiment_json):
-        """
-        Function to insert an experiment in the database. Will validate JSON parameter corresponding to the
+        """Function to insert an experiment in the database. Will validate JSON parameter corresponding to the
         request body of the API route /nestmatics/experiment. Validation will make sure request.json has the required
         keys and also that the value of keys are of the correct type. If values are not expected, if keys are missing,
         if there is already an experiment with those same parameters, a 4xx client error will
@@ -27,12 +26,9 @@ class ExperimentsHandler(ParentHandler):
         in the database.
 
         :param nestConfig_json: json containing the experiment to be inserted into the database
-        :return: ID of newly inserted document
-        if json is valid, response will be of the format:
+        :return: ID of newly inserted document if json is valid, response will be of the format:
             {
-                "ok":{
-                    "id": id of inserted document
-                }
+            "ok":{"id": id of inserted document}
             }
         """
         try:
@@ -91,8 +87,8 @@ class ExperimentsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getExperimentsOfNest(self, nestid):
-        """
-        Get experiments from a specified nest id
+        """Get experiments from a specified nest id
+
         :param nestid: ID of nest from which to retrieve experiments
         :return:
         """
@@ -115,15 +111,13 @@ class ExperimentsHandler(ParentHandler):
             return response
 
     def getExperimentFromID(self, experimentid):
-        """
-        Gets an experiment that belongs to a specified ID
+        """Gets an experiment that belongs to a specified ID
+
         :param nestid: ID of nest configuration to find
-        :return:
-        response with status code 200: if request was valid, will return rseponse with Nthe experiment
-            that belongs to the specified ID
-        response with status code 400: if id does not follow correct format, will issue a json with a error information
-        response with status code 404: no experiment for id provided
-        response with status code 500: if an error happened in the server
+        :return:response with status code 200: if request was valid, will return rseponse with Nthe experiment that belongs
+            to the specified IDresponse with status code 400: if id does not follow correct format, will issue a json
+            with a error information  response with status code 404: no experiment for id provided response with
+            status code 500: if an error happened in the server
         """
         try:
             if not self.verifyIDString(experimentid):
@@ -140,6 +134,12 @@ class ExperimentsHandler(ParentHandler):
             return response
 
     def getConfigCalculationsForReport(self, experimentid):
+        """Calculate statistics for the configurations on a specified experiment. This is meant for an experiment
+        report.
+
+        :param experimentid: ID of experiment to calculate statistics from
+        :return:
+        """
         try:
             if not self.verifyIDString(experimentid):
                 return make_response(jsonify(Error="Experiment ID must be a valid 24-character hex string"), 400)
@@ -176,17 +176,14 @@ class ExperimentsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def getExperimentsForArea(self, areaid, user_id):
-        """
-        Get experiments from a specified area id
-        :param areaid: ID of area fromwhich to retrieve experiments
+        """Get experiments from a specified area id
+
+        :param areaid: ID of area from which to retrieve experiments
         :param user_id: ID of user that has those nests
-        :return:
-        response with status code 200: if request was valid, will return rseponse with the experiment
-            that belongs to the specified area ID
-        response with status code 400: if id does not follow correct format, will issue a json with a error
-            information
-        response with status code 404:  experiments on area or no user for ids provided
-        response with status code 500: if an error happened in the server
+        :return: response with status code 200: if request was valid, will return rseponse with the experiment that
+            belongs to the specified area ID. response with status code 400: if id does not follow correct format,
+            will issue a json with a error information. response with status code 404:  experiments on area or no
+            user for ids provided. response with status code 500: if an error happened in the server
         """
         try:
             if not self.verifyIDString(areaid):
@@ -214,15 +211,14 @@ class ExperimentsHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def editExperiment(self, experimentid, name):
-        """
-        Edit an experiments name
+        """Edit an experiments name
+
         :param experimentid: Id of the experiment to modify
         :param name: name of experiment to update
-        :return:
-        response with status code 200: if request was valid, will return the amount of experiments edited
-        response with status code 400: if id does not follow correct format, will issue a json with a error information
-        response with status code 404: experiment for id provided
-        response with status code 500: if an error happened in the server
+        :return: response with status code 200: if request was valid, will return the amount of experiments edited
+            response with status code 400: if id does not follow correct format, will issue a json with a error
+            information. response with status code 404: experiment for id provided. response with status code
+            500: if an error happened in the server.
         """
         try:
             print(experimentid)
@@ -248,22 +244,20 @@ class ExperimentsHandler(ParentHandler):
             return make_response(jsonify(str(e)), 500)
 
     def deleteExperimentByNestConfig(self, nestConfig):
-        """
-        Deletes experiments that have the specified nestconfig ID
+        """Deletes experiments that have the specified nestconfig ID
+
         :param nestConfig: ID of nest configurations to delete
-        :return:
-        If there were experiments for provided nestconfig id, it will return the number of experiments
-            deleted
-        If there were no experiments that meet the criteria, return error dictionary with error information
+        :return: If there were experiments for provided nestconfig id, it will return the number of experiments
+            deleted. If there were no experiments that meet the criteria, return error dictionary with error information
         """
         result = self.ExperimentsDao.deleteExperimentByNestConfig(nestConfig)
         return {"deleted_experiments":result}
 
     def deleteExperimentByID(self, experimentid):
-        """
-        Delete experiment
+        """ Delete experiment
+
         :param experimentid: ID of experiment to delete
-        :return:
+        :return: Number of experiments deleted
         """
         try:
             if not self.verifyIDString(experimentid):

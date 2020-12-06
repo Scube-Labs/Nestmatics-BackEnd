@@ -9,6 +9,7 @@ from DAOs.RidesDao import RidesDAO
 RIDESKEYS=["bird_id", "dt", "start_time", "end_time", "ride_cost", "start_long", "start_lat",
            "end_lat", "end_long"]
 
+
 class RidesHandler(ParentHandler):
 
     def __init__(self, db):
@@ -28,8 +29,8 @@ class RidesHandler(ParentHandler):
         self.RideStatsHandler = rideStats
 
     def getRidesForDateAndArea(self, date, areaid):
-        """
-        Function to get rides for a specified date and area
+        """Function to get rides for a specified date and area
+
         :param date: date from which to get rides
         :param areaid: ID of area from which to get rides
         :return:
@@ -65,8 +66,8 @@ class RidesHandler(ParentHandler):
         return rides
 
     def getRidesCoordsForDateAndArea(self, date, areaid):
-        """
-        Function to get coordinates of rides of a specified date and area
+        """Function to get coordinates of rides of a specified date and area
+
         :param date: date from which to get rides
         :param areaid: ID of area from which to get rides
         :return:
@@ -94,8 +95,8 @@ class RidesHandler(ParentHandler):
             return response
 
     def getRidesForTimeIntervalAndArea(self, date, time_gt, time_lt, areaid):
-        """
-        Get rides for a specified time interval
+        """Get rides for a specified time interval
+
         :param time_gt: lower threshold for the time interval
         :param time_lt: upper threshold for the time interval
         :param areaid: ID of area rides belong to
@@ -132,8 +133,8 @@ class RidesHandler(ParentHandler):
             return response
 
     def getRidesStartingAtNest(self, nestid, date, areaid, start):
-        """
-        Get rides that start at a provided nest
+        """Get rides that start at a provided nest
+
         :param nestid: ID of nest to get coordinates from and verify if nest are within that area
         :param date: date where to get rides from
         :param areaid: ID of area fromn wich to get rides from
@@ -150,15 +151,14 @@ class RidesHandler(ParentHandler):
 
             ** The previously mentionederror codes will return a JSON with the format:
             {
-                "Error": error information string
+            "Error": error information string
             }
 
             Response object with 200 status code : if the request was successul a response ibject with the requested
             information and 200 status code will be issued. Format of JSON response:
             {
-                "ok":[{ride1}, {ride2}, ...... ]
+            "ok":[{ride1}, {ride2}, ...... ]
             }
-
         """
         try:
             if areaid is None:
@@ -192,15 +192,14 @@ class RidesHandler(ParentHandler):
             return response
 
     def getDistinctRideDatesForArea(self, areaid):
-        """
-        Function to get distinct ride dates for an area
+        """Function to get distinct ride dates for an area
+
         :param areaid: ID of area from which to get ride dates
-        :return:
-        response with status code 200: if request was valid, will return response with dates for the area specified
-        response with status code 400: if area id does not follow correct format, will issue a json with a error
+        :return:  response with status code 200: if request was valid, will return response with dates for the area specified
+            response with status code 400: if area id does not follow correct format, will issue a json with a error
             information
-        response with status code 404: no rides for area provided
-        response with status code 500: if an error happened in the server
+            response with status code 404: no rides for area provided
+            response with status code 500: if an error happened in the server
         """
         try:
             if areaid == None:
@@ -221,16 +220,15 @@ class RidesHandler(ParentHandler):
             return response
 
     def getDistinctRideDatesForAreaAndInterval(self, areaid, startDate, endDate):
-        """
-        Function to get distinct ride dates for an area on a specified interval
+        """Function to get distinct ride dates for an area on a specified interval
+
         :param areaid: ID of area from which to get ride dates
-        :return:
-        response with status code 200: if request was valid, will return response with dates for the date
+        :return: response with status code 200: if request was valid, will return response with dates for the date
             interval specified
-        response with status code 400: if id or dates do not follow correct format, will issue a json with a error
+            response with status code 400: if id or dates do not follow correct format, will issue a json with a error
             information
-        response with status code 404: no rides for area or dates provided
-        response with status code 500: if an error happened in the server
+            response with status code 404: no rides for area or dates provided
+            response with status code 500: if an error happened in the server
         """
         try:
             if areaid is None:
@@ -258,72 +256,31 @@ class RidesHandler(ParentHandler):
             response = make_response(jsonify(Error=str(e)), 500)
             return response
 
-    def testCSV(self, file):
-        """
-        Test function for csv files
-        :param file:
-        :return:
-        """
-        file_data = file.read().decode('utf-8').split("\n")
-        csv_reader = csv.reader(file_data)
-        counter = 0
-        line_count = 0
-        keys = {}
-        currentDate = None
-        prevDate = None
-
-        for row in csv_reader:
-            if line_count == 0:
-                for key in RIDESKEYS:
-                    if key not in row:
-                        return jsonify(Error='Missing fields from submission: ' + key)
-                    indexKey = row.index(key)
-                    keys[key] = indexKey
-                print(keys)
-                line_count += 1
-                continue
-
-            if prevDate is None:
-                prevDate = self.toIsoFormat(row[keys['dt']])
-
-            currentDate = self.toIsoFormat(row[keys['dt']])
-
-            if currentDate != prevDate:
-                return jsonify("changed dates on index ", line_count)
-
-            prevDate = currentDate
-            line_count += 1
-
-        return jsonify("success")
-
     def insertRides(self, file, area):
-        """
-        Function to insert rides in the database from a passed FileObject. This type of object is the returned file
+        """Function to insert rides in the database from a passed FileObject. This type of object is the returned file
         from flask's library to retreive files from http calls. It can be read just like any other file, though it is
         not saved in the disk as a file. In the case the file is too large a tmporary file is created. but that does
         not affect the functionality of this function.
-
         file has to have the column headers: ["bird_id", "dt", "start_time", "end_time", "ride_cost", "start_long",
-                                                "start_lat","end_lat", "end_long"]
+        "start_lat","end_lat", "end_long"]
 
         :param file: FileObject containing the csv file passed
         :param area: ID of area where rides belong
         :return: Will return a response with a status code 400, 500, or 201
-
             if the file does not have the necessary fields of headers, if date is in incorrect format, a response with
             error code 400 will be issued as well as well as a json with the format:
             {
-                "Error": error information string
+            "Error": error information string
             }
 
             if data has the correct format, a reposne with the status code 201 will be returned as well as a json with
             the format:
             {
-                "ok":{
-                "inserted":[array with ids of inserted rides]
-                "rejected":number of rejected rides (in the case there were duplicates)
-                "stats":[array with ids of inserted stats for each day]
-                }
+            "ok":{
+            "inserted":[array with ids of inserted rides]
+            "rejected":number of rejected rides (in the case there were duplicates)
+            "stats":[array with ids of inserted stats for each day]
+            }
             }
         """
         try:
@@ -473,8 +430,8 @@ class RidesHandler(ParentHandler):
             return make_response(jsonify(Error=str(e)), 500)
 
     def deleteRidesByDate(self, date):
-        """
-        Function to delete rides on a certain date
+        """Function to delete rides on a certain date
+
         :param date: date to delete rides from
         :return:
         """
@@ -484,8 +441,8 @@ class RidesHandler(ParentHandler):
         return {"rides_deleted":count, "ride_stats_deleted":deletedStats}
 
     def deleteRidesByServiceArea(self, areaid):
-        """
-        Function to delete rides on a certain date
+        """Function to delete rides on a certain date
+
         :param date: date to delete rides from
         :return:
         """
@@ -496,8 +453,8 @@ class RidesHandler(ParentHandler):
 
 # ----------------- Helper functions ----------------------------------------
     def startAtNest(self, nestid, rides, start):
-        """
-        Method to return which rides start at a specified nest
+        """Method to return which rides start at a specified nest
+
         :param nestid:  ID of nest of nest to get coordinates from
         :param rides: Rides to go through and see if are inside a specific nest
         :param start: BOOLEAN, tells if coordinates are starting or ending coordinates
@@ -527,8 +484,8 @@ class RidesHandler(ParentHandler):
         return rides_at_nest
 
     def areCoordsInsideNest(self, nest_coords, radius, compare_coords):
-        """
-        Method to that verifies if some coordinates area insides the area of a provided nest
+        """Method to that verifies if some coordinates area insides the area of a provided nest
+
         :param nest_coords: coordinates of nest to verify if rides area inside this nest
         :param radius: radius of nest
         :param compare_coords: coordinates of a ride
@@ -549,6 +506,11 @@ class RidesHandler(ParentHandler):
 
 
     def degreesToRadians(self, degrees):
+        """Function to turn degrees into radians
+
+        :param degrees: value on degree to turn into radians
+        :return:
+        """
         return degrees * pi /180
 
 

@@ -31,6 +31,13 @@ services:
       - mongo-express
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - ../Nestmatics-frontend/dist/NestmaticsUI:/usr/share/nginx/html
+      # uncomment when in server environment. THis is for the ssl certificates
+      - ../dhparam/dhparam-2048.pem:/etc/ssl/certs/dhparam-2048.pem
+      - /docker-volumes/etc/letsencrypt/live/nestmatics.tk/fullchain.pem:/etc/letsencrypt/live/nestmatics.tk/fullchain.pem
+      - /docker-volumes/etc/letsencrypt/live/nestmatics.tk/privkey.pem:/etc/letsencrypt/live/nestmatics.tk/privkey.pem
 
   mongo:
     image: mongo
@@ -44,7 +51,6 @@ services:
       - 27017
     volumes:
       - ./mongo_data:/data/db
-
 
   mongo-express:
     image: mongo-express
