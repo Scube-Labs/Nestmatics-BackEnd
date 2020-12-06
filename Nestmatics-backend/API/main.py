@@ -1139,8 +1139,7 @@ def trainModel(areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-
-@app.route(routeVar+'/nestmatics/ml/area/<areaid>/trainModel/time/<timetotrain>', methods=['POST'])
+@app.route(routeVar+'/nestmatics/ml/area/<areaid>/trainModel', methods=['PUT'])
 def scheduletrainModel(areaid=None):
     """
     Route to trigger the training of a new ML model
@@ -1167,7 +1166,7 @@ def scheduletrainModel(areaid=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route(routeVar+'/nestmatics/ml/area/<areaid>/training/metadata/', methods=['GET'])
+@app.route(routeVar+'/nestmatics/ml/area/<areaid>/training/metadata', methods=['GET'])
 def getTrainingMetadata(areaid=None):
     """
     TODO Fix
@@ -1223,7 +1222,7 @@ def getPredictionFeatures(areaid=None, date=None):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route(routeVar+'/nestmatics/ml/generate_prediction/area/<areaid>/date/<date>', methods=['POST'])
+@app.route(routeVar+'/nestmatics/ml/generate_prediction/area/<areaid>/date/<date>', methods=['GET'])
 def createPrediction(areaid=None, date=None):
     """Trigger the creation of a new prediction
 
@@ -1286,14 +1285,9 @@ def _corsify_actual_response(response):
     return response
 
 
-<<<<<<< HEAD
 # if __name__ == '__main__':
 #     app.run(debug=True)
-=======
 
-if __name__ == '__main__':
-    app.run(debug=True)
->>>>>>> master
 
 #TODO 
 #             return jsonify(Error="URI does not have all parameters needed"), 400
