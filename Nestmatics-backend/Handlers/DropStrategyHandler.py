@@ -81,7 +81,7 @@ class DropStrategyHandler(ParentHandler):
         except Exception as e:
             return jsonify(Error=str(e))
 
-    def getDropStrategyForDate(self, start_date, end_date, areaid):
+    def getDropStrategyForDate(self, start_date, end_date, areaid, userid):
         try:
             if not self.verifyIDString(areaid):
                 return make_response(jsonify(Error="area ID must be a valid 24-character hex string"),
@@ -99,7 +99,7 @@ class DropStrategyHandler(ParentHandler):
             if area is None or len(area) == 0:
                 return make_response(jsonify(Error="No drop strategy for specified area ID"), 404)
 
-            result = self.DropStrategyDao.getDropStrategyForDate(start_date, end_date, areaid)
+            result = self.DropStrategyDao.getDropStrategyForDate(start_date, end_date, areaid, userid)
             if result is None or len(result) == 0:
                 response = make_response(jsonify(Error="No drop strategy for specified date"), 404)
             else:

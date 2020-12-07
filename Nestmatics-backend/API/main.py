@@ -803,8 +803,8 @@ def getWeatherData(areaid=None, date=None):
 # ------------------------ Drop Strategy API routes ----------------------------
 
 
-@app.route(routeVar+'/nestmatics/drop/area/<areaid>/date/<sdate>/<edate>', methods=['GET'])
-def getDropStrategyForDate(areaid=None, sdate=None, edate=None):
+@app.route(routeVar+'/nestmatics/drop/user/<userid>/area/<areaid>/date/<sdate>/<edate>', methods=['GET'])
+def getDropStrategyForDate(userid=None, areaid=None, sdate=None, edate=None):
     """Gets a drop strategy between two dates. Intended so the request will receive all drop strategies
     between the specified start and end date
 
@@ -814,7 +814,7 @@ def getDropStrategyForDate(areaid=None, sdate=None, edate=None):
     :return:
     """
     if request.method == 'GET':
-        return DropStrategyHandler.getDropStrategyForDate(sdate, edate, areaid)
+        return DropStrategyHandler.getDropStrategyForDate(sdate, edate, areaid, userid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
