@@ -17,7 +17,7 @@ class DropStrategyDao(ParentDao):
         cursor = self.dropStrategyCollection.insert_one(data)
         return self.insertOne(cursor)
 
-    def getDropStrategyForDate(self, start_date, end_date, areaid, userid):
+    def getDropStrategyForDate(self, start_date, end_date, areaid):
         """
         Get drop strategy for date specified on are specified
         :param start_date: start date of drop stretegy to find
@@ -26,9 +26,7 @@ class DropStrategyDao(ParentDao):
         :return: drop strategies that meet specified criteria
         """
         cursor = self.dropStrategyCollection.find({"start_date": {"$gte": start_date},
-                                                   "end_date": {"$lte": end_date},
-                                                    "service_area": areaid,
-                                                   "user": userid})
+                                                   "end_date": {"$lte": end_date}, "service_area": areaid})
         return self.returnMany(cursor)
 
     def getDropStrategiesForArea(self, areaid):
