@@ -149,6 +149,7 @@ def predict(area_id, date):
             "service_area": area_id
         }
         print("Prediction completed")
+        print("Threshold:", OUTPUT_THRESHOLD)
         return ModelHandler.insertPrediction(prediction) #Store results
 
     except Exception as e:
@@ -737,7 +738,9 @@ def matrix_to_json(arr, top, left, meter_pixel_ratio=5):
         for i in range(0,len(rides_of_hour)):
             lat = top - ((rides_of_hour[i][1]*meter_pixel_ratio)/6372800) * (180/math.pi)
             lon = left - ((rides_of_hour[i][0]*meter_pixel_ratio)/(6372800*math.cos((math.pi/180)*lat))) * (180/math.pi)
-            lon = lon - 0.00104
+            print("lat: ", lat)
+            print("lon: " , lon)
+            # lon = lon - 0.00104
             res[str(hour)].append([lat, lon, arr[rides_of_hour[i][0],rides_of_hour[i][1],hour]])
                 
     return res
